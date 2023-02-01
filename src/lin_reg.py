@@ -1,12 +1,9 @@
 import numpy as np
 import scipy.linalg as la
 
-def do(fobj, cell):
+def do(fobj, cell, lmbda = 0.01):
     Ncos = fobj.bf_cos
     Nsin = fobj.bf_sin
-
-    nhar_i = fobj.nhar_i
-    nhar_j = fobj.nhar_j
 
     data = cell.topo_m
 
@@ -18,6 +15,11 @@ def do(fobj, cell):
     h_tilda_l = np.dot(coeff.T, data.reshape(-1,1)).flatten()
 
     E_tilda_lm = np.dot(coeff.T, coeff)
+
+    trace = np.trace(E_tilda_lm) / len(np.diag(E_tilda_lm)) * lmbda
+    szc = E_tilda_lm.shape[0]
+    for ttr in range(szc):
+        E_tilda_lm[ttr,ttr] += trace 
 
     a_m = la.inv(E_tilda_lm).dot(h_tilda_l)
 

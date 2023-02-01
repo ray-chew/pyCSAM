@@ -33,7 +33,7 @@ class f_trans(object):
         self.term1 = self.m_i.reshape(1,-1) * self.I.reshape(-1,1) / self.Ni
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
 
-    def full_f_coeffs(self, cell):
+    def do_full(self, cell):
         self.typ = 'full'
         self.__get_IJ(cell)
         self.__prepare_terms(cell)
@@ -65,7 +65,7 @@ class f_trans(object):
         self.bf_sin = Nsin
 
 
-    def axial_f_coeffs(self, cell, alpha = 0.0):
+    def do_axial(self, cell, alpha = 0.0):
         self.typ = 'axial'
         self.__get_IJ(cell)
         self.__prepare_terms(cell)
@@ -139,3 +139,5 @@ class f_trans(object):
                 r2 = np.hstack((u_blk,x_axs,l_blk))
                 fourier_coeff = np.vstack((r1,r2))
                 fourier_coeff = fourier_coeff.T
+
+        self.ampls = fourier_coeff
