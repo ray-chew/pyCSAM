@@ -46,8 +46,8 @@ class f_trans(object):
         tt_sum = self.term1 + self.term2
         tt_sum = tt_sum.reshape(tt_sum.shape[0],-1)
 
-        bcos = 2.0 * np.cos(2.0 * np.pi * (tt_sum))
-        bsin = 2.0 * np.sin(2.0 * np.pi * (tt_sum))
+        bcos = 1.0 * np.cos(2.0 * np.pi * (tt_sum))
+        bsin = 1.0 * np.sin(2.0 * np.pi * (tt_sum))
 
         if ((self.nhar_i == 2) and (self.nhar_j == 2)):
             Ncos = bcos[:,:]
@@ -107,7 +107,7 @@ class f_trans(object):
                 cos_terms = np.concatenate((zrs,cos_terms))
                 sin_terms = np.concatenate((zrs,[0.0],sin_terms))
             
-            fourier_coeff = (cos_terms + 1.0j * sin_terms) / 2.0
+            fourier_coeff = (cos_terms + 1.0j * sin_terms) #/ 2.0
             fourier_coeff = fourier_coeff.reshape(nhar_i,nhar_j).swapaxes(1,0)
 
             
@@ -118,8 +118,8 @@ class f_trans(object):
             sin_terms = np.concatenate(([0.0], sin_terms))
 
             if (nhar_j %2 == 0):
-                k_terms = (cos_terms[:nhar_i] + 1.0j * sin_terms[:nhar_i]) / 2.0
-                l_terms = (cos_terms[nhar_i:] + 1.0j * sin_terms[nhar_i:]) / 2.0
+                k_terms = (cos_terms[:nhar_i] + 1.0j * sin_terms[:nhar_i]) #/ 2.0
+                l_terms = (cos_terms[nhar_i:] + 1.0j * sin_terms[nhar_i:]) #/ 2.0
 
                 l_blk = np.zeros(( int(nhar_j/2-1), int(nhar_i) ))
                 u_blk = np.zeros(( int(nhar_j/2), int(nhar_i-1) ))
@@ -129,8 +129,8 @@ class f_trans(object):
                 fourier_coeff = np.vstack((l_blk, k_terms, u_blk))
                 
             else:
-                y_axs = (cos_terms[:int((nhar_j+1)/2+1)] + 1.0j * sin_terms[:int((nhar_j+1)/2+1)]) / 2.0
-                x_axs = (cos_terms[int((nhar_j-1)/2):] + 1.0j * sin_terms[int((nhar_j-1)/2):]) / 2.0
+                y_axs = (cos_terms[:int((nhar_j+1)/2+1)] + 1.0j * sin_terms[:int((nhar_j+1)/2+1)]) #/ 2.0
+                x_axs = (cos_terms[int((nhar_j-1)/2):] + 1.0j * sin_terms[int((nhar_j-1)/2):]) #/ 2.0
                 x_axs = x_axs.reshape(-1,1)
                 l_blk = np.zeros(( int(nhar_i-1), int((nhar_j-1)/2-1) ))
                 u_blk = np.zeros(( int(nhar_i-1), int((nhar_j-1)/2) ))
