@@ -35,9 +35,12 @@ class topo_cell(topo):
         self.mask = self.mask.reshape(self.topo.shape)
 
 
-    def get_masked(self, triangle):
+    def get_masked(self, triangle, mask = None):
 
-        self.__get_mask(triangle)
+        if mask is None:
+            self.__get_mask(triangle)
+        else:
+            self.mask = mask
 
         # self.lon_m = np.ma.masked_array(self.lon_grid, mask=self.mask)
         # self.lat_m = np.ma.masked_array(self.lat_grid, mask=self.mask)
