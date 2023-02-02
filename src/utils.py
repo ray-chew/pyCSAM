@@ -16,6 +16,23 @@ def rad2deg(val):
     return val*(180/np.pi)
 
 
+def isoceles(grid, cell, res=480):
+    grid.clon_vertices = np.array([[0, np.pi, 2.0 * np.pi],])
+    grid.clat_vertices = np.array([[0, 2.0 * np.pi, 0],])
+
+    cell.lat = np.linspace(0, 2.0 * np.pi, res)
+    cell.lon = np.linspace(0, 2.0 * np.pi, res)
+
+
+
+    return 0
+
+
+
+
+
+
+
 class triangle(object):
 
     def __init__(self, vx, vy):
@@ -47,6 +64,7 @@ class triangle(object):
     def vector(x1,y1,x2,y2):
         return [x2-x1, y2-y1]
 
+@np.vectorize
 def vector(x1,y1,x2,y2):
     return [x2-x1, y2-y1]
 
