@@ -5,6 +5,11 @@ class f_trans(object):
         self.nhar_i = nhar_i
         self.nhar_j = nhar_j
 
+        self.m_i = None
+        self.m_j = None
+
+        self.pick_kls = False
+
     def __get_IJ(self, cell):
         lon, lat = cell.lon, cell.lat
         lon_m, lat_m = cell.lon_m, cell.lat_m
@@ -23,6 +28,7 @@ class f_trans(object):
         self.Ni, self.Nj = np.unique(lat_m).size, np.unique(lon_m).size
 
         self.m_i = np.arange(0,self.nhar_i)
+    
         if self.nhar_j == 2:
             self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
         elif self.nhar_j % 2 == 0:
@@ -32,6 +38,18 @@ class f_trans(object):
 
         self.term1 = self.m_i.reshape(1,-1) * self.I.reshape(-1,1) / self.Ni
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
+
+
+    def set_kls(self, k_rng, l_rng, nhi = None, nhj = None):
+        self.k_idx = np.array(k_rng).astype(int)
+        self.l_idx = np.array(l_rng).astype(int)
+
+        if ((nhi != None) and (nhj != None)):
+            self.nhar_i = int(max(max(self.k_idx)+1,2))
+            self.nhar_j = int(max(max(self.l_idx)+1,2))
+
+        self.pick_kls = True
+
 
     def do_full(self, cell):
         self.typ = 'full'
@@ -44,14 +62,22 @@ class f_trans(object):
         self.term2 = np.repeat(self.term2,self.nhar_i,1)
 
         tt_sum = self.term1 + self.term2
-        tt_sum = tt_sum.reshape(tt_sum.shape[0],-1)
+        if self.pick_kls:
+            tt_sum = tt_sum[:, self.k_idx, self.l_idx]
+        else:
+            tt_sum = tt_sum.reshape(tt_sum.shape[0],-1)
 
         bcos = 1.0 * np.cos(2.0 * np.pi * (tt_sum))
         bsin = 1.0 * np.sin(2.0 * np.pi * (tt_sum))
 
-        if ((self.nhar_i == 2) and (self.nhar_j == 2)):
+        if ((self.nhar_i == 2) and (self.nhar_j == 2) and (self.pick_kls == False)):
             Ncos = bcos[:,:]
             Nsin = bsin[:,1:]
+
+        # elif ((self.nhar_i == 2) and (self.nhar_j == 2)):
+        elif (self.pick_kls == True):
+            Ncos = bcos
+            Nsin = bsin
 
         else:
             if (self.nhar_j % 2 == 0):
@@ -97,19 +123,29 @@ class f_trans(object):
 
         zrs = np.zeros((int(self.nhar_j/2)-1))
 
-        if self.typ == 'full':
+        if ((self.typ == 'full') and (not self.pick_kls)):
             cos_terms = a_m[:nc]
             sin_terms = a_m[nc:]
             
             if ((nhar_i == 2) and (nhar_j == 2)):
                 sin_terms = np.concatenate(([0.0],sin_terms))
-            else:
+
+            elif ((nhar_i > 2) and (nhar_j > 2)):
                 cos_terms = np.concatenate((zrs,cos_terms))
                 sin_terms = np.concatenate((zrs,[0.0],sin_terms))
             
             fourier_coeff = (cos_terms + 1.0j * sin_terms) #/ 2.0
             fourier_coeff = fourier_coeff.reshape(nhar_i,nhar_j).swapaxes(1,0)
 
+        if ((self.typ == 'full') and (self.pick_kls)):
+            cos_terms = a_m[:len(self.k_idx)]
+            sin_terms = a_m[len(self.k_idx):]
+
+            fourier_coeff = np.zeros((nhar_i, nhar_j), dtype=np.complex_)
+
+            for cnt, (row, col) in enumerate(zip(self.k_idx, self.l_idx)):
+                fourier_coeff[row, col] = cos_terms[cnt] + 1.0j * sin_terms[cnt]
+            fourier_coeff = fourier_coeff.reshape(nhar_i,nhar_j).swapaxes(1,0)
             
         if self.typ == 'axial':
             f00 = a_m[0]
