@@ -1,16 +1,23 @@
 import numpy as np
 import scipy.linalg as la
 
-def do(fobj, cell, lmbda = 0.01):
+def get_coeffs(fobj):
     Ncos = fobj.bf_cos
     Nsin = fobj.bf_sin
 
+    coeff = np.hstack([Ncos,Nsin])
+
+    return coeff
+
+
+def do(fobj, cell, lmbda = 0.0):
     data = cell.topo_m
 
-    coeff = np.hstack([Ncos,Nsin])
-    tot_coeff = coeff.shape[1]
+    coeff = get_coeffs(fobj)
 
-    E_tilda_lm = np.zeros((tot_coeff,tot_coeff))
+    # tot_coeff = coeff.shape[1]
+
+    # E_tilda_lm = np.zeros((tot_coeff,tot_coeff))
 
     h_tilda_l = np.dot(coeff.T, data.reshape(-1,1)).flatten()
 

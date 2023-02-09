@@ -17,20 +17,33 @@ def rad2deg(val):
 
 
 def isoceles(grid, cell, res=480):
-    grid.clon_vertices = np.array([[0, np.pi, 2.0 * np.pi],])
-    grid.clat_vertices = np.array([[0, 2.0 * np.pi, 0],])
+    grid.clon_vertices = np.array([[0-1e-7, np.pi, (2.0 * np.pi)+1e-7],])
+    grid.clat_vertices = np.array([[0-1e-7, (2.0 * np.pi)+1e-7, 0-1e-7],])
 
     cell.lat = np.linspace(0, 2.0 * np.pi, res)
     cell.lon = np.linspace(0, 2.0 * np.pi, res)
 
-
-
     return 0
 
 
+def gen_art_terrain(shp, seed = 555, iters = 1000):
+    np.random.seed(seed)
+    k = np.random.random (shp)
 
+    dt = 0.1
+    for _ in range(iters):
+        kp = np.pad(k, ((1,1),(1,1)), mode='wrap')
+        kll = kp[:-2,1:-1]
+        krr = kp[2:,1:-1]
+        ktt = kp[1:-1,2:]
+        kbb = kp[1:-1,:-2]
+        k = k + dt * (kll + krr + ktt + kbb - 4.0 * k)
 
+    k -= k.mean()
+    var = k.max() - k.min()
+    k /= 0.5 * var
 
+    return k
 
 
 class triangle(object):
