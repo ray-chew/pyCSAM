@@ -12,7 +12,8 @@ class ncdata(object):
         df = nc.Dataset(fn)
 
         for key, _ in vars(obj).items():
-            setattr( obj, key, df.variables[key][:] )
+            if key in df.variables:
+                setattr( obj, key, df.variables[key][:] )
 
         df.close()
 
