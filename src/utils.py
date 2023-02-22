@@ -1,13 +1,16 @@
 import numpy as np
 
-def pick_cell(lat_ref, lon_ref, grid):
+def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
     clat, clon = grid.clat, grid.clon
-    index = np.nonzero((np.abs(clat-lat_ref)<=1) & 
-                       (np.abs(clon-lon_ref)<=1))[0]
+    index = np.nonzero((np.abs(clat-lat_ref)<=radius) & 
+                       (np.abs(clon-lon_ref)<=radius))[0]
     
-    # pick the centre closest to the reference location
-    dist = np.abs(clat[index]-lat_ref) + np.abs(clon[index]-lon_ref) 
-    ind = np.argmin(dist)
+    if len(index) == 0:
+        return pick_cell(lat_ref, lon_ref, grid, radius=2.0*radius)
+    else:
+        # pick the centre closest to the reference location
+        dist = np.abs(clat[index]-lat_ref) + np.abs(clon[index]-lon_ref) 
+        ind = np.argmin(dist)
 
     return index[ind]
 
