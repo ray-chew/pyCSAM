@@ -6,11 +6,15 @@ class grid(object):
         self.clat_vertices = None
         self.clon = None
         self.clon_vertices = None
-
+        self.links = None
 
     def apply_f(self, f):
+        self.non_convertibles = ['non_convertibles', 'links']
         for key, value in vars(self).items():
-            setattr(self, key, f(value))
+            if key in self.non_convertibles:
+                pass
+            else:
+                setattr(self, key, f(value))
 
 
 
