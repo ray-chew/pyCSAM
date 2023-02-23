@@ -16,8 +16,12 @@ class f_trans(object):
 
         # now define appropriate indices for the points withing the triangle
         # by shifting the origin to the minimum lat and lon
-        lat_res = lat[1] - lat[0]
-        lon_res = lon[1] - lon[0]
+        lat_res = np.diff(lat).max()
+        lon_res = np.diff(lon).max()
+
+        self.wlat = lat_res
+        self.wlon = lon_res
+
         self.J = np.ceil((lat_m - lat_m.min())/lat_res).astype(int)
         self.I = np.ceil((lon_m - lon_m.min())/lon_res).astype(int)
 
@@ -25,7 +29,7 @@ class f_trans(object):
     def __prepare_terms(self, cell):
         lon_m, lat_m = cell.lon_m, cell.lat_m
 
-        self.Ni, self.Nj = np.unique(lat_m).size, np.unique(lon_m).size
+        self.Ni, self.Nj = np.unique(lon_m).size, np.unique(lat_m).size
 
         self.m_i = np.arange(0,self.nhar_i)
     
@@ -67,8 +71,8 @@ class f_trans(object):
         else:
             tt_sum = tt_sum.reshape(tt_sum.shape[0],-1)
 
-        bcos = 1.0 * np.cos(2.0 * np.pi * (tt_sum))
-        bsin = 1.0 * np.sin(2.0 * np.pi * (tt_sum))
+        bcos = np.cos(2.0 * np.pi * (tt_sum))
+        bsin = np.sin(2.0 * np.pi * (tt_sum))
 
         if ((self.nhar_i == 2) and (self.nhar_j == 2) and (self.pick_kls == False)):
             Ncos = bcos[:,:]
