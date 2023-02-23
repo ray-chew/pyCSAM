@@ -23,6 +23,7 @@ class topo(object):
         self.lon = None
         self.lat = None
         self.topo = None
+        self.analysis = None
 
 
 class topo_cell(topo):
@@ -39,11 +40,11 @@ class topo_cell(topo):
         self.mask = self.mask.reshape(self.topo.shape)
 
 
-    def get_masked(self, triangle, mask = None):
+    def get_masked(self, triangle = None, mask = None):
 
-        if mask is None:
+        if (triangle is not None) and (mask is None):
             self.__get_mask(triangle)
-        else:
+        elif (mask is not None):
             self.mask = mask
 
         # self.lon_m = np.ma.masked_array(self.lon_grid, mask=self.mask)
@@ -55,7 +56,29 @@ class topo_cell(topo):
         self.topo_m = self.topo[self.mask]
 
 
+class analysis(object):
+    def __init__(self):
+        self.wlat = None
+        self.wlon = None
+        self.ampls = None
 
+        # only works with explicitly setting the (k,l)-values
+        self.kks = None
+        self.lls = None
+
+        self.recon = None
+
+    def get_attrs(self, fobj, freqs):
+        self.wlat = fobj.wlat
+        self.wlon = fobj.wlon
+        self.ampls = freqs
+
+        # only works with explicitly setting the (k,l)-values
+        self.kks = fobj.k_idx / (fobj.Ni / 2.0)
+        self.lls = fobj.l_idx / (fobj.Nj / 2.0)
+
+        # self.kks = self.kks / self.kks.size
+        # self.lls = self.lls / self.lls.size
 
 #         self.clat = ma.getdata(df.variables['clat'][:])
 # clat_vertices = ma.getdata(df.variables['clat_vertices'][:])
