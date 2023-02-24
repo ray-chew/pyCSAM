@@ -74,9 +74,33 @@ class analysis(object):
         self.ampls = freqs
 
         # only works with explicitly setting the (k,l)-values
-        self.kks = fobj.k_idx / (fobj.Ni / 2.0)
-        self.lls = fobj.l_idx / (fobj.Nj / 2.0)
+        if hasattr(fobj, 'k_idx'):
+            self.kks = fobj.k_idx / (fobj.Ni / 2.0)
+        else:
+            self.kks = fobj.m_i / (fobj.Ni / 2.0)
+        if hasattr(fobj, 'l_idx'):
+            self.lls = fobj.l_idx / (fobj.Nj / 2.0)
+        else:
+            self.lls = fobj.m_j / (fobj.Nj / 2.0)
 
+            pts = []
+            cnt = 0
+            for ll in self.lls:
+                for kk in self.kks:
+                    if kk == 0 and ll <= 0:
+                        continue
+                    else:
+                        pts.append([kk,ll])
+
+                    if int(kk) == 0 and int(ll) == 0:
+                        idx = cnt
+                    
+                    cnt += 1
+
+            pts = np.array(pts)
+            self.kks = pts[:,0]
+            self.lls = pts[:,1]
+            self.ampls = np.delete(self.ampls, idx)
         # self.kks = self.kks / self.kks.size
         # self.lls = self.lls / self.lls.size
 

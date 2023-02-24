@@ -10,7 +10,7 @@ class ideal_pmf(object):
         self.AE = 6371.0008 * 1E3 # Earth's radius in [m]
 
         # If keyword arguments are specified, we use those values...
-        for key, value in kwarg:
+        for key, value in kwarg.items():
             setattr(self, key, value)
 
     def compute_uw_pmf(self, analysis):
