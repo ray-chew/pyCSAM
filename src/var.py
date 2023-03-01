@@ -75,13 +75,13 @@ class analysis(object):
 
         # only works with explicitly setting the (k,l)-values
         if hasattr(fobj, 'k_idx'):
-            self.kks = fobj.k_idx / (fobj.Ni / 2.0)
+            self.kks = fobj.k_idx / (fobj.Ni)# / np.sqrt(2.0))
         else:
-            self.kks = fobj.m_i / (fobj.Ni / 2.0)
+            self.kks = fobj.m_i / (fobj.Ni)# / np.sqrt(2.0))
         if hasattr(fobj, 'l_idx'):
-            self.lls = fobj.l_idx / (fobj.Nj / 2.0)
+            self.lls = fobj.l_idx / (fobj.Nj)# / np.sqrt(2.0))
         else:
-            self.lls = fobj.m_j / (fobj.Nj / 2.0)
+            self.lls = fobj.m_j / (fobj.Nj)# / np.sqrt(2.0))
 
             pts = []
             cnt = 0
