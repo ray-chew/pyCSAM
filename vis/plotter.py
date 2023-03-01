@@ -9,12 +9,19 @@ class fig_obj(object):
         self.fig = fig
 
 
-    def phys_panel(self, axs, data, title=""):
-        extent = [-data.shape[1]/2., data.shape[1]/2., -data.shape[0]/2., data.shape[0]/2. ]
+    def phys_panel(self, axs, data, title="", extent=None, xlabel="", ylabel="", v_extent=None):
+        if extent is None:
+            extent = [-data.shape[1]/2., data.shape[1]/2., -data.shape[0]/2., data.shape[0]/2. ]
+        if v_extent is not None:
+            vmin, vmax = v_extent[0], v_extent[1]
+        else:
+            vmin, vmax = None, None
 
-        im = axs.imshow(data, extent=extent, origin='lower', aspect='equal')
+        im = axs.imshow(data, extent=extent, origin='lower', aspect='equal', cmap='cividis', vmin=vmin, vmax=vmax)
         axs.set_title(title)
-        self.fig.colorbar(im, ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
+        axs.set_xlabel(xlabel)
+        axs.set_ylabel(ylabel)
+        self.fig.colorbar(im, ax=axs,fraction=0.2, pad=0.04, shrink=0.5)
 
         return axs
 
