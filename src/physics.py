@@ -13,7 +13,7 @@ class ideal_pmf(object):
         for key, value in kwarg.items():
             setattr(self, key, value)
 
-    def compute_uw_pmf(self, analysis):
+    def compute_uw_pmf(self, analysis, summed=True):
         N = self.N
         U = self.U
         V = self.V
@@ -24,11 +24,12 @@ class ideal_pmf(object):
         kks = analysis.kks * 2.0 * np.pi
         lls = analysis.lls * 2.0 * np.pi
 
-        if ((kks.ndim == 1) and (lls.ndim == 1)):
-            print(True)
-            ampls = analysis.ampls[np.nonzero(analysis.ampls)]
-        else:
-            ampls = analysis.ampls
+        # if ((kks.ndim == 1) and (lls.ndim == 1)):
+        #     print(True)
+        #     ampls = analysis.ampls[np.nonzero(analysis.ampls)]
+        # else:
+        #     ampls = analysis.ampls
+        ampls = analysis.ampls
 
         wla = wlat * self.AE
         wlo = wlon * self.AE
@@ -36,19 +37,36 @@ class ideal_pmf(object):
         kks = kks / wlo
         lls = lls / wla
 
-        omsq = (-kks * U - lls * V)**2
+        omsq = (-kks * U -lls * V)**2
 
-        mms = np.sqrt((N**2 * (kks**2 + lls**2) / omsq) - (kks**2 + lls**2))
+        mms = (N**2 * (kks**2 + lls**2) / omsq) - (kks**2 + lls**2)
+        mms[np.where(mms <= 0.0)] = 0.0
+        mms = np.sqrt(mms)
 
         # wave-action density
         Ag = 0.5 * ( ampls**2 * N**2 / np.sqrt(omsq) )
 
+        mms[np.isnan(mms)] = 0.0
+        Ag[np.isinf(Ag)] = 0.0
+        Ag[np.isnan(Ag)] = 0.0
+
+        # print(kks)
+        # print(mms)
+        # print(Ag)
+
         # group velocity in z-direction
         cgz = self.N * kks * mms / (kks**2 + mms**2)**(3/2)
 
-        uw_pmf = (Ag * kks * cgz).sum()
+        cgz[np.isnan(cgz)] = 0.0
 
-        return uw_pmf
+        # print(cgz)
+
+        uw_pmf = (Ag * kks * cgz)
+
+        if summed:
+            return uw_pmf.sum()
+        else:
+            return uw_pmf
         
 
         

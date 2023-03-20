@@ -1,4 +1,6 @@
 import numpy as np
+import numba as nb
+import sys
 
 def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
     clat, clon = grid.clat, grid.clon
@@ -52,52 +54,108 @@ def gen_art_terrain(shp, seed = 555, iters = 1000):
 class triangle(object):
 
     def __init__(self, vx, vy):
-        self.x1, self.x2, self.x3 = vx
-        self.y1, self.y2, self.y3 = vy
+        # self.x1, self.x2, self.x3 = vx
+        # self.y1, self.y2, self.y3 = vy
+        vx = np.append(vx, vx[0])
+        vy = np.append(vy, vy[0])
 
-        self.vec_get_mask = np.vectorize(self.get_mask)
+        vx = rescale(vx)
+        vy = rescale(vy)
 
-    def get_mask(self, x, y):
+        polygon = np.array([list(item) for item in zip(vx, vy)])
 
-        x1, x2, x3 = self.x1, self.x2, self.x3
-        y1, y2, y3 = self.y1, self.y2, self.y3
+        # self.vec_get_mask = np.vectorize(self.get_mask)
+        self.vec_get_mask = self.mask_wrapper(polygon)
 
-        e1 = self.vector(x1,y1,x2,y2) # edge 1
-        e2 = self.vector(x2,y2,x3,y3) # edge 2
-        e3 = self.vector(x3,y3,x1,y1) # edge 3
+    # def get_mask(self, x, y):
+
+    #     x1, x2, x3 = self.x1, self.x2, self.x3
+    #     y1, y2, y3 = self.y1, self.y2, self.y3
+
+    #     e1 = self.vector(x1,y1,x2,y2) # edge 1
+    #     e2 = self.vector(x2,y2,x3,y3) # edge 2
+    #     e3 = self.vector(x3,y3,x1,y1) # edge 3
         
-        p2e1 = self.vector(x,y,x1,y1) # point to edge 1
-        p2e2 = self.vector(x,y,x2,y2) # point to edge 2
-        p2e3 = self.vector(x,y,x3,y3) # point to edge 3
+    #     p2e1 = self.vector(x,y,x1,y1) # point to edge 1
+    #     p2e2 = self.vector(x,y,x2,y2) # point to edge 2
+    #     p2e3 = self.vector(x,y,x3,y3) # point to edge 3
         
-        c1 = np.cross(e1,p2e1)  # cross product 1
-        c2 = np.cross(e2,p2e2)  # cross product 2
-        c3 = np.cross(e3,p2e3)  # cross product 3
+    #     c1 = np.cross(e1,p2e1)  # cross product 1
+    #     c2 = np.cross(e2,p2e2)  # cross product 2
+    #     c3 = np.cross(e3,p2e3)  # cross product 3
         
-        return np.sign(c1) == np.sign(c2) == np.sign(c3)
+    #     return np.sign(c1) == np.sign(c2) == np.sign(c3)
 
+    # @staticmethod
+    # def vector(x1,y1,x2,y2):
+    #     return [x2-x1, y2-y1]
+    
+    def mask_wrapper(self, polygon):
+        return lambda p : self.is_inside_sm(p, polygon)
+
+
+    # Define function that computes whether a point is in a polygon, and rescales the lat-lon grid to a local coordinate between [0,1].
+    # Taken from: https://github.com/sasamil/PointInPolygon_Py/blob/master/pointInside.py
     @staticmethod
-    def vector(x1,y1,x2,y2):
-        return [x2-x1, y2-y1]
+    @nb.njit(cache=True)
+    def is_inside_sm(point, polygon):
+        length = len(polygon)-1
+        dy2 = point[1] - polygon[0][1]
+        intersections = 0
+        ii = 0
+        jj = 1
 
-@np.vectorize
-def vector(x1,y1,x2,y2):
-    return [x2-x1, y2-y1]
+        while ii<length:
+            dy  = dy2
+            dy2 = point[1] - polygon[jj][1]
 
-@np.vectorize
-def get_mask(x,y, vx, vy):
-    x1, x2, x3 = vx
-    y1, y2, y3 = vy
-    e1 = vector(x1,y1,x2,y2) # edge 1
-    e2 = vector(x2,y2,x3,y3) # edge 2
-    e3 = vector(x3,y3,x1,y1) # edge 3
+            # consider only lines which are not completely above/bellow/right from the point
+            if dy*dy2 <= 0.0 and (point[0] >= polygon[ii][0] or point[0] >= polygon[jj][0]):
+
+                # non-horizontal line
+                if dy<0 or dy2<0:
+                    F = dy*(polygon[jj][0] - polygon[ii][0])/(dy-dy2) + polygon[ii][0]
+
+                    if point[0] > F: # if line is left from the point - the ray moving towards left, will intersect it
+                        intersections += 1
+                    elif point[0] == F: # point on line
+                        return 1
+
+                # point on upper peak (dy2=dx2=0) or horizontal line (dy=dy2=0 and dx*dx2<=0)
+                elif dy2==0 and (point[0]==polygon[jj][0] or (dy==0 and (point[0]-polygon[ii][0])*(point[0]-polygon[jj][0])<=0)):
+                    return 1
+
+            ii = jj
+            jj += 1
+
+        #print 'intersections =', intersections
+        return intersections & 1  
     
-    p2e1 = vector(x,y,x1,y1) # point to edge 1
-    p2e2 = vector(x,y,x2,y2) # point to edge 2
-    p2e3 = vector(x,y,x3,y3) # point to edge 3
+
+def rescale(arr):
+    arr -= arr.min()
+    arr /= arr.max()
     
-    c1 = np.cross(e1,p2e1)  # cross product 1
-    c2 = np.cross(e2,p2e2)  # cross product 2
-    c3 = np.cross(e3,p2e3)  # cross product 3
-    
-    return np.sign(c1) == np.sign(c2) == np.sign(c3)
+    return arr
+
+
+# ref: https://github.com/bosswissam/pysize
+def get_size(obj, seen=None):
+    """Recursively finds size of objects"""
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    # Important mark as seen *before* entering recursion to gracefully handle
+    # self-referential objects
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([get_size(v, seen) for v in obj.values()])
+        size += sum([get_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_size(i, seen) for i in obj])
+    return size
