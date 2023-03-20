@@ -11,8 +11,12 @@ class f_trans(object):
         self.pick_kls = False
 
     def __get_IJ(self, cell):
-        lon, lat = cell.lon, cell.lat
-        lon_m, lat_m = cell.lon_m, cell.lat_m
+        if self.grad:
+            lon, lat = cell.grad_lon, cell.grad_lat
+            lon_m, lat_m = cell.grad_lon_m, cell.grad_lat_m
+        else:
+            lon, lat = cell.lon, cell.lat
+            lon_m, lat_m = cell.lon_m, cell.lat_m
 
         # now define appropriate indices for the points withing the triangle
         # by shifting the origin to the minimum lat and lon
@@ -27,7 +31,10 @@ class f_trans(object):
 
 
     def __prepare_terms(self, cell):
-        lon_m, lat_m = cell.lon_m, cell.lat_m
+        if self.grad:
+            lon_m, lat_m = cell.grad_lon_m, cell.grad_lat_m
+        else:
+            lon_m, lat_m = cell.lon_m, cell.lat_m
 
         self.Ni, self.Nj = np.unique(lon_m).size, np.unique(lat_m).size
 
@@ -55,8 +62,13 @@ class f_trans(object):
         self.pick_kls = True
 
 
-    def do_full(self, cell):
+    def do_full(self, cell, grad=False):
         self.typ = 'full'
+
+        if grad is True:
+            self.grad = True
+        else:
+            self.grad = False
         self.__get_IJ(cell)
         self.__prepare_terms(cell)
         

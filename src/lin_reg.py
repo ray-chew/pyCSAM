@@ -7,11 +7,17 @@ def get_coeffs(fobj):
 
     coeff = np.hstack([Ncos,Nsin])
 
+    if fobj.grad: coeff = np.vstack([coeff,coeff])
+
     return coeff
 
 
 def do(fobj, cell, lmbda = 0.0):
-    data = cell.topo_m
+    if fobj.grad:
+        cell.get_grad()
+        data = cell.grad_topo_m
+    else:
+        data = cell.topo_m
 
     coeff = get_coeffs(fobj)
 
