@@ -1,5 +1,10 @@
 *checkpoint*
 *.pyc
+*.nbc
+*.nbi
 *.nc
 *.h5
 *.pdf
+*.png
+*.json
+
