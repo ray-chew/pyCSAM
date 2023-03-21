@@ -30,6 +30,16 @@ def isoceles(grid, cell, res=480):
 
     return 0
 
+def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi, 
+    ymax = 2.0 * np.pi):
+    grid.clon_vertices = np.array([[0-1e-7, 0-1e-7, xmax],])
+    grid.clat_vertices = np.array([[0-1e-7, ymax, 0-1e-7],])
+
+    cell.lat = np.linspace(0, ymax, res_x)
+    cell.lon = np.linspace(0, xmax, res_y)
+
+    return 0
+
 
 def gen_art_terrain(shp, seed = 555, iters = 1000):
     np.random.seed(seed)
