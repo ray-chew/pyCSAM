@@ -51,13 +51,20 @@ class f_trans(object):
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
 
 
-    def set_kls(self, k_rng, l_rng, nhi = None, nhj = None):
+    def set_kls(self, k_rng, l_rng, recompute_nhij=True):
         self.k_idx = np.array(k_rng).astype(int)
         self.l_idx = np.array(l_rng).astype(int)
 
-        if ((nhi != None) and (nhj != None)):
-            self.nhar_i = int(max(max(self.k_idx)+1,2))
-            self.nhar_j = int(max(max(self.l_idx)+1,2))
+        k_max = max(self.k_idx)
+        l_max = max(self.l_idx)
+
+        # if ((nhi != None) and (nhj != None)):
+        if recompute_nhij:
+            if k_max % 2 == 1: k_max += 1 
+            if l_max % 2 == 1: l_max += 1
+
+            self.nhar_i = int(max(k_max+1,2))
+            self.nhar_j = int(max(l_max+1,2))
 
         self.pick_kls = True
 
