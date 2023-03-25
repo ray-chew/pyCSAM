@@ -9,6 +9,7 @@ class f_trans(object):
         self.m_j = None
 
         self.pick_kls = False
+        self.components = 'imag'
 
     def __get_IJ(self, cell):
         if self.grad:
@@ -46,31 +47,42 @@ class f_trans(object):
         if self.nhar_j == 2:
             self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
         elif self.nhar_j % 2 == 0:
-            self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
+            if self.components == 'real':
+                self.m_j = np.arange(0, self.nhar_j)
+            else:
+                self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
         else:
-            self.m_j = np.arange(-(self.nhar_j-1)/2,(self.nhar_j+1)/2)
+            if self.components == 'real':
+                self.m_j = np.arange(0, self.nhar_j)
+            else:
+                self.m_j = np.arange(-(self.nhar_j-1)/2,(self.nhar_j+1)/2)
 
         self.term1 = self.m_i.reshape(1,-1) * self.I.reshape(-1,1) / self.Ni
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
 
 
-    def set_kls(self, k_rng, l_rng, recompute_nhij=True, typ='imag'):
+    def set_kls(self, k_rng, l_rng, recompute_nhij=True, components='imag'):
         self.k_idx = np.array(k_rng).astype(int)
         self.l_idx = np.array(l_rng).astype(int)
 
         k_max = max(self.k_idx)
-        l_max = max(self.l_idx)
-
+        
         # if ((nhi != None) and (nhj != None)):
         if recompute_nhij:
             if k_max % 2 == 1: k_max += 1 
-            if l_max % 2 == 1: l_max += 1
+            # if l_max % 2 == 1: l_max += 1
 
             self.nhar_i = int(max(k_max+1,2))
-            self.nhar_j = int(max(l_max+1,2))
+            # self.nhar_j = int(max(l_max+1,2))
 
-            if typ == 'real':
-                self.nhar_j = int(max(2.0*(l_max)+1,2))
+            if components == 'real':
+                self.components = 'real'
+            # self.nhar_j = int(max(2.0*(l_max),2))
+            # if typ == 'real':
+                l_max = max(self.l_idx)
+                if l_max % 2 == 1: l_max += 1
+                self.nhar_j = int(max(l_max+1,2))
+        
 
         self.pick_kls = True
 
@@ -90,6 +102,8 @@ class f_trans(object):
         self.term2 = np.expand_dims(self.term2,1)
         self.term2 = np.repeat(self.term2,self.nhar_i,1)
 
+        print(self.m_j)
+        print(self.typ)
         tt_sum = self.term1 + self.term2
         if self.pick_kls:
             tt_sum = tt_sum[:, self.k_idx, self.l_idx]
