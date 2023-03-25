@@ -23,8 +23,11 @@ class f_trans(object):
         lat_res = np.diff(lat).max()
         lon_res = np.diff(lon).max()
 
-        self.wlat = lat_res
-        self.wlon = lon_res
+        self.wlat = cell.wlat
+        self.wlon = cell.wlon
+
+        lat_res = cell.wlat
+        lon_res = cell.wlon
 
         self.J = np.ceil((lat_m - lat_m.min())/lat_res).astype(int)
         self.I = np.ceil((lon_m - lon_m.min())/lon_res).astype(int)
@@ -51,7 +54,7 @@ class f_trans(object):
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
 
 
-    def set_kls(self, k_rng, l_rng, recompute_nhij=True):
+    def set_kls(self, k_rng, l_rng, recompute_nhij=True, typ='imag'):
         self.k_idx = np.array(k_rng).astype(int)
         self.l_idx = np.array(l_rng).astype(int)
 
@@ -65,6 +68,9 @@ class f_trans(object):
 
             self.nhar_i = int(max(k_max+1,2))
             self.nhar_j = int(max(l_max+1,2))
+
+            if typ == 'real':
+                self.nhar_j = int(max(2.0*(l_max)+1,2))
 
         self.pick_kls = True
 
