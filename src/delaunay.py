@@ -2,12 +2,12 @@ import numpy as np
 from scipy.spatial import Delaunay
 
 
-def get_decomposition(topo):
+def get_decomposition(topo, xnp=11, ynp=6):
     # Partition lat-lon domain into a number of coarser but regularly spaces points that will form the vertices of the Delaunay triangles.
     xlen = len(topo.lon)
     ylen = len(topo.lat)
-    xPoints = np.linspace(0,xlen-1,11)
-    yPoints = np.linspace(0,ylen-1,6)
+    xPoints = np.linspace(0,xlen-1,xnp)
+    yPoints = np.linspace(0,ylen-1,ynp)
 
     YY,XX = np.meshgrid(yPoints,xPoints)
 
