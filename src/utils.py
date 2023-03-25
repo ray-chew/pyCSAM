@@ -169,3 +169,100 @@ def get_size(obj, seen=None):
     elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
         size += sum([get_size(i, seen) for i in obj])
     return size
+
+
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False):    
+    lat_max = get_closest_idx(lat_verts.max(), topo.lat)
+    lat_min = get_closest_idx(lat_verts.min(), topo.lat)
+    
+    lon_max = get_closest_idx(lon_verts.max(), topo.lon)
+    lon_min = get_closest_idx(lon_verts.min(), topo.lon)
+    
+    cell.lat = np.copy(topo.lat[lat_min : lat_max])
+    cell.lon = np.copy(topo.lon[lon_min : lon_max])
+
+    lon_origin = cell.lon[0]
+    lat_origin = cell.lat[0]
+
+    cell.lat = latlon2m(cell.lat, lon_origin, latlon='lat')
+    cell.lon = latlon2m(cell.lon, lat_origin, latlon='lon')
+
+    cell.wlat = np.diff(cell.lat).max()
+    cell.wlon = np.diff(cell.lon).max()
+    
+    # cell.wlat = np.diff(latlon2m(cell.lat, lon_origin, latlon='lat')).max()
+    # cell.wlon = np.diff(latlon2m(cell.lon, lat_origin, latlon='lon')).max()
+
+    # cell.lat = 
+
+    # cell.lat = rescale(cell.lat) * 2.0 * np.pi
+    # cell.lon = rescale(cell.lon) * 2.0 * np.pi
+    
+    cell.topo = np.copy(topo.topo[lat_min:lat_max, lon_min:lon_max])
+
+    ampls = np.fft.fft2(cell.topo) 
+    ampls /= ampls.size
+    wlat = cell.wlat
+    wlon = cell.wlon
+
+    kks = np.fft.fftfreq(cell.topo.shape[1])
+    lls = np.fft.fftfreq(cell.topo.shape[0])
+    
+    kkg, llg = np.meshgrid(kks, lls)
+
+    kls = ((2.0 * np.pi * kkg/wlon)**2 + (2.0 * np.pi * llg/wlat)**2)**0.5
+
+    ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
+
+    cell.topo = np.fft.ifft2(ampls * ampls.size).real
+
+    cell.gen_mgrids()
+    
+    if rect:
+        cell.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
+    else:
+        cell.get_masked(triangle=triangle)
+    
+    cell.topo_m -= cell.topo_m.mean()
+                        
+def get_closest_idx(val, arr):
+    return int(np.argmin(np.abs(arr - val)))
+
+
+def latlon2m(arr, fix_pt, latlon):
+    arr = np.array(arr)
+    assert arr.ndim == 1
+    origin = arr[0]
+
+    res = np.zeros_like(arr)
+    res[0] = 0.0
+
+    for cnt, idx in enumerate(range(1,len(arr))):
+        cnt += 1
+        if latlon == 'lat':
+            res[cnt] = latlon2m_converter(fix_pt, fix_pt, origin, arr[idx])
+        elif latlon == 'lon':
+            res[cnt] = latlon2m_converter(origin, arr[idx], fix_pt, fix_pt)
+        else:
+            assert 0
+
+    return res * 1000
+        
+# https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
+def latlon2m_converter(lon1, lon2, lat1, lat2):
+    # Approximate radius of earth in km
+    R = 6373.0
+
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+    distance = R * c
+    return distance

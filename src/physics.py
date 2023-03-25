@@ -31,8 +31,8 @@ class ideal_pmf(object):
         #     ampls = analysis.ampls
         ampls = analysis.ampls
 
-        wla = wlat * self.AE
-        wlo = wlon * self.AE
+        wla = wlat #* self.AE
+        wlo = wlon #* self.AE
 
         kks = kks / wlo
         lls = lls / wla
@@ -40,11 +40,11 @@ class ideal_pmf(object):
         omsq = (-kks * U -lls * V)**2
 
         mms = (N**2 * (kks**2 + lls**2) / omsq) - (kks**2 + lls**2)
-        mms[np.where(mms <= 0.0)] = 0.0
+        ampls[np.where(mms <= 0.0)] = 0.0
         mms = np.sqrt(mms)
 
         # wave-action density
-        Ag = 0.5 * ( ampls**2 * N**2 / np.sqrt(omsq) )
+        Ag = 0.5 * ((ampls)**2 * N**2 / np.sqrt(omsq) )
 
         mms[np.isnan(mms)] = 0.0
         Ag[np.isinf(Ag)] = 0.0
