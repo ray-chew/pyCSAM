@@ -40,7 +40,8 @@ def lat_lon(topo, fs=(10,6)):
 def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                      label_idxs = False, \
                      highlight_indices = [44,45, 88,89, 16,17], \
-                     fn='output/delaunay.pdf'
+                     fn = 'output/delaunay.pdf', \
+                     output_fig = False
                      ):
     plt.figure(figsize=fs)
 
@@ -70,5 +71,5 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     plt.xlabel("longitude [deg.]")
     plt.ylabel("latitude [deg.]")
     plt.tight_layout()
-    plt.savefig(fn)
+    if output_fig: plt.savefig(fn)
     plt.show()
