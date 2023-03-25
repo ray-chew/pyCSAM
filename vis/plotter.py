@@ -17,6 +17,9 @@ class fig_obj(object):
         else:
             vmin, vmax = None, None
 
+        # conversion from [m] to [km]
+        extent = np.array(extent) / 1000.0
+
         im = axs.imshow(data, extent=extent, origin='lower', aspect='equal', cmap='cividis', vmin=vmin, vmax=vmax)
         axs.set_title(title)
         axs.set_xlabel(xlabel)
@@ -34,11 +37,58 @@ class fig_obj(object):
         im = axs.pcolormesh(np.abs(ampls), edgecolors='k', cmap='Greys')
         self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
 
-        m_j = np.arange(-nhj/2+1,nhj/2+1)
-        ylocs = np.arange(.5,nhj+.5,1.0)
+        m_j = np.arange(-nhj/2+1, nhj/2+1)
+        ylocs = np.arange(.5, nhj+.5, 1.0)
 
+        m_i = np.arange(0, nhi)
+        xlocs = np.arange(.5, nhi+.5, 1.0)
+
+        axs.set_xticks(xlocs, m_i, rotation=-90)
         axs.set_yticks(ylocs, m_j)
-        axs.set_xticks(ylocs, np.arange(0,nhj))
+        axs.set_title(title)
+        axs.set_xlabel(r'$k_n$', fontsize=12)
+        axs.set_ylabel(r'$l_m$', fontsize=12)
+        axs.set_aspect('equal')
+
+        return axs
+
+
+    def fft_freq_panel(self, axs, ampls, kks, lls, \
+                       title = "FFT power spectrum", \
+                       interval = 20, \
+                       typ='imag'
+                       ):
+        xmid = int(len(kks)/2)
+        ymid = int(len(lls)/2)
+
+        if typ == 'imag':
+            kks = kks[xmid-interval:xmid+interval]
+            lls = lls[ymid-interval:ymid+interval]
+
+            ampls = ampls[ymid-interval:ymid+interval,xmid-interval:xmid+interval]
+        elif typ == 'real':
+            interval = int(2.0 * interval)
+            kks = kks[0:interval]
+            lls = lls[0:interval]
+
+            ampls = ampls[0:interval,0:interval]
+
+
+        xlocs = np.linspace(0, len(kks)-1, 5)+0.5
+        xlabels = np.linspace(kks[0], kks[-1], 5)
+
+        ylocs = np.linspace(0, len(lls)-1, 5)+0.5
+        ylabels = np.linspace(lls[0], lls[-1], 5)
+
+        xlocs = np.around(xlocs, 2)
+        xlabels = np.around(xlabels, 2)
+        ylocs = np.around(ylocs, 2)
+        ylabels = np.around(ylabels, 2)
+
+        im = axs.imshow(np.abs(ampls), cmap='Greys', origin='lower')
+        self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
+        axs.set_xticks(xlocs, xlabels)
+        axs.set_yticks(ylocs, ylabels)
         axs.set_title(title)
         axs.set_xlabel(r'$k_n$', fontsize=12)
         axs.set_ylabel(r'$l_m$', fontsize=12)
