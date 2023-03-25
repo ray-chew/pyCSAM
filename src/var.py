@@ -120,9 +120,9 @@ class analysis(object):
         self.recon = None
 
     def get_attrs(self, fobj, freqs):
-        self.wlat = fobj.wlat
-        self.wlon = fobj.wlon
-        self.ampls = freqs
+        self.wlat = np.copy(fobj.wlat)
+        self.wlon = np.copy(fobj.wlon)
+        self.ampls = np.copy(freqs)
 
         # only works with explicitly setting the (k,l)-values
         # if hasattr(fobj, 'k_idx'):
