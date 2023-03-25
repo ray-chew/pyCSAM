@@ -67,23 +67,17 @@ class f_trans(object):
 
         k_max = max(self.k_idx)
         
-        # if ((nhi != None) and (nhj != None)):
         if recompute_nhij:
             if k_max % 2 == 1: k_max += 1 
-            # if l_max % 2 == 1: l_max += 1
 
             self.nhar_i = int(max(k_max+1,2))
-            # self.nhar_j = int(max(l_max+1,2))
 
             if components == 'real':
                 self.components = 'real'
-            # self.nhar_j = int(max(2.0*(l_max),2))
-            # if typ == 'real':
                 l_max = max(self.l_idx)
                 if l_max % 2 == 1: l_max += 1
                 self.nhar_j = int(max(l_max+1,2))
         
-
         self.pick_kls = True
 
 
@@ -102,8 +96,6 @@ class f_trans(object):
         self.term2 = np.expand_dims(self.term2,1)
         self.term2 = np.repeat(self.term2,self.nhar_i,1)
 
-        print(self.m_j)
-        print(self.typ)
         tt_sum = self.term1 + self.term2
         if self.pick_kls:
             tt_sum = tt_sum[:, self.k_idx, self.l_idx]

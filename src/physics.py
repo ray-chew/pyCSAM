@@ -41,25 +41,18 @@ class ideal_pmf(object):
 
         mms = (N**2 * (kks**2 + lls**2) / omsq) - (kks**2 + lls**2)
         ampls[np.where(mms <= 0.0)] = 0.0
+        mms[np.isnan(mms)] = 0.0
         mms = np.sqrt(mms)
 
         # wave-action density
         Ag = 0.5 * ((ampls)**2 * N**2 / np.sqrt(omsq) )
-
-        mms[np.isnan(mms)] = 0.0
         Ag[np.isinf(Ag)] = 0.0
         Ag[np.isnan(Ag)] = 0.0
-
-        # print(kks)
-        # print(mms)
-        # print(Ag)
 
         # group velocity in z-direction
         cgz = self.N * kks * mms / (kks**2 + mms**2)**(3/2)
 
         cgz[np.isnan(cgz)] = 0.0
-
-        # print(cgz)
 
         uw_pmf = (Ag * kks * cgz)
 
