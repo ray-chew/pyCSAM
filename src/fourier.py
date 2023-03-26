@@ -47,15 +47,15 @@ class f_trans(object):
         if self.nhar_j == 2:
             self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
         elif self.nhar_j % 2 == 0:
-            if self.components == 'real':
-                self.m_j = np.arange(0, self.nhar_j)
-            else:
-                self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
+            # if self.components == 'real':
+            #     self.m_j = np.arange(0, self.nhar_j)
+            # else:
+            self.m_j = np.arange(-self.nhar_j/2+1,self.nhar_j/2+1)
         else:
-            if self.components == 'real':
-                self.m_j = np.arange(0, self.nhar_j)
-            else:
-                self.m_j = np.arange(-(self.nhar_j-1)/2,(self.nhar_j+1)/2)
+            # if self.components == 'real':
+            #     self.m_j = np.arange(0, self.nhar_j)
+            # else:
+            self.m_j = np.arange(-(self.nhar_j-1)/2,(self.nhar_j+1)/2)
 
         self.term1 = self.m_i.reshape(1,-1) * self.I.reshape(-1,1) / self.Ni
         self.term2 = self.m_j.reshape(1,-1) * self.J.reshape(-1,1) / self.Nj
@@ -70,13 +70,15 @@ class f_trans(object):
         if recompute_nhij:
             if k_max % 2 == 1: k_max += 1 
 
+            # l_max = max(self.l_idx)
             self.nhar_i = int(max(k_max+1,2))
+            # self.nhar_j = int(max((2.0*l_max),2))
 
             if components == 'real':
                 self.components = 'real'
                 l_max = max(self.l_idx)
                 if l_max % 2 == 1: l_max += 1
-                self.nhar_j = int(max(l_max+1,2))
+                # self.nhar_j = int(max(l_max+1,2))
         
         self.pick_kls = True
 

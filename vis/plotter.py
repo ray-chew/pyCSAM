@@ -46,8 +46,8 @@ class fig_obj(object):
         axs.set_xticks(xlocs, m_i, rotation=-90)
         axs.set_yticks(ylocs, m_j)
         axs.set_title(title)
-        axs.set_xlabel(r'$k_n$', fontsize=12)
-        axs.set_ylabel(r'$l_m$', fontsize=12)
+        axs.set_xlabel(r'$k_n \times 2 \pi / L_x$', fontsize=12)
+        axs.set_ylabel(r'$l_m \times 2 \pi / L_y$', fontsize=12)
         axs.set_aspect('equal')
 
         return axs
@@ -58,6 +58,7 @@ class fig_obj(object):
                        interval = 20, \
                        typ='imag'
                        ):
+        
         xmid = int(len(kks)/2)
         ymid = int(len(lls)/2)
 
@@ -67,11 +68,14 @@ class fig_obj(object):
 
             ampls = ampls[ymid-interval:ymid+interval,xmid-interval:xmid+interval]
         elif typ == 'real':
-            interval = int(2.0 * interval)
-            kks = kks[0:interval]
-            lls = lls[0:interval]
+            lls = lls[ymid-interval:ymid+interval]
 
-            ampls = ampls[0:interval,0:interval]
+            interval_2 = int(2.0 * interval)
+            kks = kks[0:interval_2]
+            # lls = lls[0:interval_2]
+
+            ampls = ampls[ymid-interval:ymid+interval,0:interval_2]
+            # ampls = ampls[0:interval_2,0:interval_2]
 
 
         xlocs = np.linspace(0, len(kks)-1, 5)+0.5
@@ -90,9 +94,9 @@ class fig_obj(object):
         axs.set_xticks(xlocs, xlabels)
         axs.set_yticks(ylocs, ylabels)
         axs.set_title(title)
-        axs.set_xlabel(r'$k_n$', fontsize=12)
-        axs.set_ylabel(r'$l_m$', fontsize=12)
-        axs.set_aspect('equal')
+        axs.set_xlabel(r'$k$ [m$^{-1}$]', fontsize=12)
+        axs.set_ylabel(r'$l$ [m$^{-1}$]', fontsize=12)
+        if typ == 'imag': axs.set_aspect('equal')
 
         return axs
 
