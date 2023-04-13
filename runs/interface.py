@@ -47,8 +47,6 @@ class get_pmf(object):
         wlat = np.diff(cell.lat).max()
         wlon = np.diff(cell.lon).max()
 
-        sz = cell.topo.size
-
         kks = np.fft.rfftfreq((ampls.shape[1] * 2) - 1, d=1.0)
         lls = np.fft.fftfreq((ampls.shape[0]), d=1.0)
 
