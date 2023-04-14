@@ -171,7 +171,7 @@ def get_size(obj, seen=None):
     return size
 
 
-def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False):    
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False, filtered=True):    
     lat_max = get_closest_idx(lat_verts.max(), topo.lat)
     lat_min = get_closest_idx(lat_verts.min(), topo.lat)
     
@@ -212,7 +212,7 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False)
 
     kls = ((2.0 * np.pi * kkg/wlon)**2 + (2.0 * np.pi * llg/wlat)**2)**0.5
 
-    ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
+    if filtered: ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
 
     cell.topo = np.fft.ifft2(ampls * ampls.size).real
 

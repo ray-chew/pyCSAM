@@ -13,19 +13,26 @@ class get_pmf(object):
 
         self.debug = debug
 
-    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0):
+    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False):
         self.fobj.do_full(cell)
+
         am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
+
+        self.fobj.get_freq_grid(am)
+        freqs = scale * np.abs(self.fobj.ampls)
+
+        if refine:
+            cell.topo_m -= data_recons
+            am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
+
+            self.fobj.get_freq_grid(am)
+            freqs += scale * np.abs(self.fobj.ampls)
 
         if self.debug: print("data_recons: ", data_recons.min(), data_recons.max())
 
         dat_2D = reconstruction.recon_2D(data_recons, cell)
 
         if self.debug: print("dat_2D: ", dat_2D.min(), dat_2D.max())
-
-        self.fobj.get_freq_grid(am)
-
-        freqs = scale * np.abs(self.fobj.ampls)
         
         analysis = var.analysis()
         analysis.get_attrs(self.fobj, freqs)
@@ -34,7 +41,6 @@ class get_pmf(object):
         if updt_analysis: cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
-
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
 
         return freqs, uw_pmf_freqs, dat_2D
