@@ -80,7 +80,7 @@ class get_pmf(object):
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
 
-        return uw_pmf_freqs, ampls, dat_2D, [kks, lls]
+        return ampls, uw_pmf_freqs, dat_2D, [kks, lls]
 
 
     

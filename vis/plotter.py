@@ -46,9 +46,14 @@ class fig_obj(object):
         axs.set_xticks(xlocs, m_i, rotation=-90)
         axs.set_yticks(ylocs, m_j)
         axs.set_title(title)
-        axs.set_xlabel(r'$k_n \times 2 \pi / L_x$', fontsize=12)
-        axs.set_ylabel(r'$l_m \times 2 \pi / L_y$', fontsize=12)
-        axs.set_aspect('equal')
+        # axs.set_xlabel(r'$k_n \times 2 \pi / L_x$', fontsize=12)
+        # axs.set_ylabel(r'$l_m \times 2 \pi / L_y$', fontsize=12)
+        axs.set_xlabel(r'$k_n$', fontsize=12)
+        axs.set_ylabel(r'$l_m$', fontsize=12)
+        # axs.set_aspect('equal')
+
+        for label in axs.yaxis.get_ticklabels()[::2]:
+            label.set_visible(False)
 
         return axs
 
