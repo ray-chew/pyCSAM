@@ -55,6 +55,8 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     plt.plot(points[:,0], points[:,1], 'wo', ms=2.0)
     # plt.plot(tri_clons, tri_clats, 'rx', ms=4.0)
 
+    highlight_indices = np.array(highlight_indices)
+
     if label_idxs:
         tri_indices = np.arange(len(tri.tri_lat_verts))
 
@@ -62,7 +64,7 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
             colour = 'C7'
             fw = None
             
-            if idx in highlight_indices:
+            if (idx in highlight_indices) or (idx in highlight_indices+1):
                 colour='C3'
                 fw = 'bold'
         
