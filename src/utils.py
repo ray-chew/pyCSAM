@@ -18,7 +18,7 @@ def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
 
 
 def rad2deg(val):
-    return val*(180/np.pi)
+    return np.rad2deg(val)
 
 
 def isoceles(grid, cell, res=480):
