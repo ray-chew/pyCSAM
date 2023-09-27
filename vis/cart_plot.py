@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+from   matplotlib.collections import PolyCollection
 import numpy as np
 import cartopy.crs as ccrs
-from cartopy.mpl.ticker import (LongitudeFormatter, LatitudeFormatter,
+from cartopy.mpl.ticker import (LongitudeFormatter,
+                                LatitudeFormatter,
                                 LatitudeLocator, LongitudeLocator)
 
 def lat_lon(topo, fs=(10,6)):
@@ -40,7 +42,7 @@ def lat_lon(topo, fs=(10,6)):
 def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                      label_idxs = False, \
                      highlight_indices = [44,45, 88,89, 16,17], \
-                     fn = 'output/delaunay.pdf', \
+                     fn = '../output/delaunay.pdf', \
                      output_fig = False
                      ):
     plt.figure(figsize=fs)
@@ -75,3 +77,58 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     plt.tight_layout()
     if output_fig: plt.savefig(fn)
     plt.show()
+
+
+def lat_lon_icon(topo, triangles, \
+                 fs=(10,6), \
+                 annotate_idxs = True, \
+                 title = "", \
+                 set_global = False, \
+                 fn = '../output/icon_lam.pdf', \
+                 output_fig = False, \
+                 **kwargs):
+    # Taken from https://docs.dkrz.de/doc/visualization/sw/python/source_code/python-matplotlib-example-unstructured-icon-triangles-plot-python-3.html
+
+    #-- set projection
+    projection = ccrs.PlateCarree()
+
+    #-- create figure and axes instances; we need subplots for plot and colorbar
+    fig, ax = plt.subplots(figsize=fs, subplot_kw=dict(projection=projection))
+
+    if set_global: ax.set_global()
+
+    im = ax.contourf(topo.lon_grid, topo.lat_grid, topo.topo,
+            alpha=1.0,
+            transform=ccrs.PlateCarree(),
+            cmap='GnBu',
+            )
+
+    #-- plot land areas at last to get rid of the contour lines at land
+    ax.coastlines(linewidth=0.5, zorder=2)
+    ax.gridlines(draw_labels=True, linewidth=0.5, color='dimgray', alpha=0.4, zorder=2)
+
+    #-- plot the title string
+    plt.title(title)    
+
+    #-- create polygon/triangle collection
+    coll = PolyCollection(triangles, array=None, edgecolors='r', fc='r', alpha=0.2, linewidth=1, transform=ccrs.Geodetic(), zorder=3)
+    ax.add_collection(coll)
+
+    print('--> polygon collection done')
+
+    if annotate_idxs:
+        ncells = kwargs['ncells']
+        clon = kwargs['clon']
+        clat = kwargs['clat']
+        
+        cidx = np.arange(ncells)
+
+        for idx in cidx:
+            colour = 'r'
+            fw = 2
+
+            plt.annotate(cidx[idx], (clon[idx],clat[idx]), (clon[idx]-0.3,clat[idx]-0.2), c=colour, fontweight=fw)
+
+    #-- maximize and save the PNG file
+    if output_fig:
+        plt.savefig(fn, bbox_inches='tight',dpi=200)
