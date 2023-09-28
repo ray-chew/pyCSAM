@@ -25,8 +25,8 @@ rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
 lxkm, lykm = 120, 120
 
 # Setup the Fourier parameters and object.
-nhi = 24
-nhj = 48
+nhi = 12
+nhj = 24
 
 n_modes = 100
 
@@ -35,11 +35,11 @@ U, V = 10.0, 0.1
 rect = True
 
 debug = False
-dfft_first_guess = True
+dfft_first_guess = False
 refine = False
 verbose = False
 
-plot = True
+plot = False
 
 
 # %%
@@ -54,13 +54,18 @@ reader.read_dat(fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
 
 # read topography
-reader.read_dat(fn_topo, topo)
+# reader.read_dat(fn_topo, topo)
 
 # we only keep the topography that is inside this lat-lon extent.
 lat_verts = np.array(lat_extent)
 lon_verts = np.array(lon_extent)
 
-reader.read_topo(topo, topo, lon_verts, lat_verts)
+# reader.read_topo(topo, topo, lon_verts, lat_verts)
+
+path = "/home/ray/Documents/orog_data/MERIT/"
+reader.read_merit_topo(topo, path, lat_verts, lon_verts)
+
+topo.topo[np.where(topo.topo < -500)] = -500
 
 topo.gen_mgrids()
 
@@ -72,10 +77,14 @@ idx_name = []
 
 # %%
 # Plot the loaded topography...
-cart_plot.lat_lon(topo)
+cart_plot.lat_lon(topo, int=200)
 
 levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=rect_set, output_fig=False)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=rect_set, output_fig=False, int=200)
+
+# %%
+del topo.lat_grid
+del topo.lon_grid
 
 # %%
 for rect_idx in rect_set:
@@ -245,6 +254,7 @@ for rect_idx in rect_set:
 
         cell.uw = uw
         all_cells[cnt] = cell
+        del cell
 
         ##############################################
 
@@ -308,6 +318,8 @@ for rect_idx in rect_set:
     pmf_diff.append(residual_error)
     pmf_sum_diff.append(residual_sum_error)
 
+    del all_cells
+
 # %%
 title = ""
 
@@ -323,7 +335,7 @@ fig, (ax1) = plt.subplots(1,1,sharex=True,
 
 true_col = 'g'
 false_col = 'C4' if dfft_first_guess else 'r'
-    
+
 data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}))
 
 plt.xlabel("grid idx")
