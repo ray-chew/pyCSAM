@@ -104,9 +104,6 @@ class topo_cell(topo):
         self.grad_topo_m = np.vstack([grad_lon_topo, grad_lat_topo])
 
 
-        # return np.hstack([gradx_topo, grady_topo])
-
-
 class analysis(object):
     def __init__(self):
         self.wlat = None
