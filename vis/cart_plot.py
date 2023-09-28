@@ -43,11 +43,12 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                      label_idxs = False, \
                      highlight_indices = [44,45, 88,89, 16,17], \
                      fn = '../output/delaunay.pdf', \
-                     output_fig = False
+                     output_fig = False, \
+                     int = 1
                      ):
     plt.figure(figsize=fs)
 
-    im = plt.contourf(topo.lon_grid, topo.lat_grid, topo.topo, levels=levels, cmap='GnBu')
+    im = plt.contourf(topo.lon_grid[::int], topo.lat_grid[::int], topo.topo[::int], levels=levels, cmap='GnBu')
     im.set_clim(0.0, levels[-1])
 
     points = tri.points
