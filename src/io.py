@@ -5,8 +5,8 @@ import os
 
 class ncdata(object):
 
-    def __init__(self):
-        None
+    def __init__(self, read_merit = False):
+        self.read_merit = read_merit
 
     def read_dat(self, fn, obj):
         df = nc.Dataset(fn)
@@ -17,7 +17,7 @@ class ncdata(object):
 
         df.close()
 
-    def read_topo(self, topo, cell, lon_vert,lat_vert):
+    def read_topo(self, topo, cell, lon_vert, lat_vert):
         
         #---- variable and the coordinates
         lon, lat, z = topo.lon, topo.lat, topo.topo
@@ -80,6 +80,153 @@ class ncdata(object):
         cell.topo = topo_2D
 
 
+    class read_merit_topo(object):
+        
+        def __init__(self, cell, dir, lat_verts, lon_verts):
+            self.dir = dir
+
+            self.fn_lon = np.array([-180.0, -150.0, -120.0, -90.0, -60.0, -30.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0])
+            self.fn_lat = np.array([90.0, 60.0, 30.0, 0.0, -30.0, -60.0, -90.0])
+
+            self.lat_verts = lat_verts
+            self.lon_verts = lon_verts
+
+            lat_min_idx = self.compute_idx(lat_verts.min(), 'min', 'lat')
+            lat_max_idx = self.compute_idx(lat_verts.max(), 'max', 'lat')
+
+            lon_min_idx = self.compute_idx(lon_verts.min(), 'min', 'lon')
+            lon_max_idx = self.compute_idx(lon_verts.max(), 'max', 'lon')
+
+            fns, lon_cnt, lat_cnt = self.get_fns(lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx)
+
+            self.get_topo(cell, fns, lon_cnt, lat_cnt)
+
+
+        def compute_idx(self, vert, typ, direction):
+            if direction == 'lon':
+                fn_int = self.fn_lon
+            else:
+                fn_int = self.fn_lat
+
+            where_idx = np.argmin(np.abs(fn_int - vert))
+            print(fn_int, where_idx)
+            
+            if typ=='min':
+                if (vert - fn_int[where_idx]) < 0.0:
+                    if direction == 'lon':
+                        where_idx -= 1
+                    else:
+                        where_idx += 1
+            elif typ == 'max':
+                if (vert - fn_int[where_idx]) > 0.0:
+                    if direction == 'lon':
+                        where_idx += 1
+                    else:
+                        where_idx -= 1
+                    
+            where_idx = int(where_idx)
+                    
+            print("where_idx, vert, fn_int[where_idx] for typ:")
+            print(where_idx, vert, fn_int[where_idx], typ)
+            print("")
+                    
+            return where_idx
+
+        def get_fns(self, lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx):
+            fns = []
+
+            for lat_cnt, lat_idx in enumerate(range(lat_max_idx, lat_min_idx)):
+                l_lat_bound, r_lat_bound = self.fn_lat[lat_idx], self.fn_lat[lat_idx+1]
+                l_lat_tag, r_lat_tag = self.get_NSEW(l_lat_bound, 'lat'), self.get_NSEW(r_lat_bound, 'lat')
+                
+                for lon_cnt, lon_idx in enumerate(range(lon_min_idx, lon_max_idx)):
+
+                    l_lon_bound, r_lon_bound = self.fn_lon[lon_idx], self.fn_lon[lon_idx+1]
+                    l_lon_tag, r_lon_tag = self.get_NSEW(l_lon_bound, 'lon'), self.get_NSEW(r_lon_bound, 'lon')
+                        
+                    name = "MERIT_%s%.2d-%s%.2d_%s%.3d-%s%.3d.nc4" %(l_lat_tag, np.abs(l_lat_bound), r_lat_tag, np.abs(r_lat_bound), l_lon_tag, np.abs(l_lon_bound), r_lon_tag, np.abs(r_lon_bound))
+
+                    fns.append(name)
+
+            return fns, lon_cnt, lat_cnt
+        
+
+        def get_topo(self, cell, fns, lon_cnt, lat_cnt, init=True, populate=True):
+            if (cell.topo is None) and (init): 
+                self.get_topo(cell, fns, lon_cnt, lat_cnt, init=False, populate=False)
+
+            if not populate:
+                nc_lon = 0
+                nc_lat = 0
+            else:
+                n_col = 0
+                n_row = 0
+                lon_sz_old = 0
+                lat_sz_old = 0
+                cell.lat = []
+                cell.lon = []
+
+            for cnt, fn in enumerate(fns):
+                test = nc.Dataset(self.dir+fn)
+
+                lat = test['lat']
+                lat_min_idx = np.argmin(np.abs(lat - self.lat_verts.min()))
+                lat_max_idx = np.argmin(np.abs(lat - self.lat_verts.max()))
+
+                lat_high = np.max((lat_min_idx, lat_max_idx))
+                lat_low = np.min((lat_min_idx, lat_max_idx))
+
+                lon = test['lon']
+                lon_min_idx = np.argmin(np.abs(lon - (self.lon_verts.min())))
+                lon_max_idx = np.argmin(np.abs(lon - (self.lon_verts.max())))
+
+                lon_high = np.max((lon_min_idx, lon_max_idx))
+                lon_low = np.min((lon_min_idx, lon_max_idx))
+
+                if not populate:
+                    if cnt < (lon_cnt+1):
+                        nc_lon += lon_high - lon_low
+                    if ((cnt % (lat_cnt+1)) == 0):
+                        nc_lat += lat_high - lat_low
+                else:
+                    topo = test['Elevation'][lat_low:lat_high, lon_low:lon_high]
+                    if n_col == 0:
+                        cell.lat += (lat[lat_low:lat_high].tolist())
+                    if n_row == 0:
+                        cell.lon += (lon[lon_low:lon_high].tolist())
+
+                    lon_sz = lon_high - lon_low
+                    lat_sz = lat_high - lat_low
+
+                    cell.topo[n_row*lat_sz_old:n_row*lat_sz_old+lat_sz, n_col*lon_sz_old:n_col*lon_sz_old+lon_sz] = topo
+
+                    n_col += 1
+                    if n_col == (lon_cnt + 1):
+                        n_col = 0
+                        n_row += 1 
+                        lat_sz_old = np.copy(lat_sz)
+
+                    lon_sz_old = np.copy(lon_sz)
+
+                test.close()
+
+            if not populate:
+                cell.topo = np.zeros((nc_lat, nc_lon))
+
+        @staticmethod
+        def get_NSEW(vert, typ):
+            if typ == 'lat':
+                if vert >= 0.0:
+                    dir_tag = 'N'
+                else:
+                    dir_tag = 'S'
+            if typ == 'lon':
+                if vert >= 0.0:
+                    dir_tag = 'E'
+                else:
+                    dir_tag = 'W'
+                
+            return dir_tag
 
 class writer(object):
     """
