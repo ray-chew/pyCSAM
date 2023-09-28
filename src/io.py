@@ -212,6 +212,10 @@ class ncdata(object):
 
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
+            else:
+                cell.lat = np.sort(cell.lat)
+                cell.lon = np.sort(cell.lon)
+
 
         @staticmethod
         def get_NSEW(vert, typ):
