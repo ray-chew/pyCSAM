@@ -99,6 +99,10 @@ class f_trans(object):
         self.term2 = np.repeat(self.term2,self.nhar_i,1)
 
         tt_sum = self.term1 + self.term2
+
+        del self.term1
+        del self.term2
+
         if self.pick_kls:
             tt_sum = tt_sum[:, self.k_idx, self.l_idx]
         else:
@@ -106,6 +110,8 @@ class f_trans(object):
 
         bcos = np.cos(2.0 * np.pi * (tt_sum))
         bsin = np.sin(2.0 * np.pi * (tt_sum))
+
+        del tt_sum
 
         if ((self.nhar_i == 2) and (self.nhar_j == 2) and (self.pick_kls == False)):
             Ncos = bcos[:,:]
@@ -126,6 +132,7 @@ class f_trans(object):
         
         self.bf_cos = Ncos
         self.bf_sin = Nsin
+        self.nc = self.bf_cos.shape[1]
 
 
     def do_axial(self, cell, alpha = 0.0):
@@ -150,13 +157,14 @@ class f_trans(object):
         
         self.bf_cos = bcos
         self.bf_sin = bsin
+        self.nc = self.bf_cos.shape[1]
 
 
     def get_freq_grid(self, a_m):
         nhar_i, nhar_j = self.nhar_i, self.nhar_j
 
         fourier_coeff = np.zeros((nhar_i, nhar_j))
-        nc = self.bf_cos.shape[1]
+        nc = self.nc
 
         zrs = np.zeros((int(self.nhar_j/2)-1))
 

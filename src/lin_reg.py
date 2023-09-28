@@ -7,6 +7,9 @@ def get_coeffs(fobj):
 
     coeff = np.hstack([Ncos,Nsin])
 
+    del fobj.bf_cos
+    del fobj.bf_sin
+
     if fobj.grad: coeff = np.vstack([coeff,coeff])
 
     return coeff
