@@ -6,12 +6,12 @@ from cartopy.mpl.ticker import (LongitudeFormatter,
                                 LatitudeFormatter,
                                 LatitudeLocator, LongitudeLocator)
 
-def lat_lon(topo, fs=(10,6)):
+def lat_lon(topo, fs=(10,6), int=1):
     fig = plt.figure(figsize=fs)
     ax = plt.axes(projection=ccrs.PlateCarree())
 
     ax.coastlines()
-    im = ax.contourf(topo.lon_grid, topo.lat_grid, topo.topo,
+    im = ax.contourf(topo.lon_grid[::int], topo.lat_grid[::int], topo.topo[::int],
                 alpha=0.5,
                 transform=ccrs.PlateCarree(),
                 cmap='GnBu',
