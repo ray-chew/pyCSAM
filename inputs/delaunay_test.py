@@ -54,16 +54,16 @@ reader.read_dat(fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
 
 # read topography
-# reader.read_dat(fn_topo, topo)
+reader.read_dat(fn_topo, topo)
 
 # we only keep the topography that is inside this lat-lon extent.
 lat_verts = np.array(lat_extent)
 lon_verts = np.array(lon_extent)
 
-# reader.read_topo(topo, topo, lon_verts, lat_verts)
+reader.read_topo(topo, topo, lon_verts, lat_verts)
 
-path = "/home/ray/Documents/orog_data/MERIT/"
-reader.read_merit_topo(topo, path, lat_verts, lon_verts)
+# path = "/home/ray/Documents/orog_data/MERIT/"
+# reader.read_merit_topo(topo, path, lat_verts, lon_verts)
 
 topo.topo[np.where(topo.topo < -500)] = -500
 
