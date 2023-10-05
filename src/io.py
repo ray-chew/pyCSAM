@@ -215,7 +215,7 @@ class ncdata(object):
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
             else:
-                iint = 2
+                iint = 4
                 cell.lat = np.sort(cell.lat)[::iint]
                 cell.lon = np.sort(cell.lon)[::iint][:-1]
 

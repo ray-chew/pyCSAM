@@ -82,4 +82,21 @@ class get_pmf(object):
         return ampls, uw_pmf_freqs, dat_2D, [kks, lls]
 
 
-    
+    def cg_spsp(self, cell, freqs, kklls, dat_2D, summed=False, updt_analysis=False, scale=1.0):
+        self.fobj.do_cg_spsp(cell)
+
+        self.fobj.m_i = kklls[0]
+        self.fobj.m_j = kklls[1]
+
+        freqs = scale * np.abs(freqs)
+        
+        analysis = var.analysis()
+        analysis.get_attrs(self.fobj, freqs)
+        analysis.recon = dat_2D
+
+        if updt_analysis: cell.analysis = analysis
+
+        ideal = physics.ideal_pmf(U=self.U, V=self.V)
+        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
+
+        return freqs, uw_pmf_freqs, dat_2D

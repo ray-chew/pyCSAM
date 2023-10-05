@@ -23,8 +23,8 @@ lon_extent = [-141.,-158.,-127.]
 delaunay_xnp = 16
 delaunay_ynp = 11
 # rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
-# rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
-# rect_set = np.sort([62])
+rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
+rect_set = np.sort([276])
 lxkm, lykm = 120, 120
 
 # Setup the Fourier parameters and object.
@@ -35,10 +35,11 @@ n_modes = 100
 
 U, V = 10.0, 0.1
 
-rect = True
+rect = False
+cg_spsp = True # coarse grain the spectral space?
 
 debug = False
-dfft_first_guess = True
+dfft_first_guess = False
 refine = False
 verbose = False
 
@@ -61,12 +62,12 @@ lat_verts = np.array(lat_extent)
 lon_verts = np.array(lon_extent)
 
 # read topography
-# reader.read_dat(fn_topo, topo)
-# reader.read_topo(topo, topo, lon_verts, lat_verts)
+reader.read_dat(fn_topo, topo)
+reader.read_topo(topo, topo, lon_verts, lat_verts)
 
-path = "/scratch/atmodynamics/chew/data/MERIT/"
-reader.read_merit_topo(topo, path, lat_verts, lon_verts)
-topo.topo[np.where(topo.topo < -100)] = -100
+# path = "/scratch/atmodynamics/chew/data/MERIT/"
+# reader.read_merit_topo(topo, path, lat_verts, lon_verts)
+# topo.topo[np.where(topo.topo < -100)] = -100
 
 topo.gen_mgrids()
 
@@ -139,6 +140,10 @@ for rect_idx in rect_set:
                 print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
         #######################################################
+
+        if (not rect) and (cg_spsp):
+            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-1)
+
         # plot first guess...
 
             if cnt == 0:
@@ -164,6 +169,7 @@ for rect_idx in rect_set:
         ##############################################
 
         fq_cpy = np.copy(freqs)
+        fq_cpy[np.isnan(fq_cpy)] = 0.0 # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
 
         if debug:
             total_power = fq_cpy.sum()
@@ -174,12 +180,15 @@ for rect_idx in rect_set:
         indices = []
         max_ampls = []
 
-        for ii in range(n_modes):
-            max_idx = np.unravel_index(fq_cpy.argmax(), fq_cpy.shape)
-            indices.append(max_idx)
-            max_ampls.append(fq_cpy[max_idx])
-            max_val = fq_cpy[max_idx]
-            fq_cpy[max_idx] = 0.0
+        if not cg_spsp:
+            for ii in range(n_modes):
+                max_idx = np.unravel_index(fq_cpy.argmax(), fq_cpy.shape)
+                indices.append(max_idx)
+                max_ampls.append(fq_cpy[max_idx])
+                max_val = fq_cpy[max_idx]
+                fq_cpy[max_idx] = 0.0
+        else:
+            pass
 
         utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
 
@@ -192,19 +201,29 @@ for rect_idx in rect_set:
             print("top %i idxs:" %n_modes)
             print(indices, len(indices))
 
-        k_idxs = [pair[1] for pair in indices]
-        l_idxs = [pair[0] for pair in indices]
-
         second_guess = interface.get_pmf(nhi,nhj,U,V)
 
-        if dfft_first_guess:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+        if not cg_spsp:
+            k_idxs = [pair[1] for pair in indices]
+            l_idxs = [pair[0] for pair in indices]
+
+            if dfft_first_guess:
+                second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+            else:
+                second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+
+            freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
         else:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+            freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
+
+            kks = np.arange(0,nhi)[1::3]
+            lls = np.arange(-nhj/2+1,nhj/2+1)[1::3]
+            kklls = [kks,lls]
+
+            freqs, uw, dat_2D_sg0 = second_guess.cg_spsp(cell, freqs, kklls, dat_2D_fg0, updt_analysis=True, scale=np.sqrt(2.0))
+
 
         ##############################################            
-
-        freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
         
         if refine:
             utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=True, filtered=False)
