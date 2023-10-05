@@ -13,9 +13,11 @@ from vis import plotter, cart_plot
 
 
 # %%
+# fn_grid = '/scratch/atmodynamics/chew/data/icon_compact.nc'
+# fn_topo = '/scratch/atmodynamics/chew/data/topo_compact.nc'
 
-fn_grid = '/scratch/atmodynamics/chew/data/icon_compact.nc'
-fn_topo = '/scratch/atmodynamics/chew/data/topo_compact.nc'
+fn_grid = '/home/ray/git-projects/spec_appx/data/icon_compact.nc'
+fn_topo = '/home/ray/git-projects/spec_appx/data/topo_compact.nc'
 
 lat_extent = [52.,64.,64.]
 lon_extent = [-141.,-158.,-127.]
@@ -36,7 +38,7 @@ n_modes = 100
 U, V = 10.0, 0.1
 
 rect = False
-cg_spsp = True # coarse grain the spectral space?
+cg_spsp = False # coarse grain the spectral space?
 
 debug = False
 dfft_first_guess = False
@@ -214,7 +216,9 @@ for rect_idx in rect_set:
 
             freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
         else:
+            freqs = np.array(freqs, order='C')
             freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
+            freqs = np.array(freqs, order='F')
 
             kks = np.arange(0,nhi)[1::3]
             lls = np.arange(-nhj/2+1,nhj/2+1)[1::3]
