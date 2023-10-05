@@ -11,35 +11,39 @@ from src import io, var, utils, fourier, physics, delaunay
 from runs import interface
 from vis import plotter, cart_plot
 
+
 # %%
 
-fn_grid = '../data/icon_compact.nc'
-fn_topo = '../data/topo_compact.nc'
+fn_grid = '/scratch/atmodynamics/chew/data/icon_compact.nc'
+fn_topo = '/scratch/atmodynamics/chew/data/topo_compact.nc'
 
 lat_extent = [52.,64.,64.]
 lon_extent = [-141.,-158.,-127.]
 
 delaunay_xnp = 16
 delaunay_ynp = 11
-rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
+# rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
+rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
+rect_set = np.sort([276])
 lxkm, lykm = 120, 120
 
 # Setup the Fourier parameters and object.
-nhi = 12
-nhj = 24
+nhi = 24
+nhj = 48
 
 n_modes = 100
 
 U, V = 10.0, 0.1
 
-rect = True
+rect = False
+cg_spsp = True # coarse grain the spectral space?
 
 debug = False
 dfft_first_guess = False
 refine = False
 verbose = False
 
-plot = False
+plot = True
 
 
 # %%
@@ -53,19 +57,17 @@ reader = io.ncdata()
 reader.read_dat(fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
 
-# read topography
-reader.read_dat(fn_topo, topo)
-
 # we only keep the topography that is inside this lat-lon extent.
 lat_verts = np.array(lat_extent)
 lon_verts = np.array(lon_extent)
 
+# read topography
+reader.read_dat(fn_topo, topo)
 reader.read_topo(topo, topo, lon_verts, lat_verts)
 
-# path = "/home/ray/Documents/orog_data/MERIT/"
+# path = "/scratch/atmodynamics/chew/data/MERIT/"
 # reader.read_merit_topo(topo, path, lat_verts, lon_verts)
-
-topo.topo[np.where(topo.topo < -500)] = -500
+# topo.topo[np.where(topo.topo < -100)] = -100
 
 topo.gen_mgrids()
 
@@ -77,10 +79,10 @@ idx_name = []
 
 # %%
 # Plot the loaded topography...
-cart_plot.lat_lon(topo, int=200)
+cart_plot.lat_lon(topo, int=20)
 
 levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=rect_set, output_fig=False, int=200)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=rect_set, output_fig=False, int=20)
 
 # %%
 del topo.lat_grid
@@ -124,7 +126,7 @@ for rect_idx in rect_set:
         # do fourier...
 
             if not dfft_first_guess:
-                freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=0.0)
+                freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-2)
 
                 print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
@@ -138,6 +140,10 @@ for rect_idx in rect_set:
                 print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
         #######################################################
+
+        if (not rect) and (cg_spsp):
+            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-1)
+
         # plot first guess...
 
             if cnt == 0:
@@ -157,12 +163,13 @@ for rect_idx in rect_set:
                     axs[2] = fig_obj.freq_panel(axs[2], uw_pmf_freqs, title="PMF spectrum")
 
                 plt.tight_layout()
-                plt.savefig('../output/T%i_T%i_fg.pdf' %(idx,idx+1))
+                # plt.savefig('../output/T%i_T%i_fg.pdf' %(idx,idx+1))
                 plt.show()
 
         ##############################################
 
         fq_cpy = np.copy(freqs)
+        fq_cpy[np.isnan(fq_cpy)] = 0.0 # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
 
         if debug:
             total_power = fq_cpy.sum()
@@ -173,12 +180,15 @@ for rect_idx in rect_set:
         indices = []
         max_ampls = []
 
-        for ii in range(n_modes):
-            max_idx = np.unravel_index(fq_cpy.argmax(), fq_cpy.shape)
-            indices.append(max_idx)
-            max_ampls.append(fq_cpy[max_idx])
-            max_val = fq_cpy[max_idx]
-            fq_cpy[max_idx] = 0.0
+        if not cg_spsp:
+            for ii in range(n_modes):
+                max_idx = np.unravel_index(fq_cpy.argmax(), fq_cpy.shape)
+                indices.append(max_idx)
+                max_ampls.append(fq_cpy[max_idx])
+                max_val = fq_cpy[max_idx]
+                fq_cpy[max_idx] = 0.0
+        else:
+            pass
 
         utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
 
@@ -191,19 +201,29 @@ for rect_idx in rect_set:
             print("top %i idxs:" %n_modes)
             print(indices, len(indices))
 
-        k_idxs = [pair[1] for pair in indices]
-        l_idxs = [pair[0] for pair in indices]
-
         second_guess = interface.get_pmf(nhi,nhj,U,V)
 
-        if dfft_first_guess:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+        if not cg_spsp:
+            k_idxs = [pair[1] for pair in indices]
+            l_idxs = [pair[0] for pair in indices]
+
+            if dfft_first_guess:
+                second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+            else:
+                second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+
+            freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
         else:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+            freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
+
+            kks = np.arange(0,nhi)[1::3]
+            lls = np.arange(-nhj/2+1,nhj/2+1)[1::3]
+            kklls = [kks,lls]
+
+            freqs, uw, dat_2D_sg0 = second_guess.cg_spsp(cell, freqs, kklls, dat_2D_fg0, updt_analysis=True, scale=np.sqrt(2.0))
+
 
         ##############################################            
-
-        freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
         
         if refine:
             utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=True, filtered=False)
@@ -254,7 +274,6 @@ for rect_idx in rect_set:
 
         cell.uw = uw
         all_cells[cnt] = cell
-        del cell
 
         ##############################################
 
@@ -270,10 +289,12 @@ for rect_idx in rect_set:
                 axs[1] = fig_obj.freq_panel(axs[1], freqs)
                 axs[2] = fig_obj.freq_panel(axs[2], uw, title="PMF spectrum")
             plt.tight_layout()
-            plt.savefig('../output/T%i.pdf' %idx)
+            # plt.savefig('../output/T%i.pdf' %idx)
             plt.show()
 
         ##############################################
+
+        del cell
     
     cell0 = all_cells[0]
     cell1 = all_cells[1]
@@ -299,12 +320,12 @@ for rect_idx in rect_set:
         fs = (15,5.0)
         fig, axs = plt.subplots(1,3, figsize=fs)
         fig_obj = plotter.fig_obj(fig, second_guess.fobj.nhar_i, second_guess.fobj.nhar_j)
-        axs[0] = fig_obj.phys_panel(axs[0], fft_2D, title='T%i + T%i: FFT reconstruction' %(idx-1, idx), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+        axs[0] = fig_obj.phys_panel(axs[0], fft_2D, title='T%i + T%i: FFT reconstruction' %(idx-1, idx), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell0.lon.min(), cell0.lon.max(), cell0.lat.min(), cell0.lat.max()], v_extent=v_extent)
 
         axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real')
         axs[2] = fig_obj.fft_freq_panel(axs[2], uw_ref, kls[0], kls[1], title="FFT PMF spectrum", typ='real')
         plt.tight_layout()
-        plt.savefig('../output/T%i_T%i_fft.pdf' %(idx-1,idx))
+        # plt.savefig('../output/T%i_T%i_fft.pdf' %(idx-1,idx))
         plt.show()
 
     residual_error = (uw01 / uw_ref.sum()) - 1.0
@@ -320,7 +341,7 @@ for rect_idx in rect_set:
 
     del all_cells
 
-# %%
+ # %%
 title = ""
 
 print(idx_name)
@@ -363,6 +384,6 @@ plt.tight_layout()
 
 fn = "%ix%i_%s_FF%s" %(lxkm, lykm, fg_tag, rfn_tag[:-1])
 print(fn)
-plt.savefig('../output/'+fn+'_poster.pdf')
+# plt.savefig('../output/'+fn+'_poster.pdf')
 plt.show()
 # %%

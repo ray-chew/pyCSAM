@@ -160,6 +160,14 @@ class f_trans(object):
         self.nc = self.bf_cos.shape[1]
 
 
+    def do_cg_spsp(self, cell):
+        self.typ = 'full'
+        self.grad = False
+        
+        self.__get_IJ(cell)
+        self.__prepare_terms(cell)
+
+
     def get_freq_grid(self, a_m):
         nhar_i, nhar_j = self.nhar_i, self.nhar_j
 
@@ -167,6 +175,7 @@ class f_trans(object):
         nc = self.nc
 
         zrs = np.zeros((int(self.nhar_j/2)-1))
+        zrs[:] = np.nan
 
         if ((self.typ == 'full') and (not self.pick_kls)):
             cos_terms = a_m[:nc]

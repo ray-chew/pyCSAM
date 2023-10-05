@@ -3,6 +3,8 @@ import numpy as np
 import h5py
 import os
 
+from src import utils
+
 class ncdata(object):
 
     def __init__(self, read_merit = False):
@@ -213,9 +215,11 @@ class ncdata(object):
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
             else:
-                cell.lat = np.sort(cell.lat)
-                cell.lon = np.sort(cell.lon)
+                iint = 4
+                cell.lat = np.sort(cell.lat)[::iint]
+                cell.lon = np.sort(cell.lon)[::iint][:-1]
 
+                cell.topo = utils.sliding_window_view(cell.topo, (iint,iint), (iint,iint)).mean(axis=(-1,-2))[::-1,:]
 
         @staticmethod
         def get_NSEW(vert, typ):
