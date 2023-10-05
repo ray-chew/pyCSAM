@@ -266,3 +266,184 @@ def latlon2m_converter(lon1, lon2, lat1, lat2):
 
     distance = R * c
     return distance
+
+
+# ref: https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a
+def sliding_window_view(arr, window_shape, steps):
+    """ 
+    Produce a view from a sliding, striding window over `arr`.
+    The window is only placed in 'valid' positions - no overlapping
+    over the boundary.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray, shape=(...,[x, (...), z])
+        The array to slide the window over.
+    window_shape : Sequence[int]
+        The shape of the window to raster: [Wx, (...), Wz],
+        determines the length of [x, (...), z]
+    steps : Sequence[int]
+        The step size used when applying the window
+        along the [x, (...), z] directions: [Sx, (...), Sz]
+
+    Returns
+    -------
+    view of `arr`, shape=([X, (...), Z], ..., [Wx, (...), Wz]), where X = (x - Wx) // Sx + 1
+
+    Note
+    -----
+    In general, given::
+
+        out = sliding_window_view(arr,
+                                    window_shape=[Wx, (...), Wz],
+                                    steps=[Sx, (...), Sz])
+        out[ix, (...), iz] = arr[..., ix*Sx:ix*Sx+Wx,  (...), iz*Sz:iz*Sz+Wz]
+
+    This function is taken from:
+    https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a
+
+    Example
+    --------
+    >>> import numpy as np
+    >>> x = np.arange(9).reshape(3,3)
+    >>> x
+    array([[0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8]])
+    >>> y = sliding_window_view(x, window_shape=(2, 2), steps=(1, 1))
+    >>> y
+    array([[[[0, 1],
+            [3, 4]],
+            [[1, 2],
+            [4, 5]]],
+        [[[3, 4],
+            [6, 7]],
+            [[4, 5],
+            [7, 8]]]])
+    >>> np.shares_memory(x, y)
+        True
+    # Performing a neural net style 2D conv (correlation)
+    # placing a 4x4 filter with stride-1
+    >>> data = np.random.rand(10, 3, 16, 16)  # (N, C, H, W)
+    >>> filters = np.random.rand(5, 3, 4, 4)  # (F, C, Hf, Wf)
+    >>> windowed_data = sliding_window_view(data,
+    ...                                     window_shape=(4, 4),
+    ...                                     steps=(1, 1))
+    >>> conv_out = np.tensordot(filters,
+    ...                         windowed_data,
+    ...                         axes=[[1,2,3], [3,4,5]])
+    # (F, H', W', N) -> (N, F, H', W')
+    >>> conv_out = conv_out.transpose([3,0,1,2])
+
+    """
+         
+    from numpy.lib.stride_tricks import as_strided
+    in_shape = np.array(arr.shape[-len(steps):])  # [x, (...), z]
+    window_shape = np.array(window_shape)  # [Wx, (...), Wz]
+    steps = np.array(steps)  # [Sx, (...), Sz]
+    nbytes = arr.strides[-1]  # size (bytes) of an element in `arr`
+
+    # number of per-byte steps to take to fill window
+    window_strides = tuple(np.cumprod(arr.shape[:0:-1])[::-1]) + (1,)
+    # number of per-byte steps to take to place window
+    step_strides = tuple(window_strides[-len(steps):] * steps)
+    # number of bytes to step to populate sliding window view
+    strides = tuple(int(i) * nbytes for i in step_strides + window_strides)
+
+    outshape = tuple((in_shape - window_shape) // steps + 1)
+    # outshape: ([X, (...), Z], ..., [Wx, (...), Wz])
+    outshape = outshape + arr.shape[:-len(steps)] + tuple(window_shape)
+    return as_strided(arr, shape=outshape, strides=strides, writeable=False)
+
+
+from builtins import map
+import numpy
+
+try:
+    # If you use vigra, we do special handling to preserve axistags
+    import vigra
+
+    _vigra_available = True
+except ImportError:
+    _vigra_available = False
+
+
+def blockwise_view(a, blockshape, aslist=False, require_aligned_blocks=True):
+    """
+    Return a 2N-D view of the given N-D array, rearranged so each ND block (tile)
+    of the original array is indexed by its block address using the first N
+    indexes of the output array.
+
+    Note: This function is nearly identical to ``skimage.util.view_as_blocks()``, except:
+          - "imperfect" block shapes are permitted (via require_aligned_blocks=False)
+          - only contiguous arrays are accepted.  (This function will NOT silently copy your array.)
+            As a result, the return value is *always* a view of the input.
+
+    Args:
+        a: The ND array
+
+        blockshape: The tile shape
+
+        aslist: If True, return all blocks as a list of ND blocks
+                instead of a 2D array indexed by ND block coordinate.
+
+        require_aligned_blocks: If True, check to make sure no data is "left over"
+                                in each row/column/etc. of the output view.
+                                That is, the blockshape must divide evenly into the full array shape.
+                                If False, "leftover" items that cannot be made into complete blocks
+                                will be discarded from the output view.
+
+    Here's a 2D example (this function also works for ND):
+
+    >>> a = numpy.arange(1,21).reshape(4,5)
+    >>> print(a)
+    [[ 1  2  3  4  5]
+     [ 6  7  8  9 10]
+     [11 12 13 14 15]
+     [16 17 18 19 20]]
+
+    >>> view = blockwise_view(a, (2,2), require_aligned_blocks=False)
+    >>> print(view)
+    [[[[ 1  2]
+       [ 6  7]]
+    <BLANKLINE>
+      [[ 3  4]
+       [ 8  9]]]
+    <BLANKLINE>
+    <BLANKLINE>
+     [[[11 12]
+       [16 17]]
+    <BLANKLINE>
+      [[13 14]
+       [18 19]]]]
+
+    Inspired by the 2D example shown here: http://stackoverflow.com/a/8070716/162094
+    """
+    assert a.flags["C_CONTIGUOUS"], "This function relies on the memory layout of the array."
+    blockshape = tuple(blockshape)
+    outershape = tuple(numpy.array(a.shape) // blockshape)
+    view_shape = outershape + blockshape
+
+    if require_aligned_blocks:
+        assert (
+            numpy.mod(a.shape, blockshape) == 0
+        ).all(), "blockshape {} must divide evenly into array shape {}".format(blockshape, a.shape)
+
+    # inner strides: strides within each block (same as original array)
+    intra_block_strides = a.strides
+
+    # outer strides: strides from one block to another
+    inter_block_strides = tuple(a.strides * numpy.array(blockshape))
+
+    # This is where the magic happens.
+    # Generate a view with our new strides (outer+inner).
+    view = numpy.lib.stride_tricks.as_strided(a, shape=view_shape, strides=(inter_block_strides + intra_block_strides))
+
+    # Special handling for VigraArrays
+    if _vigra_available and isinstance(a, vigra.VigraArray) and hasattr(a, "axistags"):
+        view_axistags = vigra.AxisTags([vigra.AxisInfo() for _ in blockshape] + list(a.axistags))
+        view = vigra.taggedView(view, view_axistags)
+
+    if aslist:
+        return list(map(view.__getitem__, numpy.ndindex(outershape)))
+    return view
