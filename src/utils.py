@@ -1,5 +1,6 @@
 import numpy as np
 import numba as nb
+import scipy.signal as signal
 import sys
 
 def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
@@ -171,12 +172,12 @@ def get_size(obj, seen=None):
     return size
 
 
-def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False, filtered=True):    
-    lat_max = get_closest_idx(lat_verts.max(), topo.lat)
-    lat_min = get_closest_idx(lat_verts.min(), topo.lat)
-    
-    lon_max = get_closest_idx(lon_verts.max(), topo.lon)
-    lon_min = get_closest_idx(lon_verts.min(), topo.lon)
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False, filtered=True, padding=0):    
+    lat_max = get_closest_idx(lat_verts.max(), topo.lat) + padding
+    lat_min = get_closest_idx(lat_verts.min(), topo.lat) - padding
+
+    lon_max = get_closest_idx(lon_verts.max(), topo.lon) + padding
+    lon_min = get_closest_idx(lon_verts.min(), topo.lon) - padding
     
     cell.lat = np.copy(topo.lat[lat_min : lat_max])
     cell.lon = np.copy(topo.lon[lon_min : lon_max])
@@ -354,3 +355,76 @@ def sliding_window_view(arr, window_shape, steps):
     # outshape: ([X, (...), Z], ..., [Wx, (...), Wz])
     outshape = outshape + arr.shape[:-len(steps)] + tuple(window_shape)
     return as_strided(arr, shape=outshape, strides=strides, writeable=False)
+
+
+class taper(object):
+    def __init__(self, cell, padding, stencil_typ='OP', scale_fac=1.0, art_dt=0.5, art_it=800):
+        stencil = np.zeros((3,3))
+
+        if stencil_typ == 'OP':
+            self.stencil = self.stencil_OP(stencil)
+        elif stencil_typ == '5pt':
+            self.stencil = self.stencil_5pt(stencil)
+        elif stencil_typ == 'PK':
+            self.stencil = self.stencil_PK(stencil)
+
+        self.stencil *= scale_fac
+
+        self.art_dt = art_dt
+        self.art_it = art_it
+        self.padding = padding
+
+        self.__apply_mask_padding(cell)
+
+    def __apply_mask_padding(self, cell):
+        p0 = cell.mask
+        self.p0 = np.pad(p0, (self.padding,self.padding), mode='constant')
+
+        self.p = np.copy(self.p0)
+
+    def do_tapering(self):
+        for _ in range(self.art_it):
+            # artificial diffusion / Shapiro filter
+            self.p = self.p + self.art_dt * signal.convolve2d(self.p, self.stencil, mode='same')
+
+            # resetting of the topography mask
+            self.p *= ~self.p0
+            self.p += self.p0
+
+        del self.p0
+
+
+    # https://en.wikipedia.org/wiki/Nine-point_stencil
+    # I tried the 5pt stencil but it struggles when art_dt is large.
+    # From experience, the most robust stencil is the isotropic Oono-Puri 
+    @staticmethod
+    def stencil_5pt(stencil):
+        stencil[0,1] = 1.0
+        stencil[1,0] = 1.0
+        stencil[1,2] = 1.0
+        stencil[2,1] = 1.0
+        stencil[1,1] = -4.0
+        return stencil
+
+    @staticmethod
+    def stencil_OP(stencil):
+        stencil[:,:] = 0.25
+        stencil[0,1] = 0.50
+        stencil[1,0] = 0.50
+        stencil[1,2] = 0.50
+        stencil[2,1] = 0.50
+        stencil[1,1] = -3.0
+        return stencil
+    
+    @staticmethod
+    def stencil_PK(stencil):
+        stencil[:,:] = 1.0/6
+        stencil[0,1] = 4.0/6
+        stencil[1,0] = 4.0/6
+        stencil[1,2] = 4.0/6
+        stencil[2,1] = 4.0/6
+        stencil[1,1] = -20.0/6
+        return stencil
+    
+
+        
