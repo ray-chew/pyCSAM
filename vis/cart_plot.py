@@ -79,7 +79,6 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     if output_fig: plt.savefig(fn)
     plt.show()
 
-
 def lat_lon_icon(topo, triangles, \
                  fs=(10,6), \
                  annotate_idxs = True, \

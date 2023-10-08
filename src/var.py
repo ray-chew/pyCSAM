@@ -47,7 +47,7 @@ class topo_cell(topo):
         if not grad:
             lat_grid, lon_grid = self.lat_grid, self.lon_grid
         else:
-            lat_grid, lon_grid = self.grad_lat_grid, self.lon_grid
+            lat_grid, lon_grid = self.grad_lat_grid, self.grad_lon_grid
 
         lat_grid_tmp = np.expand_dims(np.copy(lat_grid),-1)
         lon_grid_tmp = np.expand_dims(np.copy(lon_grid),-1)
