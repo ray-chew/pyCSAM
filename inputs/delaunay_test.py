@@ -24,9 +24,10 @@ lon_extent = [-141.,-158.,-127.]
 
 delaunay_xnp = 16
 delaunay_ynp = 11
-# rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
-rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
-rect_set = np.sort([276])
+rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
+rect_set = np.sort([156,154,32,72,160,96,162,276])
+# rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
+# rect_set = np.sort([276])
 lxkm, lykm = 120, 120
 
 # Setup the Fourier parameters and object.
@@ -37,8 +38,13 @@ n_modes = 100
 
 U, V = 10.0, 0.1
 
-rect = False
 cg_spsp = False # coarse grain the spectral space?
+rect = False if cg_spsp else True 
+
+tapering = True
+rect = True
+padding=10
+
 
 debug = False
 dfft_first_guess = False
@@ -102,10 +108,21 @@ for rect_idx in rect_set:
         simplex_lat = tri.tri_lat_verts[idx]
         simplex_lon = tri.tri_lon_verts[idx]
 
-        triangle = utils.triangle(simplex_lon, simplex_lat)
-        utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=rect)
+        if tapering:
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+        
+            taper = utils.taper(cell, padding, art_it=1000)
+            taper.do_tapering()
+
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=padding)
+
+            mask_taper = np.copy(cell.mask)
+
+        # else:
+        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect)
 
         topo_orig = np.copy(cell.topo)
+        mask_orig = np.copy(cell.mask)
         
         if dfft_first_guess:
             nhi = len(cell.lon)
@@ -143,30 +160,35 @@ for rect_idx in rect_set:
 
         #######################################################
 
-        if (not rect) and (cg_spsp):
+        elif (not rect) and (cg_spsp):
             freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-1)
+
+        elif (not rect):
+            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-2)
+
+            print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
         # plot first guess...
 
-            if cnt == 0:
-                v_extent = [dat_2D_fg0.min(), dat_2D_fg0.max()]
+        if cnt == 0:
+            v_extent = [dat_2D_fg0.min(), dat_2D_fg0.max()]
 
-            if plot:
-                fs = (15.0,4.0)
-                fig, axs = plt.subplots(1,3, figsize=fs)
-                fig_obj = plotter.fig_obj(fig, first_guess.fobj.nhar_i, first_guess.fobj.nhar_j)
-                axs[0] = fig_obj.phys_panel(axs[0], dat_2D_fg0, title='T%i+T%i: FF reconstruction' %(idx,idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+        if plot:
+            fs = (15.0,4.0)
+            fig, axs = plt.subplots(1,3, figsize=fs)
+            fig_obj = plotter.fig_obj(fig, first_guess.fobj.nhar_i, first_guess.fobj.nhar_j)
+            axs[0] = fig_obj.phys_panel(axs[0], dat_2D_fg0, title='T%i+T%i: FF reconstruction' %(idx,idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
 
-                if dfft_first_guess:
-                    axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real')
-                    axs[2] = fig_obj.fft_freq_panel(axs[2], uw_pmf_freqs, kls[0], kls[1], title="PMF spectrum", typ='real')
-                else:
-                    axs[1] = fig_obj.freq_panel(axs[1], freqs)
-                    axs[2] = fig_obj.freq_panel(axs[2], uw_pmf_freqs, title="PMF spectrum")
+            if dfft_first_guess:
+                axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real')
+                axs[2] = fig_obj.fft_freq_panel(axs[2], uw_pmf_freqs, kls[0], kls[1], title="PMF spectrum", typ='real')
+            else:
+                axs[1] = fig_obj.freq_panel(axs[1], freqs)
+                axs[2] = fig_obj.freq_panel(axs[2], uw_pmf_freqs, title="PMF spectrum")
 
-                plt.tight_layout()
-                # plt.savefig('../output/T%i_T%i_fg.pdf' %(idx,idx+1))
-                plt.show()
+            plt.tight_layout()
+            # plt.savefig('../output/T%i_T%i_fg.pdf' %(idx,idx+1))
+            plt.show()
 
         ##############################################
 
@@ -192,7 +214,12 @@ for rect_idx in rect_set:
         else:
             pass
 
-        utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
+        if tapering:
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=padding, topo_mask=taper.p, mask=mask_taper)
+        else:
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+
+        # utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
 
         ############################################
 
@@ -230,7 +257,7 @@ for rect_idx in rect_set:
         ##############################################            
         
         if refine:
-            utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=True, filtered=False)
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, filtered=False)
             cell.topo -= dat_2D_fg0
             cell.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
             # cell.get_masked(triangle=triangle)
@@ -257,7 +284,7 @@ for rect_idx in rect_set:
                 k_idxs = [pair[1] for pair in indices]
                 l_idxs = [pair[0] for pair in indices]
                 
-            utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
             
             second_guess = interface.get_pmf(nhi,nhj,U,V)
             if dfft_first_guess:
@@ -274,11 +301,6 @@ for rect_idx in rect_set:
                     uw = tmp
                 uw += uw_sg
         
-        cell.topo = topo_orig
-
-        cell.uw = uw
-        all_cells[cnt] = cell
-
         ##############################################
 
         if plot:
@@ -298,12 +320,24 @@ for rect_idx in rect_set:
 
         ##############################################
 
+        cell.topo = topo_orig
+        cell.mask = mask_orig
+
+        cell.uw = uw
+        all_cells[cnt] = cell
+
         del cell
     
     cell0 = all_cells[0]
     cell1 = all_cells[1]
 
-    ampls, uw_ref, fft_2D, kls = first_guess.dfft(cell0)
+    if not rect:
+        cell_ref = var.topo_cell()
+        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell_ref, topo, rect=True)
+    else:
+        cell_ref = cell0
+
+    ampls, uw_ref, fft_2D, kls = first_guess.dfft(cell_ref)
 
     ampls_sum = (all_cells[0].analysis.ampls + all_cells[1].analysis.ampls)
     all_cells[0].analysis.ampls = ampls_sum
@@ -345,7 +379,7 @@ for rect_idx in rect_set:
 
     del all_cells
 
- # %%
+# %%
 title = ""
 
 print(idx_name)
@@ -390,4 +424,7 @@ fn = "%ix%i_%s_FF%s" %(lxkm, lykm, fg_tag, rfn_tag[:-1])
 print(fn)
 # plt.savefig('../output/'+fn+'_poster.pdf')
 plt.show()
+
+
+
 # %%
