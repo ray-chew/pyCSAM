@@ -62,16 +62,16 @@ def gen_art_terrain(shp, seed = 555, iters = 1000):
     return k
 
 
-class triangle(object):
+class gen_triangle(object):
 
-    def __init__(self, vx, vy):
+    def __init__(self, vx, vy, x_rng=None, y_rng=None):
         # self.x1, self.x2, self.x3 = vx
         # self.y1, self.y2, self.y3 = vy
         vx = np.append(vx, vx[0])
         vy = np.append(vy, vy[0])
 
-        vx = rescale(vx)
-        vy = rescale(vy)
+        vx = rescale(vx,rng=x_rng)
+        vy = rescale(vy,rng=y_rng)
 
         polygon = np.array([list(item) for item in zip(vx, vy)])
 
@@ -143,9 +143,15 @@ class triangle(object):
         return intersections & 1  
     
 
-def rescale(arr):
-    arr -= arr.min()
-    arr /= arr.max()
+def rescale(arr, rng=None):
+
+    if rng is None:
+        arr -= arr.min()
+        arr /= arr.max()
+    else:
+        rr = rng[1] - rng[0]
+        arr -= rng[0]
+        arr /= rr
     
     return arr
 
@@ -172,7 +178,7 @@ def get_size(obj, seen=None):
     return size
 
 
-def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False, filtered=True, padding=0):    
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None):    
     lat_max = get_closest_idx(lat_verts.max(), topo.lat) + padding
     lat_min = get_closest_idx(lat_verts.min(), topo.lat) - padding
 
@@ -185,11 +191,11 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False,
     lon_origin = cell.lon[0]
     lat_origin = cell.lat[0]
 
-    cell.lat = latlon2m(cell.lat, lon_origin, latlon='lat')
-    cell.lon = latlon2m(cell.lon, lat_origin, latlon='lon')
+    lat_in_m = latlon2m(cell.lat, lon_origin, latlon='lat')
+    lon_in_m = latlon2m(cell.lon, lat_origin, latlon='lon')
 
-    cell.wlat = np.diff(cell.lat).max()
-    cell.wlon = np.diff(cell.lon).max()
+    cell.wlat = np.diff(lat_in_m).max()
+    cell.wlon = np.diff(lon_in_m).max()
     
     # cell.wlat = np.diff(latlon2m(cell.lat, lon_origin, latlon='lat')).max()
     # cell.wlon = np.diff(latlon2m(cell.lon, lat_origin, latlon='lon')).max()
@@ -217,10 +223,23 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, triangle, rect=False,
 
     cell.topo = np.fft.ifft2(ampls * ampls.size).real
 
+    if topo_mask is not None:
+        cell.topo *= topo_mask
+
+    if (padding > 0):
+        triangle = gen_triangle(lon_verts, lat_verts, x_rng=[cell.lon.min(),cell.lon.max()], y_rng=[cell.lat.min(),cell.lat.max()])
+    else:
+        triangle = gen_triangle(lon_verts, lat_verts)
+
+    # crucial to update of the lat-lon data in the cell object AFTER the initialisation of the triangle object.
+    cell.lat = lat_in_m
+    cell.lon = lon_in_m
     cell.gen_mgrids()
     
     if rect:
         cell.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
+    elif mask is not None:
+        cell.get_masked(mask=mask)
     else:
         cell.get_masked(triangle=triangle)
     
@@ -359,14 +378,12 @@ def sliding_window_view(arr, window_shape, steps):
 
 class taper(object):
     def __init__(self, cell, padding, stencil_typ='OP', scale_fac=1.0, art_dt=0.5, art_it=800):
-        stencil = np.zeros((3,3))
-
         if stencil_typ == 'OP':
-            self.stencil = self.stencil_OP(stencil)
+            self.stencil = self.__stencil(0.5)
         elif stencil_typ == '5pt':
-            self.stencil = self.stencil_5pt(stencil)
+            self.stencil = self.__stencil(0.0)
         elif stencil_typ == 'PK':
-            self.stencil = self.stencil_PK(stencil)
+            self.stencil = self.__stencil(1.0/3.0)
 
         self.stencil *= scale_fac
 
@@ -378,7 +395,7 @@ class taper(object):
 
     def __apply_mask_padding(self, cell):
         p0 = cell.mask
-        self.p0 = np.pad(p0, (self.padding,self.padding), mode='constant')
+        self.p0 = np.pad(p0, ((self.padding,self.padding),(self.padding,self.padding)), mode='constant')
 
         self.p = np.copy(self.p0)
 
@@ -396,35 +413,22 @@ class taper(object):
 
     # https://en.wikipedia.org/wiki/Nine-point_stencil
     # I tried the 5pt stencil but it struggles when art_dt is large.
-    # From experience, the most robust stencil is the isotropic Oono-Puri 
+    # From experience, the most robust stencil is the isotropic Oono-Puri, gam=1/3.
     @staticmethod
-    def stencil_5pt(stencil):
-        stencil[0,1] = 1.0
-        stencil[1,0] = 1.0
-        stencil[1,2] = 1.0
-        stencil[2,1] = 1.0
-        stencil[1,1] = -4.0
-        return stencil
+    def __stencil(gam):
+        stencil_iso = np.zeros((3,3))
+        stencil_iso[0,1] = 1.0
+        stencil_iso[1,0] = 1.0
+        stencil_iso[1,2] = 1.0
+        stencil_iso[2,1] = 1.0
+        stencil_iso[1,1] = -4.0
 
-    @staticmethod
-    def stencil_OP(stencil):
-        stencil[:,:] = 0.25
-        stencil[0,1] = 0.50
-        stencil[1,0] = 0.50
-        stencil[1,2] = 0.50
-        stencil[2,1] = 0.50
-        stencil[1,1] = -3.0
-        return stencil
-    
-    @staticmethod
-    def stencil_PK(stencil):
-        stencil[:,:] = 1.0/6
-        stencil[0,1] = 4.0/6
-        stencil[1,0] = 4.0/6
-        stencil[1,2] = 4.0/6
-        stencil[2,1] = 4.0/6
-        stencil[1,1] = -20.0/6
-        return stencil
-    
+        stencil_aniso = np.zeros((3,3))
+        stencil_aniso[0,0] = 0.5
+        stencil_aniso[0,2] = 0.5
+        stencil_aniso[1,1] = -2
+        stencil_aniso[2,0] = 0.5
+        stencil_aniso[2,2] = 0.5
 
-        
+        stencil = (1.0 - gam) * stencil_iso + gam * stencil_aniso
+        return stencil
