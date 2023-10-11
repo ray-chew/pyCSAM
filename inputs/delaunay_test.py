@@ -25,7 +25,7 @@ lon_extent = [-141.,-158.,-127.]
 delaunay_xnp = 16
 delaunay_ynp = 11
 rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
-rect_set = np.sort([156,154,32,72,160,96,162,276])
+# rect_set = np.sort([156,154,32,72,160,96,162,276])
 # rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
 # rect_set = np.sort([276])
 lxkm, lykm = 120, 120
@@ -42,8 +42,13 @@ cg_spsp = False # coarse grain the spectral space?
 rect = False if cg_spsp else True 
 
 tapering = True
+taper_first = False
+taper_full_fg = False
+taper_second = True
+taper_both = False
+
 rect = True
-padding=10
+padding = 50
 
 
 debug = False
@@ -60,7 +65,7 @@ grid = var.grid()
 topo = var.topo_cell()
 
 # read grid
-reader = io.ncdata()
+reader = io.ncdata(padding=padding)
 
 reader.read_dat(fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
@@ -79,11 +84,7 @@ reader.read_topo(topo, topo, lon_verts, lat_verts)
 
 topo.gen_mgrids()
 
-tri = delaunay.get_decomposition(topo, xnp=delaunay_xnp, ynp=delaunay_ynp)
-
-pmf_diff = []
-pmf_sum_diff = []
-idx_name = []
+tri = delaunay.get_decomposition(topo, xnp=delaunay_xnp, ynp=delaunay_ynp, padding = reader.padding)
 
 # %%
 # Plot the loaded topography...
@@ -97,6 +98,9 @@ del topo.lat_grid
 del topo.lon_grid
 
 # %%
+pmf_diff = []
+pmf_sum_diff = []
+idx_name = []
 for rect_idx in rect_set:
     all_cells = np.zeros(2, dtype='object')
     for cnt, idx in enumerate(range(rect_idx,rect_idx+2)):
@@ -109,17 +113,23 @@ for rect_idx in rect_set:
         simplex_lon = tri.tri_lon_verts[idx]
 
         if tapering:
-            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+            fg_rect = True if taper_full_fg else False
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=fg_rect)
         
             taper = utils.taper(cell, padding, art_it=1000)
             taper.do_tapering()
 
-            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=padding)
 
-            mask_taper = np.copy(cell.mask)
+            if taper_second or taper_both:
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=padding)
+                mask_taper = np.copy(cell.mask)
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect)
+            
+            if (taper_first) or taper_both:
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=padding, topo_mask=taper.p)
 
-        # else:
-        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect)
+        else:
+            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect)
 
         topo_orig = np.copy(cell.topo)
         mask_orig = np.copy(cell.mask)
@@ -139,7 +149,7 @@ for rect_idx in rect_set:
             print("cell.lon: ", cell.lon.min(), cell.lon.max())
             print("cell.lat: ", cell.lat.min(), cell.lat.max())
         
-        if ((cnt == 0) and (rect)):
+        if ((rect) and ((cnt == 0) or (taper_first and not taper_full_fg) or taper_both)):
 
         #######################################################
         # do fourier...
@@ -214,7 +224,7 @@ for rect_idx in rect_set:
         else:
             pass
 
-        if tapering:
+        if (tapering) and ((taper_second) or (taper_both)):
             utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=padding, topo_mask=taper.p, mask=mask_taper)
         else:
             utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
@@ -331,7 +341,7 @@ for rect_idx in rect_set:
     cell0 = all_cells[0]
     cell1 = all_cells[1]
 
-    if not rect:
+    if tapering and (taper_first or taper_both):
         cell_ref = var.topo_cell()
         utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell_ref, topo, rect=True)
     else:
