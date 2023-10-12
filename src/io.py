@@ -227,7 +227,7 @@ class writer(object):
     HDF5 writer class. Contains methods to create HDF5 file, create data sets and populate them with output variables.
 
     """
-    def __init__(self, fn, sfx=''):
+    def __init__(self, fn, idxs, sfx='', debug=False):
         """
         Creates HDF5 file based on filename given attribute `OUTPUT_FILENAME`.
 
@@ -238,21 +238,47 @@ class writer(object):
         self.OUTPUT_FILENAME = fn
         self.OUTPUT_FULLPATH = self.OUTPUT_FOLDER + self.OUTPUT_FILENAME
         self.SUFFIX = sfx
+        self.DEBUG = debug
                 
-        self.PATHS = [  'coarse_errs',
-                        'fine_errs',
-                        'coarse_lmbdas',
-                        'fine_lmbdas',
-                        'min_cls',
-                        'min_fls',
-                        'min_errs_cls',
-                        'min_errs_fls',
-                        'opt_lmbdas',
-                        'opt_errs',
-                        'dat_errs',
+        self.IDXS = idxs
+        self.PATHS = [  
+                        # vars from the 'tri' object
+                        'tri_lat_verts',
+                        'tri_lon_verts',
+                        'tri_clats',
+                        'tri_clons',
+                        # vars from the 'cell' object
+                        'lon',
+                        'lat',
+                        'lon_grid',
+                        'lat_grid',
+                        # vars from the 'analysis' object
+                        'ampls',
+                        'kks',
+                        'lls',
+                        'recon',
                     ]
+        
+        self.ATTRS = [
+                        # vars from the 'analysis' object
+                        'wlat',
+                        'wlon',
+                    ]
+        
+        if debug:
+            self.PATHS = np.append(self.PATHS,
+                                   [
+                                       'mask',
+                                       'topo_ref',
+                                       'pmf_ref',
+                                       'spectrum_fg',
+                                       'recon_fg',
+                                       'pmf_fg',
+                                   ]
+                                   )
+
  
-        self.io_create_file(self.PATHS)
+        self.io_create_file(self.IDXS)
 
     def io_create_file(self,paths):
         """
@@ -274,10 +300,11 @@ class writer(object):
 
         # If file exists, rename it with old.
         if os.path.exists(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT):
-            os.rename(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, self.FULLPATH + self.SUFFIX + '_old' + self.FORMAT)
+            os.rename(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, self.OUTPUT_FULLPATH + self.SUFFIX + '_old' + self.FORMAT)
             
         file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'a')
         for path in paths:
+            path = str(path)
             # check if groups have been created
             # if not created, create empty groups
             if not (path in file):
@@ -285,40 +312,30 @@ class writer(object):
         
         file.close()
 
+    def write_all(self, idx, *args):
+        for arg in args:
+            for attr in self.PATHS:
+                if hasattr(arg, attr):
+                    self.populate(idx, attr, getattr(arg, attr))
 
-    # def write_all(self,Sol,mpv,elem,node,th,name):
-    #     """
-    #     At a given time, write output from `Sol` and `mpv` to the HDF5 file.
+            for attr in self.ATTRS:
+                if hasattr(arg, attr):
+                    self.write_attr(idx, attr, getattr(arg, attr))
 
-    #     Parameters
-    #     ----------
-    #     Sol : :class:`management.variable.Vars`
-    #         Solution data container
-    #     mpv : :class:`physics.low_mach.mpv.MPV`
-    #         Variables relating to the elliptic solver
-    #     elem : :class:`discretization.kgrid.ElemSpaceDiscr`
-    #         Cells grid
-    #     node : :class:`discretization.kgrid.NodeSpaceDiscr`
-    #         Nodes grid
-    #     th : :class:`physics.gas_dynamics.thermodynamic.ThermodynamicInit`
-    #         Thermodynamic variables of the system
-    #     name: str
-    #         The time and additional suffix label for the dataset, e.g. "_10.0_after_full_step", where 10.0 is the time and "after_full_step" denotes when the output was made.
+    def write_attr(self,idx,key,value):
+        """
+        Method to write attributes to HDF5 file.
+        """
+        file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
 
-    #     """
-    #     print("writing hdf output..." + name)
-    #     self.populate(name,'rho',Sol.rho)
-    #     self.populate(name,'rhoY',Sol.rhoY)
-    #     self.populate(name,'rhou',Sol.rhou)
-    #     self.populate(name,'rhov',Sol.rhov)
-    #     self.populate(name,'rhow',Sol.rhow)
-    #     self.populate(name,'rhoX',Sol.rhoX)
+        try:
+            file[str(idx)].attrs.create(str(key), value)
+        except:
+            file[str(idx)].attrs.create(str(key), repr(value),dtype='<S' + str(len(repr(value))))
 
-    #     self.populate(name,'p2_nodes',mpv.p2_nodes)
-    #     self.populate(name,'vorty', self.vorty(Sol,elem,node))
+        file.close()
 
-
-    def populate(self,name,path,data,options=None):
+    def populate(self,idx,path,data,options=None):
         """
         Helper function to write data into HDF5 dataset.
 
@@ -337,6 +354,6 @@ class writer(object):
         # name is the simulation time of the output array
         # path is the array type, e.g. U,V,H, and data is it's data.
         file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
-        file.create_dataset(str(path) + '/' + str(path) + '_' + str(name), data=data, chunks=True, compression='gzip', compression_opts=4, dtype=np.float32)
+        file.create_dataset(str(idx) + '/' + str(path), data=data, chunks=True, compression='gzip', compression_opts=4)
 
         file.close()
