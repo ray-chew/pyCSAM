@@ -184,3 +184,7 @@ class analysis(object):
 
 
         return freq_grid
+    
+
+class obj(object):
+    pass
