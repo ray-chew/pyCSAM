@@ -335,6 +335,15 @@ class writer(object):
 
         file.close()
 
+    def write_all_attrs(self, obj):
+        file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
+        for key, value in vars(obj).items():
+            try:
+                file.attrs.create(key,value)
+            except:
+                file.attrs.create(key,repr(value),dtype='<S' + str(len(repr(value))))
+        file.close()
+
     def populate(self,idx,path,data,options=None):
         """
         Helper function to write data into HDF5 dataset.
@@ -357,3 +366,36 @@ class writer(object):
         file.create_dataset(str(idx) + '/' + str(path), data=data, chunks=True, compression='gzip', compression_opts=4)
 
         file.close()
+
+
+class reader(object):
+
+    def __init__(self, fn):
+        self.fn = fn
+
+        self.names = {
+                        'lat' : 'lat',
+                        'lon' : 'lon',
+                        'recon' : 'data',
+                        'ampls' : 'spec',
+                        'pmf_sg' : 'pmf',
+                    }
+
+    def get_params(self, params):
+        file = h5py.File(self.fn)
+
+        for key in file.attrs.keys():
+            setattr(params, key, file.attrs[key])
+
+        file.close()
+
+    def read_data(self, idx, cell):
+        file = h5py.File(self.fn)
+
+        idx = str(idx)
+        for key, value in self.names.items():
+            setattr(cell, value, file[idx][key][:])
+
+        file.close()
+
+
