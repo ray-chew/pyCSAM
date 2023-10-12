@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial import Delaunay
-
+from src import utils, var
 
 def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
     # Partition lat-lon domain into a number of coarser but regularly spaces points that will form the vertices of the Delaunay triangles.
@@ -38,3 +38,21 @@ def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
     tri.tri_clons = tri.tri_lon_verts.sum(axis=1) / 3.0
 
     return tri
+
+
+def get_land_cells(tri, topo, height_tol=0.5, percent_tol=0.95):
+    rect_set = []
+    n_tri = len(tri.tri_lat_verts)
+
+    for tri_idx in range(n_tri)[::2]:
+        cell = var.topo_cell()
+
+    print("computing idx:", tri_idx)
+
+    simplex_lat = tri.tri_lat_verts[tri_idx]
+    simplex_lon = tri.tri_lon_verts[tri_idx]
+
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+
+    if not (((cell.topo <= height_tol).sum() / cell.topo.size) > percent_tol):
+        rect_set.append(tri_idx)
