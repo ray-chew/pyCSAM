@@ -1,7 +1,8 @@
 # %%
 import sys
+import os
 # set system path to find local modules
-sys.path.append('..')
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
 import pandas as pd
@@ -41,10 +42,10 @@ U, V = 10.0, 0.1
 cg_spsp = False # coarse grain the spectral space?
 rect = False if cg_spsp else True 
 
-tapering = True
-taper_first = False
-taper_full_fg = False
-taper_second = True
+tapering = False
+taper_first = True
+taper_full_fg = True
+taper_second = False
 taper_both = False
 
 rect = True
@@ -52,6 +53,7 @@ padding = 50
 
 
 debug = False
+debug_writer = True
 dfft_first_guess = False
 refine = False
 verbose = False
@@ -66,6 +68,9 @@ topo = var.topo_cell()
 
 # read grid
 reader = io.ncdata(padding=padding)
+
+# writer object
+writer = io.writer('test', rect_set, debug=debug_writer)
 
 reader.read_dat(fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
@@ -85,6 +90,8 @@ reader.read_topo(topo, topo, lon_verts, lat_verts)
 topo.gen_mgrids()
 
 tri = delaunay.get_decomposition(topo, xnp=delaunay_xnp, ynp=delaunay_ynp, padding = reader.padding)
+writer.write_all('decomposition', tri)
+writer.populate('decomposition', 'rect_set', rect_set)
 
 # %%
 # Plot the loaded topography...
@@ -177,6 +184,11 @@ for rect_idx in rect_set:
             freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-2)
 
             print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
+
+        if debug_writer:
+            writer.populate(idx, 'spectrum_fg', freqs)
+            writer.populate(idx, 'recon_fg', dat_2D_fg0)
+            writer.populate(idx, 'pmf_fg', uw_pmf_freqs)
 
         # plot first guess...
 
@@ -330,6 +342,8 @@ for rect_idx in rect_set:
 
         ##############################################
 
+        writer.write_all(idx, cell, cell.analysis)
+
         cell.topo = topo_orig
         cell.mask = mask_orig
 
@@ -388,6 +402,8 @@ for rect_idx in rect_set:
     pmf_sum_diff.append(residual_sum_error)
 
     del all_cells
+
+writer.populate('decomposition', 'pmf_diff', pmf_diff)
 
 # %%
 title = ""
