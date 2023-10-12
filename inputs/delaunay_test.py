@@ -14,53 +14,8 @@ from vis import plotter, cart_plot
 
 
 # %%
-# fn_grid = '/scratch/atmodynamics/chew/data/icon_compact.nc'
-# fn_topo = '/scratch/atmodynamics/chew/data/topo_compact.nc'
-
-params = var.obj()
-
-params.fn_grid = '/home/ray/git-projects/spec_appx/data/icon_compact.nc'
-params.fn_topo = '/home/ray/git-projects/spec_appx/data/topo_compact.nc'
-
-params.lat_extent = [52.,64.,64.]
-params.lon_extent = [-141.,-158.,-127.]
-
-params.delaunay_xnp = 16
-params.delaunay_ynp = 11
-params.rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
-# rect_set = np.sort([156,154,32,72,160,96,162,276])
-# rect_set = np.sort([52,62,110,280,296,298,178,276,244,242])
-# rect_set = np.sort([276])
-params.lxkm, params.lykm = 120, 120
-
-# Setup the Fourier parameters and object.
-params.nhi = 24
-params.nhj = 48
-
-params.n_modes = 100
-
-params.U, params.V = 10.0, 0.1
-
-params.cg_spsp = False # coarse grain the spectral space?
-params.rect = False if params.cg_spsp else True 
-
-params.tapering        = True
-params.taper_first     = False
-params.taper_full_fg   = False
-params.taper_second    = True
-params.taper_both      = False
-
-params.rect = True
-params.padding = 50
-
-params.debug = False
-params.debug_writer = True
-params.dfft_first_guess = False
-params.refine = False
-params.verbose = False
-
-params.plot = True
-
+# from runs.lam_run import params
+from runs.selected_run import params
 
 # %%
 # initialise data objects
@@ -71,7 +26,7 @@ topo = var.topo_cell()
 reader = io.ncdata(padding=params.padding)
 
 # writer object
-writer = io.writer('test', params.rect_set, debug=params.debug_writer)
+writer = io.writer(params.output_fn, params.rect_set, debug=params.debug_writer)
 writer.write_all_attrs(params)
 
 reader.read_dat(params.fn_grid, grid)
@@ -422,12 +377,14 @@ print(avg_err)
 pmf_percent_diff = 100.0 * np.array(pmf_diff)
 data = pd.DataFrame(pmf_percent_diff,index=idx_name, columns=['values'])
 fig, (ax1) = plt.subplots(1,1,sharex=True,
-                         figsize=(3.0,2.0))
+                         figsize=(20.0,10.0))
 
 true_col = 'g'
 false_col = 'C4' if params.dfft_first_guess else 'r'
 
 data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}))
+
+plt.grid()
 
 plt.xlabel("grid idx")
 plt.ylabel("percentage rel. pmf diff")
@@ -449,7 +406,7 @@ else:
 cs_dd = "%s + FF%s; ~(%i x %i)km\nModes: %s; N=%i\nAverage err: " %(fg_tag, rfn_tag, params.lxkm, params.lykm, spec_dom, params.n_modes) + r"$\bf{" + str(err_input) + "\%}$"
 
 plt.title(title, fontsize=12, pad=-10)
-plt.ylim([-50,50])
+plt.ylim([-100,100])
 plt.tight_layout()
 
 fn = "%ix%i_%s_FF%s" %(params.lxkm, params.lykm, fg_tag, rfn_tag[:-1])
