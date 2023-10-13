@@ -13,6 +13,10 @@ params.lon_extent = [-141.,-158.,-127.]
 params.delaunay_xnp = 16
 params.delaunay_ynp = 11
 
+###############################
+# USGS GMTED2010 Alaska-LAM run
+###############################
+
 # severe overstimation (>10% error)
 params.rect_set = [102, 274, 188, 294,  58, 216,   8, 190, 136, 258]
 # >30% error
@@ -35,6 +39,22 @@ params.rect_set = [228, 192, 230, 6, 250, 168, 226, 280, 244, 278, 142, 66, 260,
 # params.rect_set = [228, 192, 230, 6, 250, 168, 226]
 # params.rect_set = [260]
 
+
+###############################
+# MERIT DEM Alaska-LAM run
+###############################
+
+params.merit_cg = 10
+params.merit_path = '/home/ray/Documents/orog_data/MERIT/'
+
+# +39% overestimation
+params.rect_set = [20]
+
+# -23.3%; -22.6%; -15.9% underestimation
+params.rect_set = [66, 182, 240]
+
+# all the main MERIT offenders
+params.rect_set = [20, 66, 182, 240]
 
 params.lxkm, params.lykm = 120, 120
 
@@ -64,9 +84,9 @@ params.padding = 50
 params.debug = False
 params.debug_writer = True
 params.dfft_first_guess = False
-params.refine = True
 
-params_refine_n_modes = 50
+params.refine = True
+params.refine_n_modes = 50
 params.refine_lmbda_fg = 1e-2
 params.refine_lmbda_sg = 0.2
 
