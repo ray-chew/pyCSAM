@@ -15,7 +15,11 @@ from vis import plotter, cart_plot
 
 # %%
 # from runs.lam_run import params
-from runs.selected_run import params
+# from runs.selected_run import params
+from runs.debug_run import params
+
+# print run parameters, for sanity check.
+params.print()
 
 # %%
 # initialise data objects
@@ -122,7 +126,7 @@ for rect_idx in params.rect_set:
         # do fourier...
 
             if not params.dfft_first_guess:
-                freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-2)
+                freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=params.lmbda_fg)
 
                 print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
@@ -138,10 +142,10 @@ for rect_idx in params.rect_set:
         #######################################################
 
         elif (not params.rect) and (params.cg_spsp):
-            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-1)
+            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=params.lmbda_fg)
 
         elif (not params.rect):
-            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=1e-2)
+            freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=params.lmbda_fg)
 
             print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
@@ -223,7 +227,7 @@ for rect_idx in params.rect_set:
             else:
                 second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-            freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
+            freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sg, updt_analysis=True, scale=np.sqrt(2.0))
         else:
             freqs = np.array(freqs, order='C')
             freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
@@ -247,7 +251,7 @@ for rect_idx in params.rect_set:
             
             first_guess = interface.get_pmf(nhi,nhj,params.U,params.V)
             if not params.dfft_first_guess:
-                freqs_fg, _, dat_2D_fg = first_guess.sappx(cell, lmbda=0.0)
+                freqs_fg, _, dat_2D_fg = first_guess.sappx(cell, lmbda=params.refine_lmbda_fg)
             else:
                 ampls, uw_pmf_freqs, dat_2D_fg, kls = first_guess.dfft(cell)
                 freqs_fg = np.copy(ampls)
@@ -256,7 +260,7 @@ for rect_idx in params.rect_set:
             indices = []
             max_ampls = []
 
-            for ii in range(25):
+            for ii in range(params.refine_n_modes):
                 max_idx = np.unravel_index(fq_cpy.argmax(), fq_cpy.shape)
                 indices.append(max_idx)
                 max_ampls.append(fq_cpy[max_idx])
@@ -274,14 +278,23 @@ for rect_idx in params.rect_set:
             else:
                 second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
             
-            freqs_sg, uw_sg, dat_2D_sg = second_guess.sappx(cell, lmbda=0.2, updt_analysis= True, scale=np.sqrt(2.0))
+            freqs_sg, uw_sg, dat_2D_sg = second_guess.sappx(cell, lmbda=params.refine_lmbda_sg, updt_analysis= True, scale=np.sqrt(2.0))
 
-            if freqs_sg.sum() < freqs.sum():
-                if uw_sg.shape[1] > uw.shape[1]:
-                    tmp = np.zeros_like(uw_sg)
-                    tmp[:,:uw.shape[1]] = uw
-                    uw = tmp
-                uw += uw_sg
+            # if freqs_sg.sum() < freqs.sum():
+            #     if uw_sg.shape[1] > uw.shape[1]:
+            #         tmp = np.zeros_like(uw_sg)
+            #         tmp[:,:uw.shape[1]] = uw
+            #         uw = tmp
+
+            freqs_tmp = freqs + freqs_sg
+            cutoff = np.sort(freqs_tmp.ravel())[::-1][params.n_modes-1]
+            freqs_tmp[np.where(freqs_tmp < cutoff)] = 0.0
+            cell.analysis.ampls = freqs_tmp
+
+            ideal = physics.ideal_pmf(U=params.U, V=params.V)
+            uw = ideal.compute_uw_pmf(cell.analysis, summed=False)
+
+            # uw += uw_sg
         
         ##############################################
 
@@ -377,7 +390,7 @@ print(avg_err)
 pmf_percent_diff = 100.0 * np.array(pmf_diff)
 data = pd.DataFrame(pmf_percent_diff,index=idx_name, columns=['values'])
 fig, (ax1) = plt.subplots(1,1,sharex=True,
-                         figsize=(20.0,10.0))
+                         figsize=(5.0,3.0))
 
 true_col = 'g'
 false_col = 'C4' if params.dfft_first_guess else 'r'
