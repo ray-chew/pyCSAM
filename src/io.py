@@ -70,20 +70,22 @@ class ncdata(object):
 
     class read_merit_topo(object):
         
-        def __init__(self, cell, dir, lat_verts, lon_verts):
-            self.dir = dir
+        def __init__(self, cell, params):
+            self.dir = params.merit_path
 
             self.fn_lon = np.array([-180.0, -150.0, -120.0, -90.0, -60.0, -30.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0])
             self.fn_lat = np.array([90.0, 60.0, 30.0, 0.0, -30.0, -60.0, -90.0])
 
-            self.lat_verts = lat_verts
-            self.lon_verts = lon_verts
+            self.lat_verts = np.array(params.lat_extent)
+            self.lon_verts = np.array(params.lon_extent)
 
-            lat_min_idx = self.compute_idx(lat_verts.min(), 'min', 'lat')
-            lat_max_idx = self.compute_idx(lat_verts.max(), 'max', 'lat')
+            self.merit_cg = params.merit_cg
 
-            lon_min_idx = self.compute_idx(lon_verts.min(), 'min', 'lon')
-            lon_max_idx = self.compute_idx(lon_verts.max(), 'max', 'lon')
+            lat_min_idx = self.compute_idx(self.lat_verts.min(), 'min', 'lat')
+            lat_max_idx = self.compute_idx(self.lat_verts.max(), 'max', 'lat')
+
+            lon_min_idx = self.compute_idx(self.lon_verts.min(), 'min', 'lon')
+            lon_max_idx = self.compute_idx(self.lon_verts.max(), 'max', 'lon')
 
             fns, lon_cnt, lat_cnt = self.get_fns(lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx)
 
@@ -201,9 +203,13 @@ class ncdata(object):
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
             else:
-                iint = 4
-                cell.lat = np.sort(cell.lat)[::iint]
-                cell.lon = np.sort(cell.lon)[::iint][:-1]
+                iint = self.merit_cg
+                # cell.lat = np.sort(cell.lat)[::iint]
+                # cell.lon = np.sort(cell.lon)[::iint][:-1]
+
+                cell.lat = utils.sliding_window_view(np.sort(cell.lat), (iint,), (iint,)).mean(axis=-1)
+                cell.lon = utils.sliding_window_view(np.sort(cell.lon), (iint,), (iint,)).mean(axis=-1)
+
 
                 cell.topo = utils.sliding_window_view(cell.topo, (iint,iint), (iint,iint)).mean(axis=(-1,-2))[::-1,:]
 
@@ -344,7 +350,7 @@ class writer(object):
                 file.attrs.create(key,repr(value),dtype='<S' + str(len(repr(value))))
         file.close()
 
-    def populate(self,idx,path,data,options=None):
+    def populate(self,idx,name,data,options=None):
         """
         Helper function to write data into HDF5 dataset.
 
@@ -363,7 +369,12 @@ class writer(object):
         # name is the simulation time of the output array
         # path is the array type, e.g. U,V,H, and data is it's data.
         file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
-        file.create_dataset(str(idx) + '/' + str(path), data=data, chunks=True, compression='gzip', compression_opts=4)
+
+        path = str(idx) + '/' + str(name)
+        if not (path in file):
+            file.create_dataset(path, data=data, chunks=True, compression='gzip', compression_opts=4)
+        else:
+            file[path][...] = data
 
         file.close()
 
