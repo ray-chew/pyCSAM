@@ -15,8 +15,8 @@ from vis import plotter, cart_plot
 
 # %%
 # from runs.lam_run import params
-# from runs.selected_run import params
-from runs.debug_run import params
+from runs.selected_run import params
+# from runs.debug_run import params
 
 # print run parameters, for sanity check.
 params.print()
@@ -41,12 +41,12 @@ lat_verts = np.array(params.lat_extent)
 lon_verts = np.array(params.lon_extent)
 
 # read topography
-reader.read_dat(params.fn_topo, topo)
-reader.read_topo(topo, topo, lon_verts, lat_verts)
+# reader.read_dat(params.fn_topo, topo)
+# reader.read_topo(topo, topo, lon_verts, lat_verts)
 
 # path = "/scratch/atmodynamics/chew/data/MERIT/"
-# reader.read_merit_topo(topo, path, lat_verts, lon_verts)
-# topo.topo[np.where(topo.topo < -100)] = -100
+reader.read_merit_topo(topo, params)
+topo.topo[np.where(topo.topo < -100)] = -100
 
 topo.gen_mgrids()
 
@@ -56,10 +56,10 @@ writer.populate('decomposition', 'rect_set', params.rect_set)
 
 # %%
 # Plot the loaded topography...
-cart_plot.lat_lon(topo, int=20)
+cart_plot.lat_lon(topo, int=2)
 
 levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=False, int=20)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=False, int=2)
 
 # %%
 del topo.lat_grid
