@@ -53,9 +53,6 @@ params.rect_set = [20]
 # -23.3%; -22.6%; -15.9% underestimation
 params.rect_set = [66, 182, 240]
 
-# all the main MERIT offenders
-params.rect_set = [20, 66, 182, 240]
-
 params.lxkm, params.lykm = 120, 120
 
 # Setup the Fourier parameters and object.

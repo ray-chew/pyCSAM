@@ -29,6 +29,10 @@ params.rect_set = np.sort([156,152,130,78,20,174,176,64, 86, 228])
 # MERIT 10x coarse-graining corresponding selected rect set (better approximation of the USGS GMTED2010 resolution).
 params.rect_set = np.sort([66,182, 20, 216, 246, 244, 240, 152, 278, 22])
 
+# all the main MERIT x10 offenders. To test implementation of correction strategy.
+# params.rect_set = [20, 66, 182, 240]
+# params.rect_set = [182]
+
 params.lxkm, params.lykm = 120, 120
 
 # Setup the Fourier parameters and object.
