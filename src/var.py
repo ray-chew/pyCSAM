@@ -187,4 +187,10 @@ class analysis(object):
     
 
 class obj(object):
-    pass
+    
+    def __init__(self):
+        pass
+
+    def print(self):
+        for var in vars(self):
+            print(var, getattr(self, var))
