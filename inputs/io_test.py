@@ -15,7 +15,7 @@ from vis import plotter, cart_plot
 import h5py
 
 # %%
-fn = '../outputs/test.h5'
+fn = '../outputs/backup/lam_alaska_merit_191023_151813.h5'
 file = h5py.File(fn)
 
 reader = io.reader(fn)
@@ -26,7 +26,7 @@ reader.get_params(params)
 for idx in params.rect_set:
     cell = var.topo_cell()
 
-    reader.read_data(idx, cell)
+    reader.read_all(idx, cell)
 
     fs = (15,5.0)
     fig, axs = plt.subplots(1,3, figsize=fs)
