@@ -71,8 +71,9 @@ class ncdata(object):
 
     class read_merit_topo(object):
         
-        def __init__(self, cell, params):
+        def __init__(self, cell, params, verbose=False):
             self.dir = params.merit_path
+            self.verbose = verbose
 
             self.fn_lon = np.array([-180.0, -150.0, -120.0, -90.0, -60.0, -30.0, 0.0, 30.0, 60.0, 90.0, 120.0, 150.0, 180.0])
             self.fn_lat = np.array([90.0, 60.0, 30.0, 0.0, -30.0, -60.0, -90.0])
@@ -100,7 +101,9 @@ class ncdata(object):
                 fn_int = self.fn_lat
 
             where_idx = np.argmin(np.abs(fn_int - vert))
-            print(fn_int, where_idx)
+
+            if self.verbose:
+                print(fn_int, where_idx)
             
             if typ=='min':
                 if (vert - fn_int[where_idx]) < 0.0:
@@ -116,10 +119,11 @@ class ncdata(object):
                         where_idx -= 1
                     
             where_idx = int(where_idx)
-                    
-            print("where_idx, vert, fn_int[where_idx] for typ:")
-            print(where_idx, vert, fn_int[where_idx], typ)
-            print("")
+
+            if self.verbose:  
+                print("where_idx, vert, fn_int[where_idx] for typ:")
+                print(where_idx, vert, fn_int[where_idx], typ)
+                print("")
                     
             return where_idx
 
@@ -254,6 +258,8 @@ class writer(object):
                         'tri_lon_verts',
                         'tri_clats',
                         'tri_clons',
+                        'points',
+                        'simplices',
                         # vars from the 'cell' object
                         'lon',
                         'lat',
@@ -402,7 +408,16 @@ class reader(object):
 
         file.close()
 
-    def read_data(self, idx, cell):
+
+    def read_data(self, idx, name):
+        file = h5py.File(self.fn)
+        dat = file[str(idx)][name][:]
+        file.close()
+
+        return np.array(dat)
+
+
+    def read_all(self, idx, cell):
         file = h5py.File(self.fn)
 
         idx = str(idx)
@@ -410,6 +425,8 @@ class reader(object):
             setattr(cell, value, file[idx][key][:])
 
         file.close()
+
+    
 
 
 
