@@ -2,12 +2,13 @@ import netCDF4 as nc
 import numpy as np
 import h5py
 import os
+from datetime import datetime
 
 from src import utils
 
 class ncdata(object):
 
-    def __init__(self, read_merit = False, padding = 0, padding_tol = 10):
+    def __init__(self, read_merit = False, padding = 0, padding_tol = 50):
         self.read_merit = read_merit
         self.padding = padding_tol + padding
 
@@ -277,6 +278,7 @@ class writer(object):
                                        'mask',
                                        'topo_ref',
                                        'pmf_ref',
+                                       'spectrum_ref',
                                        'spectrum_fg',
                                        'recon_fg',
                                        'pmf_fg',
@@ -410,3 +412,29 @@ class reader(object):
         file.close()
 
 
+
+
+def fn_gen(params):
+    if hasattr(params, 'fn_tag'):
+        tag = params.fn_tag
+    else:
+        tag = 'unnamed'
+
+    if params.enable_merit:
+        topo_dat = 'merit'
+    else:
+        topo_dat = 'usgs'
+
+    now = datetime.now()
+
+    date = now.strftime("%d%m%y")
+    time = now.strftime("%H%M%S")
+
+    ord = ['tag', 'topo_dat', 'date', 'time']
+
+    fn = ''
+    for item in ord:
+        fn += locals()[item] 
+        fn += '_'
+
+    return fn[:-1]
