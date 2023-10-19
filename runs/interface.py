@@ -12,10 +12,13 @@ class get_pmf(object):
 
         self.debug = debug
 
-    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False):
+    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False, get_n_modes=False):
         self.fobj.do_full(cell)
 
-        am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
+        if iter_solve:
+            am, data_recons = lin_reg.do_iter(self.fobj, cell, lmbda, get_n_modes)    
+        else:
+            am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
 
         self.fobj.get_freq_grid(am)
         freqs = scale * np.abs(self.fobj.ampls)
