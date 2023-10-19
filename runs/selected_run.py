@@ -27,41 +27,22 @@ params.rect_set = np.sort([156,152,130,78,20,174,176,64, 86, 228])
 
 
 # MERIT 10x coarse-graining corresponding selected rect set (better approximation of the USGS GMTED2010 resolution).
+# PADDING=50
 params.rect_set = np.sort([66,182, 20, 216, 246, 244, 240, 152, 278, 22])
 
 # all the main MERIT x10 offenders. To test implementation of correction strategy.
 # params.rect_set = [20, 66, 182, 240]
 # params.rect_set = [182]
 
+# MERIT full LAM top underestimators AFTER correction... Why does correction not work?
+# params.rect_set = np.sort([98, 210, 286, 80, 266])
+
+# MERIT full LAM top overestimators AFTER correction
+# params.rect_set = np.sort([0, 6, 212, 84, 174])
+# params.rect_set = np.sort([212, 174])
+
 params.lxkm, params.lykm = 120, 120
 
-# Setup the Fourier parameters and object.
-params.nhi = 24
-params.nhj = 48
+params.run_full_land_model = False
 
-params.n_modes = 100
-
-params.U, params.V = 10.0, 0.1
-
-params.cg_spsp = False # coarse grain the spectral space?
-params.rect = False if params.cg_spsp else True 
-
-params.lmbda_fg = 1e-2
-params.lmbda_sg = 1e-1
-
-params.tapering        = True
-params.taper_first     = False
-params.taper_full_fg   = False
-params.taper_second    = True
-params.taper_both      = False
-
-params.rect = True
-params.padding = 50
-
-params.debug = False
-params.debug_writer = True
-params.dfft_first_guess = False
-params.refine = False
-
-params.verbose = False
-params.plot = True
+params.padding = 0
