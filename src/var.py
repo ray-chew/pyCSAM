@@ -237,6 +237,9 @@ class params(obj):
         self.cg_spsp = False # coarse grain the spectral space?
         self.rect = False if self.cg_spsp else True 
 
+        self.fg_iter_solve = True
+        self.sg_iter_solve = True
+
         # Penalty terms
         self.lmbda_fg = 1e-2 # first guess
         self.lmbda_sg = 1e-1 # second step
