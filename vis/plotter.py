@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class fig_obj(object):
 
@@ -107,5 +108,50 @@ class fig_obj(object):
 
 
 
-    
+def error_bar_plot( idx_name,
+                    pmf_diff,
+                    params,
+                    title="",
+                    gen_title=False,
+                    output_fig=False,
+                    fn="../output/error_plot.pdf",
+                    ylim=[-100,100]
+                    ):
+
+    data = pd.DataFrame(pmf_diff,index=idx_name, columns=['values'])
+    fig, (ax1) = plt.subplots(1,1,sharex=True,
+                         figsize=(10.0,6.0))
+
+    true_col = 'g'
+    false_col = 'C4' if params.dfft_first_guess else 'r'
+
+    data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}))
+
+    plt.grid()
+
+    plt.xlabel("grid idx")
+    plt.ylabel("percentage rel. pmf diff")
+
+    avg_err = np.abs(pmf_diff).mean()
+    err_input = np.around(avg_err,2)
+
+    if params.dfft_first_guess:
+        spec_dom = "(from FFT)"
+        fg_tag = 'FFT' 
+    else:
+        spec_dom = "(%i x %i)" %(params.nhi,params.nhj)
+        fg_tag = 'FF'
         
+    if params.refine:
+        rfn_tag = ' + ext.'
+    else:
+        rfn_tag = ''
+
+    if gen_title: title = fg_tag + '+FF' + ' ' + rfn_tag + ' avg err: ' + str(err_input)
+
+    plt.title(title, fontsize=12, pad=-10)
+    plt.ylim(ylim)
+    plt.tight_layout()
+
+    if output_fig: plt.savefig('../output/'+fn+'_poster.pdf')
+    plt.show()
