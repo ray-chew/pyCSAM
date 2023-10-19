@@ -1,7 +1,7 @@
 import numpy as np
 from src import var
 
-params = var.obj()
+params = var.params()
 
 params.fn_grid = '/home/ray/git-projects/spec_appx/data/icon_compact.nc'
 params.fn_topo = '/home/ray/git-projects/spec_appx/data/topo_compact.nc'
