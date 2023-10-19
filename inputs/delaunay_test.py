@@ -17,8 +17,8 @@ from vis import plotter, cart_plot
 %autoreload
 
 # %%
-from runs.lam_run import params
-# from runs.selected_run import params
+# from runs.lam_run import params
+from runs.selected_run import params
 from copy import deepcopy
 # from runs.debug_run import params
 
@@ -36,7 +36,6 @@ reader = io.ncdata(padding=params.padding, padding_tol=(60-params.padding))
 
 # writer object
 writer = io.writer(params.output_fn, params.rect_set, debug=params.debug_writer)
-writer.write_all_attrs(params)
 
 reader.read_dat(params.fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
@@ -65,7 +64,7 @@ if params.run_full_land_model:
     print(params.rect_set)
 
 params_orig = deepcopy(params)
-
+writer.write_all_attrs(params)
 # %%
 # Plot the loaded topography...
 cart_plot.lat_lon(topo, int=1)
@@ -483,52 +482,8 @@ writer.populate('decomposition', 'pmf_diff', pmf_diff)
 
 
 # %%
-title = ""
-
-print(idx_name)
-print(pmf_diff)
-avg_err = np.abs(pmf_diff).mean() * 100.0
-print(avg_err)
-
-pmf_percent_diff = 100.0 * np.array(pmf_diff)
-data = pd.DataFrame(pmf_percent_diff,index=idx_name, columns=['values'])
-fig, (ax1) = plt.subplots(1,1,sharex=True,
-                         figsize=(10.0,6.0))
-
-true_col = 'g'
-false_col = 'C4' if params.dfft_first_guess else 'r'
-
-data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}))
-
-plt.grid()
-
-plt.xlabel("grid idx")
-plt.ylabel("percentage rel. pmf diff")
-
-err_input = np.around(avg_err,2)
-
-if params.dfft_first_guess:
-    spec_dom = "(from FFT)"
-    fg_tag = 'FFT' 
-else:
-    spec_dom = "(%i x %i)" %(nhi,nhj)
-    fg_tag = 'FF'
-    
-if params.refine:
-    rfn_tag = ' + ext.'
-else:
-    rfn_tag = ''
-    
-cs_dd = "%s + FF%s; ~(%i x %i)km\nModes: %s; N=%i\nAverage err: " %(fg_tag, rfn_tag, params.lxkm, params.lykm, spec_dom, params.n_modes) + r"$\bf{" + str(err_input) + "\%}$"
-
-plt.title(title, fontsize=12, pad=-10)
-plt.ylim([-100,100])
-plt.tight_layout()
-
-fn = "%ix%i_%s_FF%s" %(params.lxkm, params.lykm, fg_tag, rfn_tag[:-1])
-print(fn)
-# plt.savefig('../output/'+fn+'_poster.pdf')
-plt.show()
+pmf_percent_diff = np.array(pmf_diff) * 100
+plotter.error_bar_plot(params.rect_set, pmf_percent_diff, params, gen_title=True)
 
 
 
@@ -537,6 +492,7 @@ importlib.reload(io)
 importlib.reload(cart_plot)
 
 errors = np.zeros((len(tri.simplices)))
+errors[:] = np.nan
 errors[params.rect_set] = pmf_percent_diff
 errors[np.array(params.rect_set)+1] = pmf_percent_diff
 
