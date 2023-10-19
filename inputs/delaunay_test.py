@@ -6,22 +6,25 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
 import pandas as pd
+import importlib
 import matplotlib.pyplot as plt
 
 from src import io, var, utils, fourier, physics, delaunay
 from runs import interface
 from vis import plotter, cart_plot
 
+%load_ext autoreload
+%autoreload
 
 # %%
-# from runs.lam_run import params
-from runs.selected_run import params
+from runs.lam_run import params
+# from runs.selected_run import params
 from copy import deepcopy
 # from runs.debug_run import params
 
 # print run parameters, for sanity check.
-params.print()
-params_orig = deepcopy(params)
+if params.self_test():
+    params.print()
 
 # %%
 # initialise data objects
@@ -29,7 +32,7 @@ grid = var.grid()
 topo = var.topo_cell()
 
 # read grid
-reader = io.ncdata(padding=params.padding)
+reader = io.ncdata(padding=params.padding, padding_tol=(60-params.padding))
 
 # writer object
 writer = io.writer(params.output_fn, params.rect_set, debug=params.debug_writer)
@@ -43,12 +46,12 @@ lat_verts = np.array(params.lat_extent)
 lon_verts = np.array(params.lon_extent)
 
 # read topography
-# reader.read_dat(params.fn_topo, topo)
-# reader.read_topo(topo, topo, lon_verts, lat_verts)
-
-# path = "/scratch/atmodynamics/chew/data/MERIT/"
-reader.read_merit_topo(topo, params)
-topo.topo[np.where(topo.topo < -100)] = -100
+if not params.enable_merit:
+    reader.read_dat(params.fn_topo, topo)
+    reader.read_topo(topo, topo, lon_verts, lat_verts)
+else:
+    reader.read_merit_topo(topo, params)
+    topo.topo[np.where(topo.topo < -500.0)] = -500.0
 
 topo.gen_mgrids()
 
@@ -57,15 +60,22 @@ writer.write_all('decomposition', tri)
 writer.populate('decomposition', 'rect_set', params.rect_set)
 
 # %%
-# Plot the loaded topography...
-cart_plot.lat_lon(topo, int=2)
+if params.run_full_land_model:
+    params.rect_set = delaunay.get_land_cells(tri, topo, height_tol=0.5)
+    print(params.rect_set)
 
-levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=False, int=2)
+params_orig = deepcopy(params)
 
 # %%
-del topo.lat_grid
-del topo.lon_grid
+# Plot the loaded topography...
+cart_plot.lat_lon(topo, int=1)
+
+levels = np.linspace(-1000.0, 3000.0, 5)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=False, int=1)
+
+# %%
+# del topo.lat_grid
+# del topo.lon_grid
 
 # %%
 pmf_diff = []
@@ -132,7 +142,7 @@ for rect_idx in params.rect_set:
             # do fourier...
 
                 if not params.dfft_first_guess:
-                    freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=params.lmbda_fg)
+                    freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=params.lmbda_fg, iter_solve=params.fg_iter_solve)
 
                     print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
@@ -233,7 +243,7 @@ for rect_idx in params.rect_set:
                 else:
                     second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-                freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sg, updt_analysis=True, scale=np.sqrt(2.0))
+                freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sg, updt_analysis=True, scale=np.sqrt(2.0), iter_solve=params.sg_iter_solve)
             else:
                 freqs = np.array(freqs, order='C')
                 freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
@@ -360,6 +370,11 @@ for rect_idx in params.rect_set:
 
         uw01 = 0.5 * (uw0 + uw1)
 
+        if params.debug_writer:
+            writer.populate(idx-1, 'topo_ref', cell_ref.topo)
+            writer.populate(idx-1, 'spectrum_ref', ampls)
+            writer.populate(idx-1, 'pmf_ref', uw_ref)
+
         print("")
         print("pmf tri1, tri2:", uw0, uw1)
         print("pmf ref, avg, sum:", uw_ref.sum(), uw01, uw_sum)
@@ -391,21 +406,63 @@ for rect_idx in params.rect_set:
             old_residual_error = np.copy(residual_error)
 
 
-        if (tried_correction):
+        if (tried_correction and (np.abs(residual_error) < 0.25)) or (params.no_corrections):
             corrected = True
 
         # MERIT x10 correction strategy
+        if (residual_error > 0.0):
+            params.refine = False
+
+        # if (residual_error > 0.5):
+        #     params.n_modes = int(params.n_modes / 2)
+        #     params.lmbda_sg = 1e-1
+        #     tried_correction = True
+
+        # elif (residual_error > 0.2):
+        #     params.n_modes = 25
+        #     params.lmbda_sg = 0.05
+        #     tried_correction = True
+
+        # elif (residual_error > 0.1):
+        #     params.n_modes = 50
+        #     params.lmbda_sg = 1e-1
+        #     tried_correction = True
+
         if (residual_error > 0.1):
-            params.n_modes = 50
+            params.n_modes = int(params.n_modes / 2)
             params.lmbda_sg = 1e-1
             tried_correction = True
 
         elif (residual_error < -0.15):
             params.refine = True
-            params.refine_n_modes = 50
+            if not hasattr(params, 'refine_n_modes'):
+                params.refine_n_modes = 10
+            else:
+                params.refine_n_modes = int(params.refine_n_modes + 10)
             params.refine_lmbda_fg = 1e-2
             params.refine_lmbda_sg = 0.2
             tried_correction = True
+
+        # elif (residual_error < -0.5):
+        #     params.refine = True
+        #     params.refine_n_modes = 100
+        #     params.refine_lmbda_fg = 1e-1
+        #     params.refine_lmbda_sg = 0.05
+        #     tried_correction = True
+
+        # elif (residual_error < -0.25):
+        #     params.refine = True
+        #     params.refine_n_modes = 80
+        #     params.refine_lmbda_fg = 1e-1
+        #     params.refine_lmbda_sg = 1e-1
+        #     tried_correction = True
+
+        # elif (residual_error < -0.15):
+        #     params.refine = True
+        #     params.refine_n_modes = 50
+        #     params.refine_lmbda_fg = 1e-2
+        #     params.refine_lmbda_sg = 0.2
+        #     tried_correction = True
         else:
             corrected = True
 
@@ -424,6 +481,7 @@ for rect_idx in params.rect_set:
 
 writer.populate('decomposition', 'pmf_diff', pmf_diff)
 
+
 # %%
 title = ""
 
@@ -435,7 +493,7 @@ print(avg_err)
 pmf_percent_diff = 100.0 * np.array(pmf_diff)
 data = pd.DataFrame(pmf_percent_diff,index=idx_name, columns=['values'])
 fig, (ax1) = plt.subplots(1,1,sharex=True,
-                         figsize=(5.0,3.0))
+                         figsize=(10.0,6.0))
 
 true_col = 'g'
 false_col = 'C4' if params.dfft_first_guess else 'r'
@@ -473,5 +531,16 @@ print(fn)
 plt.show()
 
 
+
+# %%
+importlib.reload(io)
+importlib.reload(cart_plot)
+
+errors = np.zeros((len(tri.simplices)))
+errors[params.rect_set] = pmf_percent_diff
+errors[np.array(params.rect_set)+1] = pmf_percent_diff
+
+levels = np.linspace(-1000.0, 3000.0, 5)
+cart_plot.error_delaunay(topo, tri, label_idxs=True, fs=(15,10), highlight_indices=params.rect_set, output_fig=False, iint=1, errors=errors, alpha_max=0.6)
 
 # %%
