@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from   matplotlib.collections import PolyCollection
+from   matplotlib.colors import ListedColormap
 import numpy as np
 import cartopy.crs as ccrs
 from cartopy.mpl.ticker import (LongitudeFormatter,
@@ -30,6 +31,13 @@ def lat_lon(topo, fs=(10,6), int=1):
     gl.xformatter = LongitudeFormatter(auto_hide=False)
     gl.yformatter = LatitudeFormatter()
 
+    ax.text(-0.01, 0.5, 'latitude', va='bottom', ha='center',
+            rotation='vertical', rotation_mode='anchor',
+            transform=ax.transAxes)
+    ax.text(0.5, -0.15, 'longitude', va='bottom', ha='center',
+            rotation='horizontal', rotation_mode='anchor',
+            transform=ax.transAxes)
+    
     ax.tick_params(axis="both",
                 tickdir='out',
                 length=15,
@@ -89,7 +97,8 @@ def error_delaunay(topo, tri, fs=(8,4),   \
                      output_fig = False, \
                      iint = 1, \
                      errors = None, \
-                     alpha_max = 0.5,
+                     alpha_max = 0.5, \
+                     v_extent = [-25.0, 25.0]
                   ):
     fig = plt.figure(figsize=fs)
     ax = plt.axes(projection=ccrs.PlateCarree())
@@ -103,21 +112,19 @@ def error_delaunay(topo, tri, fs=(8,4),   \
     
     points = tri.points
 
-    from matplotlib.colors import ListedColormap
     cmap = plt.cm.RdYlGn
     my_cmap = cmap(np.arange(cmap.N))
 
-
-    zeros_len = 30 # must be even
+    zeros_len = 2 # must be even
     lcmap_ov2 = cmap.N / 2
     my_cmap[:,-1] = np.concatenate((np.linspace(0, alpha_max, int(lcmap_ov2 - zeros_len/2))[::-1], np.zeros(zeros_len), np.linspace(0, alpha_max, int(lcmap_ov2 - zeros_len/2))))
     my_cmap = ListedColormap(my_cmap)
 
-    im = ax.tripcolor(points[:,0], points[:,1], tri.simplices.copy(), facecolors=errors, edgecolors='k', cmap=my_cmap, alpha=None)
+    im = ax.tripcolor(points[:,0], points[:,1], tri.simplices.copy(), facecolors=errors, edgecolors='k', cmap=my_cmap, alpha=0.5, vmin=v_extent[0],vmax=v_extent[1])
 
     if label_idxs:
         highlight_indices = np.array(highlight_indices)
-        tri_indices = np.arange(len(tri.tri_lat_verts))
+        tri_indices = np.arange(len(tri.tri_clats))
 
         for idx in tri_indices:
             colour = 'C7'
@@ -129,13 +136,13 @@ def error_delaunay(topo, tri, fs=(8,4),   \
         
             ax.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw)
 
-    cax = fig.add_axes([0.99, 0.22, 0.025, 0.55])
-    fig.colorbar(im, cax=cax)
+    cax = fig.add_axes([1.0, 0.228, 0.025, 0.54])
+    fig.colorbar(im, cax=cax, label='percentage of local error over maximum pmf')
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                     linewidth=2, color='gray', alpha=0.0, linestyle='--')
     gl.top_labels = False
-    gl.left_labels = False
+    gl.right_labels = False
 
     gl.xlocator = LongitudeLocator()
     gl.ylocator = LatitudeLocator()
@@ -146,12 +153,17 @@ def error_delaunay(topo, tri, fs=(8,4),   \
                 tickdir='out',
                 length=15,
                 grid_transform=ccrs.PlateCarree())
-
     
-    plt.xlabel("longitude [deg.]")
-    plt.ylabel("latitude [deg.]")
+    ax.text(-0.05, 0.5, 'latitude [deg]', va='bottom', ha='center',
+            rotation='vertical', rotation_mode='anchor',
+            transform=ax.transAxes)
+    ax.text(0.5, -0.08, 'longitude [deg]', va='bottom', ha='center',
+            rotation='horizontal', rotation_mode='anchor',
+            transform=ax.transAxes)
+    
+    
     plt.tight_layout()
-    if output_fig: plt.savefig(fn)
+    if output_fig: plt.savefig(fn, bbox_inches='tight',dpi=200)
 
     plt.show()
     
