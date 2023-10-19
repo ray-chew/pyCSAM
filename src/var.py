@@ -1,5 +1,5 @@
 import numpy as np
-from src import utils
+from src import utils, io
 
 class grid(object):
     def __init__(self):
@@ -194,3 +194,107 @@ class obj(object):
     def print(self):
         for var in vars(self):
             print(var, getattr(self, var))
+
+
+class params(obj):
+    def __init__(self):
+        # Define filenames
+        self.path = '/home/ray/git-projects/spec_appx/data/'
+        self.fn_grid = self.path + 'icon_compact.nc'
+        self.fn_topo = self.path + 'topo_compact.nc'
+
+        self.output_fn = None
+
+        self.enable_merit = True
+        self.merit_cg = 10
+        self.merit_path = '/home/ray/Documents/orog_data/MERIT/'
+
+        # Domain size
+        self.lat_extent = None
+        self.lon_extent = None
+
+        self.run_full_land_model = True
+
+        # Compulsory Delaunay parameters
+        self.delaunay_xnp = None
+        self.delaunay_ynp = None
+        self.rect_set = None
+        self.lxkm, self.lykm = None, None
+
+        # Set the Fourier parameters and object.
+        self.nhi = 24
+        self.nhj = 48
+        self.n_modes = 100
+
+        # Set artificial wind
+        self.U, self.V = 10.0, 0.1
+
+        # Set Spec Appx parameters
+        self.rect = True
+        self.dfft_first_guess = False
+        self.refine = False
+        self.no_corrections = True
+        self.cg_spsp = False # coarse grain the spectral space?
+        self.rect = False if self.cg_spsp else True 
+
+        # Penalty terms
+        self.lmbda_fg = 1e-2 # first guess
+        self.lmbda_sg = 1e-1 # second step
+
+        # Tapering parameters
+        self.tapering        = False
+        self.taper_first     = False
+        self.taper_full_fg   = False
+        self.taper_second    = True
+        self.taper_both      = False
+        self.padding = 0 # must be less than 60
+
+        # Flags
+        self.get_delaunay_triangulation = False
+        self.debug = False
+        self.debug_writer = True
+        self.verbose = False
+        self.plot = False
+
+
+    def self_test(self):
+        if self.output_fn is None:
+            self.output_fn = io.fn_gen(self)
+
+        self.check_init()
+
+        if self.get_delaunay_triangulation:
+            self.check_delaunay()
+
+        return True
+
+    def check_init(self):
+        compulsory_params = [
+                             'lat_extent',
+                             'lon_extent'
+                             ]
+        
+        offenders = self.checker(self, compulsory_params)
+        assert len(offenders) == 0, "Compulsory run parameter(s) undefined: %s" %offenders
+
+    def check_delaunay(self):
+        compulsory_params = [
+                             'delaunay_xnp',
+                             'delaunay_ynp',
+                             'rect_set',
+                             'lxkm',
+                             'lykm'
+                             ]
+
+        offenders = self.checker(self, compulsory_params)
+        assert len(offenders) == 0, "Compulsory Delaunay run parameter(s) undefined: %s" %offenders
+
+
+    @staticmethod
+    def checker(arg, compulsory_params):
+        offenders = []
+        for key, value in vars(arg).items():
+            if key in compulsory_params:
+                if value is None:
+                    offenders.append(key)
+        return offenders
