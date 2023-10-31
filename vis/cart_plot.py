@@ -103,7 +103,7 @@ def error_delaunay(topo, tri, fs=(8,4),   \
     fig = plt.figure(figsize=fs)
     ax = plt.axes(projection=ccrs.PlateCarree())
 
-    ax.coastlines()
+    ax.coastlines(alpha=0.5)
     ax.contourf(topo.lon_grid[::iint], topo.lat_grid[::iint], topo.topo[::iint],
                 alpha=1.0,
                 transform=ccrs.PlateCarree(),
@@ -131,10 +131,10 @@ def error_delaunay(topo, tri, fs=(8,4),   \
             fw = None
             
             if (idx in highlight_indices) or (idx in highlight_indices+1):
-                colour='C3'
+                colour='C0'
                 fw = 'bold'
         
-            ax.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw)
+            ax.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw, fontsize=12.0)
 
     cax = fig.add_axes([1.0, 0.228, 0.025, 0.54])
     fig.colorbar(im, cax=cax, label='percentage of local error over maximum pmf')
