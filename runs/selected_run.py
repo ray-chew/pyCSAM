@@ -43,6 +43,10 @@ params.rect_set = np.sort([66,182, 20, 216, 246, 244, 240, 152, 278, 22])
 
 params.lxkm, params.lykm = 120, 120
 
+params.U, params.V = 10.0, 0.0
+
 params.run_full_land_model = False
 
 params.padding = 0
+
+params.dfft_first_guess = False
