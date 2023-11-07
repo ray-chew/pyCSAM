@@ -4,10 +4,12 @@ import pandas as pd
 
 class fig_obj(object):
 
-    def __init__(self, fig, nhi, nhj):
+    def __init__(self, fig, nhi, nhj, cbar=True, set_label=True):
         self.nhi = nhi
         self.nhj = nhj
         self.fig = fig
+        self.cbar = cbar
+        self.set_label = set_label
 
 
     def phys_panel(self, axs, data, title="", extent=None, xlabel="", ylabel="", v_extent=None):
@@ -23,9 +25,13 @@ class fig_obj(object):
 
         im = axs.imshow(data, extent=extent, origin='lower', aspect='equal', cmap='cividis', vmin=vmin, vmax=vmax)
         axs.set_title(title)
-        axs.set_xlabel(xlabel)
-        axs.set_ylabel(ylabel)
-        self.fig.colorbar(im, ax=axs,fraction=0.2, pad=0.04, shrink=0.5)
+
+        if self.set_label:
+            axs.set_xlabel(xlabel)
+            axs.set_ylabel(ylabel)
+
+        if self.cbar:
+            self.fig.colorbar(im, ax=axs,fraction=0.2, pad=0.04, shrink=0.5)
 
         return axs
 
@@ -40,8 +46,9 @@ class fig_obj(object):
         else:
             vmin, vmax = None, None
 
-        im = axs.pcolormesh(np.abs(ampls), edgecolors='k', cmap='Greys', vmin=vmin, vmax=vmax)
-        self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
+        im = axs.pcolormesh(np.abs(ampls), edgecolor='k', cmap='Greys', vmin=vmin, vmax=vmax)
+        if self.cbar:
+            self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
 
         m_j = np.arange(-nhj/2+1, nhj/2+1)
         ylocs = np.arange(.5, nhj+.5, 1.0)
@@ -52,10 +59,14 @@ class fig_obj(object):
         axs.set_xticks(xlocs, m_i, rotation=-90)
         axs.set_yticks(ylocs, m_j)
         axs.set_title(title)
+        # axs.grid(which='minor', color='k', linestyle='-', linewidth=1)
         # axs.set_xlabel(r'$k_n \times 2 \pi / L_x$', fontsize=12)
         # axs.set_ylabel(r'$l_m \times 2 \pi / L_y$', fontsize=12)
+
+        if self.set_label:
+            axs.set_ylabel(r'$l_m$', fontsize=12)
+        
         axs.set_xlabel(r'$k_n$', fontsize=12)
-        axs.set_ylabel(r'$l_m$', fontsize=12)
         # axs.set_aspect('equal')
 
         for label in axs.yaxis.get_ticklabels()[::2]:
@@ -101,12 +112,15 @@ class fig_obj(object):
         ylabels = np.around(ylabels, 2)
 
         im = axs.imshow(np.abs(ampls), cmap='Greys', origin='lower')
-        self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
+        if self.cbar:
+            self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
         axs.set_xticks(xlocs, xlabels)
         axs.set_yticks(ylocs, ylabels)
         axs.set_title(title)
-        axs.set_xlabel(r'$k$ [m$^{-1}$]', fontsize=12)
-        axs.set_ylabel(r'$l$ [m$^{-1}$]', fontsize=12)
+
+        if self.set_label:
+            axs.set_xlabel(r'$k$ [m$^{-1}$]', fontsize=12)
+            axs.set_ylabel(r'$l$ [m$^{-1}$]', fontsize=12)
         if typ == 'imag': axs.set_aspect('equal')
 
         return axs
@@ -165,7 +179,7 @@ def error_bar_plot( idx_name,
 def error_bar_split_plot(errs, lbls, bs, ts, ts_ticks,
                          fs=(3.5,3.5), 
                          title="", 
-                         output=False, 
+                         output_fig=False, 
                          fn='output/errors.pdf'
                          ):
     
@@ -209,17 +223,18 @@ def error_bar_split_plot(errs, lbls, bs, ts, ts_ticks,
             
     plt.title(title, fontsize=18, pad=10)
     plt.tight_layout()
-    if output: plt.savefig(fn)
+    if output_fig: plt.savefig(fn)
     plt.show()
 
 
 def error_bar_abs_plot(errs, lbls,
                          fs=(3.5,3.5), 
                          title="", 
-                         output=False, 
+                         output_fig=False, 
                          fn='output/errors.pdf',
                          color=None,
-                         ylims=None
+                         ylims=None,
+                         fontsize=10
                          ):
     
     errs = [np.around(err,2) for err in errs]
@@ -237,7 +252,7 @@ def error_bar_abs_plot(errs, lbls,
     if ylims is not None:
         ax1.set_ylim([ylims[0],ylims[1]])
 
-    plt.title(title, fontsize=18, pad=10)
+    plt.title(title, fontsize=fontsize, pad=10)
     plt.tight_layout()
-    if output: plt.savefig(fn)
+    if output_fig: plt.savefig(fn, bbox_inches="tight")
     plt.show()
