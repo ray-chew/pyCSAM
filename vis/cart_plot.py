@@ -7,6 +7,7 @@ from cartopy.mpl.ticker import (LongitudeFormatter,
                                 LatitudeFormatter,
                                 LatitudeLocator, LongitudeLocator)
 
+
 def lat_lon(topo, fs=(10,6), int=1):
     fig = plt.figure(figsize=fs)
     ax = plt.axes(projection=ccrs.PlateCarree())
@@ -53,20 +54,25 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                      fn = '../output/delaunay.pdf', \
                      output_fig = False, \
                      int = 1, \
+                     raster=False
                      ):
     plt.figure(figsize=fs)
 
     im = plt.contourf(topo.lon_grid[::int], topo.lat_grid[::int], topo.topo[::int], levels=levels, cmap='GnBu')
     im.set_clim(0.0, levels[-1])
 
+    if raster:
+        for c in im.collections:
+            c.set_rasterized(True)
+
     points = tri.points
 
     cbar = plt.colorbar(im,fraction=0.2,pad=0.005, shrink=1.0)
 
-    plt.triplot(points[:,0], points[:,1], tri.simplices, c='C7', lw=0.5)
+    plt.triplot(points[:,0], points[:,1], tri.simplices, c='C7', lw=0.5, alpha=0.7)
 
 
-    plt.plot(points[:,0], points[:,1], 'wo', ms=2.0)
+    plt.plot(points[:,0], points[:,1], 'wo', ms=0.0)
     # plt.plot(tri_clons, tri_clats, 'rx', ms=4.0)
 
     if label_idxs:
@@ -81,7 +87,7 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                 colour='C3'
                 fw = 'bold'
         
-            plt.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw)
+            plt.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw, alpha=0.8)
 
     plt.xlabel("longitude [deg.]")
     plt.ylabel("latitude [deg.]")
@@ -101,7 +107,9 @@ def error_delaunay(topo, tri, fs=(8,4),   \
                      v_extent = [-25.0, 25.0]
                   ):
     fig = plt.figure(figsize=fs)
-    ax = plt.axes(projection=ccrs.PlateCarree())
+    # ax = plt.axes(projection=ccrs.PlateCarree())
+    ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+
 
     ax.coastlines(alpha=0.5)
     ax.contourf(topo.lon_grid[::iint], topo.lat_grid[::iint], topo.topo[::iint],
@@ -134,10 +142,12 @@ def error_delaunay(topo, tri, fs=(8,4),   \
                 colour='C0'
                 fw = 'bold'
         
-            ax.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw, fontsize=12.0)
+            ax.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw)
+
 
     cax = fig.add_axes([1.0, 0.228, 0.025, 0.54])
-    fig.colorbar(im, cax=cax, label='percentage of local error over maximum pmf')
+    # cax = fig.add_axes([0.85, 0.1, 0.025, 0.8])
+    fig.colorbar(im, cax=cax)
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                     linewidth=2, color='gray', alpha=0.0, linestyle='--')
