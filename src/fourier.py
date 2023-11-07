@@ -21,8 +21,8 @@ class f_trans(object):
 
         # now define appropriate indices for the points withing the triangle
         # by shifting the origin to the minimum lat and lon
-        lat_res = np.diff(lat).max()
-        lon_res = np.diff(lon).max()
+        lat_res = np.diff(lat).mean()
+        lon_res = np.diff(lon).mean()
 
         self.wlat = cell.wlat
         self.wlon = cell.wlon
