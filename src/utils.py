@@ -1,6 +1,7 @@
 import numpy as np
 import numba as nb
 import scipy.signal as signal
+import scipy.interpolate as interpolate
 import sys
 
 def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
@@ -178,7 +179,7 @@ def get_size(obj, seen=None):
     return size
 
 
-def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None):    
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None):
     lat_max = get_closest_idx(lat_verts.max(), topo.lat) + padding
     lat_min = get_closest_idx(lat_verts.min(), topo.lat) - padding
 
@@ -194,34 +195,51 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=
     lat_in_m = latlon2m(cell.lat, lon_origin, latlon='lat')
     lon_in_m = latlon2m(cell.lon, lat_origin, latlon='lon')
 
-    cell.wlat = np.diff(lat_in_m).max()
-    cell.wlon = np.diff(lon_in_m).max()
-    
-    # cell.wlat = np.diff(latlon2m(cell.lat, lon_origin, latlon='lat')).max()
-    # cell.wlon = np.diff(latlon2m(cell.lon, lat_origin, latlon='lon')).max()
+    cell.wlat = np.diff(lat_in_m).mean()
+    cell.wlon = np.diff(lon_in_m).mean()
 
-    # cell.lat = 
+    if rect:
+        cell.topo = np.copy(topo.topo[lat_min:lat_max, lon_min:lon_max])
+        cell.topo -= cell.topo.mean()
+        lon_grid_in_m, lat_grid_in_m = np.meshgrid(lon_in_m, lat_in_m)
+        shp = cell.topo.shape
 
-    # cell.lat = rescale(cell.lat) * 2.0 * np.pi
-    # cell.lon = rescale(cell.lon) * 2.0 * np.pi
-    
-    cell.topo = np.copy(topo.topo[lat_min:lat_max, lon_min:lon_max])
+        equid_lat = np.linspace(lat_in_m.min(), lat_in_m.max(), lat_in_m.size)
+        equid_lon = np.linspace(lon_in_m.min(), lon_in_m.max(), lon_in_m.size)
 
-    ampls = np.fft.fft2(cell.topo) 
-    ampls /= ampls.size
-    wlat = cell.wlat
-    wlon = cell.wlon
+        equid_lon_grid, equid_lat_grid = np.meshgrid(equid_lon, equid_lat)
 
-    kks = np.fft.fftfreq(cell.topo.shape[1])
-    lls = np.fft.fftfreq(cell.topo.shape[0])
-    
-    kkg, llg = np.meshgrid(kks, lls)
+        cell.topo = interpolate.griddata(
+                                (lon_grid_in_m.ravel(), lat_grid_in_m.ravel()),\
+                                cell.topo.ravel(),\
+                                (equid_lon_grid, equid_lat_grid),\
+                                method='nearest'
+                                )
+        
+        cell.topo = cell.topo.reshape(shp)
+        lat_in_m = equid_lat
+        lon_in_m = equid_lon
 
-    kls = ((2.0 * np.pi * kkg/wlon)**2 + (2.0 * np.pi * llg/wlat)**2)**0.5
+        cell.wlat = np.diff(lat_in_m).mean()
+        cell.wlon = np.diff(lon_in_m).mean()
 
-    if filtered: ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
 
-    cell.topo = np.fft.ifft2(ampls * ampls.size).real
+    if filtered:
+        ampls = np.fft.fft2(cell.topo) 
+        ampls /= ampls.size
+        wlat = cell.wlat
+        wlon = cell.wlon
+
+        kks = np.fft.fftfreq(cell.topo.shape[1])
+        lls = np.fft.fftfreq(cell.topo.shape[0])
+        
+        kkg, llg = np.meshgrid(kks, lls)
+
+        kls = ((2.0 * np.pi * kkg/wlon)**2 + (2.0 * np.pi * llg/wlat)**2)**0.5
+
+        ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
+
+        cell.topo = np.fft.ifft2(ampls * ampls.size).real
 
     if topo_mask is not None:
         cell.topo *= topo_mask
