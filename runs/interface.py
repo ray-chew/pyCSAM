@@ -130,7 +130,7 @@ def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo):
     # mask_taper = np.copy(cell.mask)
 
     # apply tapering mask to padded non-quad domain
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, filtered=False, mask=(taper.p > 1e-1).astype(bool))
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, filtered=False, mask=(taper.p > 1e-2).astype(bool))
 
     # mask=(taper.p > 1e-2).astype(bool)
     # cell.topo = taper.p * cell.topo * mask

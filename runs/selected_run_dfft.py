@@ -24,9 +24,20 @@ params.delaunay_ynp = 11
 # (xnp x ynp) = (14 x 11); (16, 11)
 params.rect_set = np.sort([20,148,160,212,38,242])
 
+params.nhi = 32
+params.nhj = 64
 
 # (xnp x ynp) = (16 x 14)
 # params.rect_set = np.sort([20,148,160,212,256,242])
+
+# corresponds to approx (80x80)km
+params.delaunay_xnp = 28
+params.delaunay_ynp = 22
+params.rect_set = np.sort([20,148,160,678,312,698, 342])
+params.nhi = 16
+params.nhj = 32
+# look into 342!!
+# params.rect_set = np.sort([342])
 
 # params.rect_set = np.sort([116])
 # all the main MERIT x10 offenders. To test implementation of correction strategy.
@@ -40,8 +51,6 @@ params.rect_set = np.sort([20,148,160,212,38,242])
 # params.rect_set = np.sort([0, 6, 212, 84, 174])
 # params.rect_set = np.sort([212, 174])
 
-params.nhi = 32
-params.nhj = 64
 
 params.lmbda_fa = 1e-1 # first guess
 params.lmbda_sa = 1e-1 # second step
@@ -53,7 +62,7 @@ params.U, params.V = 10.0, 0.0
 
 params.run_full_land_model = False
 
-params.padding = 20
+params.padding = 10
 
 params.n_modes = 50
 
@@ -62,7 +71,7 @@ params.dfft_first_guess = False
 params.taper_ref = True
 params.taper_fa = True
 params.taper_sa = False
-params.taper_art_it = 200
+params.taper_art_it = 20
 
 params.no_corrections = False
 

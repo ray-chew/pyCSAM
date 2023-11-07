@@ -71,7 +71,7 @@ writer.write_all_attrs(params)
 # cart_plot.lat_lon(topo, int=1)
 
 levels = np.linspace(-500.0, 3500.0, 9)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/delaunay.pdf', int=1, raster=True)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(20,12), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/delaunay.pdf', int=1, raster=True)
 
 # %%
 # del topo.lat_grid
