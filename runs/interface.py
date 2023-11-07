@@ -12,11 +12,11 @@ class get_pmf(object):
 
         self.debug = debug
 
-    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False, get_n_modes=False):
+    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
         self.fobj.do_full(cell)
 
         if iter_solve:
-            am, data_recons = lin_reg.do_iter(self.fobj, cell, lmbda, get_n_modes)    
+            am, data_recons = lin_reg.do_iter(self.fobj, cell, lmbda)    
         else:
             am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
 
@@ -52,8 +52,8 @@ class get_pmf(object):
         ampls = np.fft.rfft2(cell.topo - cell.topo.mean())
         ampls /= ampls.size
 
-        wlat = np.diff(cell.lat).max()
-        wlon = np.diff(cell.lon).max()
+        wlat = np.diff(cell.lat).mean()
+        wlon = np.diff(cell.lon).mean()
 
         kks = np.fft.rfftfreq((ampls.shape[1] * 2) - 1, d=1.0)
         lls = np.fft.fftfreq((ampls.shape[0]), d=1.0)
@@ -63,7 +63,7 @@ class get_pmf(object):
 
         kkg, llg = np.meshgrid(kks, lls)
 
-        dat_2D = np.fft.irfft2(np.fft.ifftshift(ampls, axes=0) * ampls.size).real 
+        dat_2D = np.fft.irfft2(np.fft.ifftshift(ampls, axes=0) * ampls.size, s=cell.topo.shape).real
 
         ampls = np.abs(ampls)
 
@@ -103,3 +103,37 @@ class get_pmf(object):
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
 
         return freqs, uw_pmf_freqs, dat_2D
+    
+
+
+def taper_quad(params, simplex_lat, simplex_lon, cell, topo):
+    # get quadrilateral mask
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True)
+
+    # get tapered mask with padding
+    taper = utils.taper(cell, params.padding, art_it=params.taper_art_it)
+    taper.do_tapering()    
+
+    # get tapered topography in quadrilateral with padding
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding, topo_mask=taper.p)
+
+def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo):
+    # get tapered mask with padding
+    taper = utils.taper(cell, params.padding, art_it=params.taper_art_it)
+    taper.do_tapering()
+
+    # get padded topography
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding)
+
+    # get padded topography in non-quad
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, filtered=False)
+    # mask_taper = np.copy(cell.mask)
+
+    # apply tapering mask to padded non-quad domain
+    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, filtered=False, mask=(taper.p > 1e-1).astype(bool))
+
+    # mask=(taper.p > 1e-2).astype(bool)
+    # cell.topo = taper.p * cell.topo * mask
+    # cell.mask = mask 
+
+    
