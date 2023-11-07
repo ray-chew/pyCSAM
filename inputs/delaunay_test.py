@@ -18,9 +18,9 @@ from vis import plotter, cart_plot
 
 # %%
 # from runs.lam_run import params
-from runs.selected_run import params
-from copy import deepcopy
+from runs.selected_run_dfft import params
 # from runs.debug_run import params
+from copy import deepcopy
 
 # print run parameters, for sanity check.
 if params.self_test():
@@ -67,16 +67,18 @@ params_orig = deepcopy(params)
 writer.write_all_attrs(params)
 # %%
 # Plot the loaded topography...
-cart_plot.lat_lon(topo, int=1)
+%autoreload
+# cart_plot.lat_lon(topo, int=1)
 
-levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=False, int=1)
+levels = np.linspace(-500.0, 3500.0, 9)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(10,6), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/delaunay.pdf', int=1, raster=True)
 
 # %%
 # del topo.lat_grid
 # del topo.lon_grid
 
 # %%
+%autoreload
 pmf_diff = []
 pmf_sum_diff = []
 idx_name = []
@@ -99,9 +101,8 @@ for rect_idx in params.rect_set:
                 fg_rect = True if params.taper_full_fg else False
                 utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=fg_rect)
             
-                taper = utils.taper(cell, params.padding, art_it=1000)
+                taper = utils.taper(cell, params.padding, art_it=10)
                 taper.do_tapering()
-
 
                 if params.taper_second or params.taper_both:
                     utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding)
@@ -110,9 +111,8 @@ for rect_idx in params.rect_set:
                 
                 if (params.taper_first) or params.taper_both:
                     utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding, topo_mask=taper.p)
-
             else:
-                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=params.rect)
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=params.rect)    
 
             topo_orig = np.copy(cell.topo)
             mask_orig = np.copy(cell.mask)
@@ -125,8 +125,6 @@ for rect_idx in params.rect_set:
                 nhj = params.nhj
 
             first_guess = interface.get_pmf(nhi,nhj,params.U,params.V)
-
-            fobj_tri = fourier.f_trans(nhi,nhj)
 
             #######################################################
 
@@ -216,9 +214,9 @@ for rect_idx in params.rect_set:
                 pass
 
             if (params.tapering) and ((params.taper_second) or (params.taper_both)):
-                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, mask=mask_taper)
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, mask=mask_taper, filtered=False)
             else:
-                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, filtered=False)
 
             # utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=False)
 
@@ -242,7 +240,7 @@ for rect_idx in params.rect_set:
                 else:
                     second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-                freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sg, updt_analysis=True, scale=np.sqrt(2.0), iter_solve=params.sg_iter_solve)
+                freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sg, updt_analysis=True, do_scale=True, scale=1.0, iter_solve=params.sg_iter_solve, get_n_modes=True, n_modes=params.n_modes)
             else:
                 freqs = np.array(freqs, order='C')
                 freqs = np.nanmean(utils.sliding_window_view(freqs, (3,3), (3,3)), axis=(-1,-2))
@@ -252,16 +250,27 @@ for rect_idx in params.rect_set:
                 lls = np.arange(-nhj/2+1,nhj/2+1)[1::3]
                 kklls = [kks,lls]
 
-                freqs, uw, dat_2D_sg0 = second_guess.cg_spsp(cell, freqs, kklls, dat_2D_fg0, updt_analysis=True, scale=np.sqrt(2.0))
+                freqs, uw, dat_2D_sg0 = second_guess.cg_spsp(cell, freqs, kklls, dat_2D_fg0, updt_analysis=True, scale=1.0)
 
 
             ##############################################            
             
             if params.refine:
                 if params.tapering and params.taper_second:
-                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding)
+                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, filtered=False)
                     mask_taper = np.copy(cell.mask)
-                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, filtered=False)
+                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True)
+                # if ((cell.topo.shape[0] % 2) == 1):
+                #     cell.topo = cell.topo[:-1,:]- dat_2D_fg0
+                #     cell.lon = cell.lon[:-1]
+                #     cell.lat_grid = cell.lat_grid[:-1,:]
+                #     cell.lon_grid = cell.lon_grid[:-1,:]
+                # elif ((cell.topo.shape[1] % 2) == 1):
+                #     cell.topo = cell.topo[:,:-1]- dat_2D_fg0
+                #     cell.lat = cell.lat[:-1]
+                #     cell.lat_grid = cell.lat_grid[:,:-1]
+                #     cell.lon_grid = cell.lon_grid[:,:-1]
+                # else:
                 cell.topo -= dat_2D_fg0
                 cell.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
                 # cell.get_masked(triangle=triangle)
@@ -289,9 +298,9 @@ for rect_idx in params.rect_set:
                     l_idxs = [pair[0] for pair in indices]
                     
                 if params.tapering and params.taper_second:
-                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, mask=mask_taper)
+                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, mask=mask_taper, filtered=False)
                 else:
-                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+                    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, filtered=False)
                 
                 second_guess = interface.get_pmf(nhi,nhj,params.U,params.V)
                 if params.dfft_first_guess:
@@ -299,13 +308,16 @@ for rect_idx in params.rect_set:
                 else:
                     second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
                 
-                freqs_sg, uw_sg, dat_2D_sg = second_guess.sappx(cell, lmbda=params.refine_lmbda_sg, updt_analysis= True, scale=np.sqrt(2.0))
+                freqs_sg, uw_sg, dat_2D_sg = second_guess.sappx(cell, lmbda=params.refine_lmbda_sg, updt_analysis= True, scale=1.0)
 
                 # if freqs_sg.sum() < freqs.sum():
                 #     if uw_sg.shape[1] > uw.shape[1]:
                 #         tmp = np.zeros_like(uw_sg)
                 #         tmp[:,:uw.shape[1]] = uw
                 #         uw = tmp
+                
+                # axs_diff = freqs.shape[1] - freqs_sg.shape[1]
+                # freqs_sg = np.pad(freqs_sg, ((0,0), (0,axs_diff)),mode='constant')
 
                 freqs_tmp = freqs + freqs_sg
                 cutoff = np.sort(freqs_tmp.ravel())[::-1][params.n_modes-1]
@@ -313,7 +325,16 @@ for rect_idx in params.rect_set:
                 cell.analysis.ampls = freqs_tmp
 
                 ideal = physics.ideal_pmf(U=params.U, V=params.V)
-                uw = ideal.compute_uw_pmf(cell.analysis, summed=False)
+                uw_ref = ideal.compute_uw_pmf(cell.analysis, summed=False)
+
+                # uw_tmp = uw + uw_ref
+                # cutoff = np.sort(uw_tmp.ravel())[::-1][params.n_modes-1]
+                # uw_tmp[np.where(uw_tmp < cutoff)] = 0.0
+
+                # freqs_tmp = freqs + freqs_sg
+                # freqs_tmp[np.where(uw_tmp == 0.0)] = 0.0
+                # cell.analysis.ampls = freqs_tmp
+
 
                 # uw += uw_sg
             
@@ -376,7 +397,7 @@ for rect_idx in params.rect_set:
 
         print("")
         print("pmf tri1, tri2:", uw0, uw1)
-        print("pmf ref, avg, sum:", uw_ref.sum(), uw01, uw_sum)
+        print("pmf ref, avg, sum:", uw_ref.sum(), uw01, uw0 + uw1)
 
         if params.plot:
             fs = (15,5.0)
@@ -391,7 +412,12 @@ for rect_idx in params.rect_set:
             plt.show()
 
         residual_error = (uw01 / uw_ref.sum()) - 1.0
-        residual_sum_error = (uw_sum / uw_ref.sum()) - 1.0
+        # residual_sum_error = ( (0.5 * uw_sum) / uw_ref.sum()) - 1.0
+        residual_sum_error = ((uw0 + uw1) / uw_ref.sum()) - 1.0
+
+
+        print(residual_error, residual_sum_error )
+
 
         print("")
         print("##########")
@@ -429,44 +455,21 @@ for rect_idx in params.rect_set:
 
         if (residual_error > 0.1):
             params.n_modes = int(params.n_modes / 2)
-            params.lmbda_sg = 1e-1
+            # params.lmbda_sg = 1e-1
             tried_correction = True
 
         elif (residual_error < -0.15):
             params.refine = True
             if not hasattr(params, 'refine_n_modes'):
-                params.refine_n_modes = 10
+                params.refine_n_modes = 100
             else:
-                params.refine_n_modes = int(params.refine_n_modes + 10)
+                params.refine_n_modes = int(params.refine_n_modes + 100)
             params.refine_lmbda_fg = 1e-2
             params.refine_lmbda_sg = 0.2
             tried_correction = True
-
-        # elif (residual_error < -0.5):
-        #     params.refine = True
-        #     params.refine_n_modes = 100
-        #     params.refine_lmbda_fg = 1e-1
-        #     params.refine_lmbda_sg = 0.05
-        #     tried_correction = True
-
-        # elif (residual_error < -0.25):
-        #     params.refine = True
-        #     params.refine_n_modes = 80
-        #     params.refine_lmbda_fg = 1e-1
-        #     params.refine_lmbda_sg = 1e-1
-        #     tried_correction = True
-
-        # elif (residual_error < -0.15):
-        #     params.refine = True
-        #     params.refine_n_modes = 50
-        #     params.refine_lmbda_fg = 1e-2
-        #     params.refine_lmbda_sg = 0.2
-        #     tried_correction = True
         else:
             corrected = True
 
-
-        print(residual_error)
 
         if corrected:
             if np.abs(old_residual_error) < np.abs(residual_error):
@@ -482,7 +485,7 @@ writer.populate('decomposition', 'pmf_diff', pmf_diff)
 
 
 # %%
-pmf_percent_diff = np.array(pmf_diff) * 100
+pmf_percent_diff = np.array(pmf_sum_diff) * 100
 plotter.error_bar_plot(params.rect_set, pmf_percent_diff, params, gen_title=True)
 
 
@@ -491,12 +494,13 @@ plotter.error_bar_plot(params.rect_set, pmf_percent_diff, params, gen_title=True
 importlib.reload(io)
 importlib.reload(cart_plot)
 
+
 errors = np.zeros((len(tri.simplices)))
 errors[:] = np.nan
 errors[params.rect_set] = pmf_percent_diff
 errors[np.array(params.rect_set)+1] = pmf_percent_diff
 
 levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.error_delaunay(topo, tri, label_idxs=True, fs=(15,10), highlight_indices=params.rect_set, output_fig=False, iint=1, errors=errors, alpha_max=0.6)
+cart_plot.error_delaunay(topo, tri, label_idxs=True, fs=(12,8), highlight_indices=params.rect_set, output_fig=False, iint=1, errors=errors, alpha_max=0.6)
 
 # %%

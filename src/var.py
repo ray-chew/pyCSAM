@@ -237,19 +237,18 @@ class params(obj):
         self.cg_spsp = False # coarse grain the spectral space?
         self.rect = False if self.cg_spsp else True 
 
-        self.fg_iter_solve = True
-        self.sg_iter_solve = True
+        self.fa_iter_solve = True
+        self.sa_iter_solve = True
 
         # Penalty terms
-        self.lmbda_fg = 1e-2 # first guess
-        self.lmbda_sg = 1e-1 # second step
+        self.lmbda_fa = 1e-2 # first guess
+        self.lmbda_sa = 1e-1 # second step
 
         # Tapering parameters
-        self.tapering        = False
-        self.taper_first     = False
-        self.taper_full_fg   = False
-        self.taper_second    = True
-        self.taper_both      = False
+        self.taper_ref       = False
+        self.taper_fa        = False
+        self.taper_sa        = False
+        self.taper_art_it    = 50
         self.padding = 0 # must be less than 60
 
         # Flags
