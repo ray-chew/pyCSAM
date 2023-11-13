@@ -179,7 +179,7 @@ def get_size(obj, seen=None):
     return size
 
 
-def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None):
+def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None, load_topo=False):
     lat_max = get_closest_idx(lat_verts.max(), topo.lat) + padding
     lat_min = get_closest_idx(lat_verts.min(), topo.lat) - padding
 
@@ -198,7 +198,7 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=
     cell.wlat = np.diff(lat_in_m).mean()
     cell.wlon = np.diff(lon_in_m).mean()
 
-    if rect:
+    if rect or load_topo:
         cell.topo = np.copy(topo.topo[lat_min:lat_max, lon_min:lon_max])
         cell.topo -= cell.topo.mean()
         lon_grid_in_m, lat_grid_in_m = np.meshgrid(lon_in_m, lat_in_m)

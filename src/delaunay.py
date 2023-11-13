@@ -52,7 +52,7 @@ def get_land_cells(tri, topo, height_tol=0.5, percent_tol=0.95):
         simplex_lat = tri.tri_lat_verts[tri_idx]
         simplex_lon = tri.tri_lon_verts[tri_idx]
 
-        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False)
+        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, load_topo=True, filtered=False)
 
         if not (((cell.topo <= height_tol).sum() / cell.topo.size) > percent_tol):
             rect_set.append(tri_idx)
