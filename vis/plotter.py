@@ -130,6 +130,7 @@ class fig_obj(object):
 def error_bar_plot( idx_name,
                     pmf_diff,
                     params,
+                    comparison = None,
                     title="",
                     gen_title=False,
                     output_fig=False,
@@ -140,6 +141,11 @@ def error_bar_plot( idx_name,
     data = pd.DataFrame(pmf_diff,index=idx_name, columns=['values'])
     fig, (ax1) = plt.subplots(1,1,sharex=True,
                          figsize=(10.0,6.0))
+
+    if comparison is not None:
+        comp_data = pd.DataFrame(comparison, index=idx_name, columns=['values'])
+
+        comp_data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(comp_data['values'] > 0).map({True: 'C7', False: 'C7'}))
 
     true_col = 'g'
     false_col = 'C4' if params.dfft_first_guess else 'r'

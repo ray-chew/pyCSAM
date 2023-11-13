@@ -87,7 +87,7 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                 colour='C3'
                 fw = 'bold'
         
-            plt.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw, alpha=0.8)
+            plt.annotate(tri_indices[idx], (tri.tri_clons[idx],tri.tri_clats[idx]), (tri.tri_clons[idx]-0.3,tri.tri_clats[idx]-0.2), c=colour, fontweight=fw, alpha=0.8, fontsize=12)
 
     plt.xlabel("longitude [deg.]")
     plt.ylabel("latitude [deg.]")
@@ -104,7 +104,7 @@ def error_delaunay(topo, tri, fs=(8,4),   \
                      iint = 1, \
                      errors = None, \
                      alpha_max = 0.5, \
-                     v_extent = [-25.0, 25.0]
+                     v_extent = [-25.0, 25.0], \
                   ):
     fig = plt.figure(figsize=fs)
     # ax = plt.axes(projection=ccrs.PlateCarree())
