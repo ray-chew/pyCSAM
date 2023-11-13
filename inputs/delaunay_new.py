@@ -123,18 +123,6 @@ for rect_idx in params.rect_set:
     sols = (cell_ref, ampls_ref, uw_ref, fft_2D_ref)
     dplot.show(rect_idx, sols, kls=kls_ref, v_extent = v_extent, dfft_plot=True)
 
-    # if params.plot:
-    #     fs = (15,5.0)
-    #     fig, axs = plt.subplots(1,3, figsize=fs)
-    #     fig_obj = plotter.fig_obj(fig, nhi, nhj)
-    #     axs[0] = fig_obj.phys_panel(axs[0], fft_2D_ref, title='T%i + T%i: Reference FFT reconstruction' %(rect_idx, rect_idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell_ref.lon.min(), cell_ref.lon.max(), cell_ref.lat.min(), cell_ref.lat.max()], v_extent=v_extent)
-
-    #     axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_ref, kls_ref[0], kls_ref[1], typ='real')
-    #     axs[2] = fig_obj.fft_freq_panel(axs[2], uw_ref, kls_ref[0], kls_ref[1], title="FFT PMF spectrum", typ='real')
-    #     plt.tight_layout()
-    #     plt.show()
-
-
     ###################################
     #
     # Do first approximation
@@ -159,23 +147,6 @@ for rect_idx in params.rect_set:
     sols = (cell_fa, ampls_fa, uw_fa, dat_2D_fa)
     dplot.show(rect_idx, sols, v_extent=v_extent)
 
-    # if params.plot:
-    #     fs = (15.0,4.0)
-    #     fig, axs = plt.subplots(1,3, figsize=fs)
-    #     fig_obj = plotter.fig_obj(fig, nhi, nhj)
-    #     axs[0] = fig_obj.phys_panel(axs[0], dat_2D_fa, title='T%i+T%i: FF reconstruction' %(rect_idx,rect_idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell_fa.lon.min(), cell_fa.lon.max(), cell_fa.lat.min(), cell_fa.lat.max()], v_extent=v_extent)
-
-    #     if params.dfft_first_guess:
-    #         axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_fa, kls_fa[0], kls_fa[1], typ='real')
-    #         axs[2] = fig_obj.fft_freq_panel(axs[2], uw_fa, kls_fa[0], kls_fa[1], title="PMF spectrum", typ='real')
-    #     else:
-    #         axs[1] = fig_obj.freq_panel(axs[1], ampls_fa)
-    #         axs[2] = fig_obj.freq_panel(axs[2], uw_fa, title="PMF spectrum")
-
-    #     plt.tight_layout()
-    #     plt.show()
-    
-
     ###################################
     #
     # Do second approximation over non-
@@ -189,20 +160,6 @@ for rect_idx in params.rect_set:
 
         sols = (cell, ampls_sa, uw_sa, dat_2D_sa)
         dplot.show(idx, sols, v_extent=v_extent)
-        # if params.plot:
-        #     fs = (15,4.0)
-        #     fig, axs = plt.subplots(1,3, figsize=fs)
-        #     fig_obj = plotter.fig_obj(fig, nhi, nhj)
-        #     axs[0] = fig_obj.phys_panel(axs[0], dat_2D_sa, title='T%i: Reconstruction' %idx, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
-        #     if params.dfft_first_guess:
-        #         axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_sa, kls_fa[0], kls_fa[1], typ='real')
-        #         axs[2] = fig_obj.fft_freq_panel(axs[2], uw_sa, kls_fa[0], kls_fa[1], title="PMF spectrum", typ='real')
-        #     else:
-        #         axs[1] = fig_obj.freq_panel(axs[1], ampls_sa)
-        #         axs[2] = fig_obj.freq_panel(axs[2], uw_sa, title="PMF spectrum")
-        #     plt.tight_layout()
-        #     # plt.savefig('../output/T%i.pdf' %idx)
-        #     plt.show()
 
         cell.uw = uw_sa
         triangle_pair[cnt] = cell
@@ -215,92 +172,28 @@ for rect_idx in params.rect_set:
     #
     # Do iterative refinement?
     # 
-
     ref_topo = np.copy(cell_ref.topo)
     topo_sum = np.zeros_like(ref_topo)
     rel_err = diag.get_rel_err(triangle_pair)
     rel_errs_orig.append(rel_err)
     print(rel_err)
     print(diag)
-    corrected = False
-
-    # while (rel_err > 0.2) and (not params.no_corrections):
-    #     sa.n_modes = int(sa.n_modes / 2)
- 
-    #     print("correcting overestimation... with n_modes=", sa.n_modes)
-
-    #     refinement_pair = np.zeros(2, dtype='object')
-
-    #     cell_fa, ampls_fa, uw_fa, dat_2D_fa = fa.do(simplex_lat, simplex_lon)
-
-    #     v_extent = [dat_2D_fa.min(), dat_2D_fa.max()]
-
-    #     if params.plot:
-    #         fs = (15.0,4.0)
-    #         fig, axs = plt.subplots(1,3, figsize=fs)
-    #         fig_obj = plotter.fig_obj(fig, nhi, nhj)
-    #         axs[0] = fig_obj.phys_panel(axs[0], dat_2D_fa, title='T%i+T%i: FF reconstruction' %(rect_idx,rect_idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell_fa.lon.min(), cell_fa.lon.max(), cell_fa.lat.min(), cell_fa.lat.max()], v_extent=v_extent)
-
-    #         if params.dfft_first_guess:
-    #             axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_fa, kls_fa[0], kls_fa[1], typ='real')
-    #             axs[2] = fig_obj.fft_freq_panel(axs[2], uw_fa, kls_fa[0], kls_fa[1], title="PMF spectrum", typ='real')
-    #         else:
-    #             axs[1] = fig_obj.freq_panel(axs[1], ampls_fa)
-    #             axs[2] = fig_obj.freq_panel(axs[2], uw_fa, title="PMF spectrum")
-
-    #         plt.tight_layout()
-    #         plt.show()
-
-    #     for cnt, idx in enumerate(range(rect_idx, rect_idx+2)):
-
-    #         cell, ampls_rf, uw_rf, dat_2D_rf = sa.do(idx, ampls_fa)
-
-    #         cell.uw = uw_pmf_refined
-    #         refinement_pair[cnt] = cell
-
-    #         if params.plot:
-    #             fs = (15,4.0)
-    #             fig, axs = plt.subplots(1,3, figsize=fs)
-    #             fig_obj = plotter.fig_obj(fig, nhi, nhj)
-    #             axs[0] = fig_obj.phys_panel(axs[0], dat_2D_rf, title='T%i: Reconstruction' %idx, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
-    #             if params.dfft_first_guess:
-    #                 axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_rf, kls_fa[0], kls_fa[1], typ='real')
-    #                 axs[2] = fig_obj.fft_freq_panel(axs[2], uw_rf, kls_fa[0], kls_fa[1], title="PMF spectrum", typ='real')
-    #             else:
-    #                 axs[1] = fig_obj.freq_panel(axs[1], ampls_rf)
-    #                 axs[2] = fig_obj.freq_panel(axs[2], uw_rf, title="PMF spectrum")
-    #             plt.tight_layout()
-    #             # plt.savefig('../output/T%i.pdf' %idx)
-    #             plt.show()
-
-
-    #     corrected = True
-    #     rel_err = diag.get_rel_err(refinement_pair)
-    #     print(rel_err)
-    #     print(diag)
-
-    # sa.n_modes = params.n_modes
-        
+    corrected = False        
     
     while np.abs(rel_err) > 0.2 and (not params.no_corrections): 
         print("correcting underestimation... with n_modes=", sa.n_modes)
 
         refinement_pair = np.zeros(2, dtype='object')
 
-        sa.params.lmbda_sa = 1e-1
-
         topo_sum += dat_2D_fa
         res_topo = -np.sign(rel_err) * (ref_topo - topo_sum)
         res_topo -= res_topo.mean()
-        # ref_topo = np.copy(res_topo)
 
         cell_fa, ampls_fa, uw_fa, dat_2D_fa = fa.do(simplex_lat, simplex_lon, res_topo=res_topo)
 
         v_extent = [dat_2D_fa.min(), dat_2D_fa.max()]
 
         for cnt, idx in enumerate(range(rect_idx, rect_idx+2)):
-            # res_topo = cell_ref.topo - triangle_pair[cnt].analysis.recon
-
             cell, ampls_rf, uw_rf, dat_2D_rf = sa.do(idx, ampls_fa, res_topo = res_topo)
 
             ampls_sum = triangle_pair[cnt].analysis.ampls - np.sign(rel_err) * ampls_rf
@@ -324,32 +217,13 @@ for rect_idx in params.rect_set:
             sols = (cell, ampls_rf, uw_rf, dat_2D_rf)
             dplot.show(idx, sols, v_extent=v_extent)
 
-            # if params.plot:
-            #     fs = (15,4.0)
-            #     fig, axs = plt.subplots(1,3, figsize=fs)
-            #     fig_obj = plotter.fig_obj(fig, nhi, nhj)
-            #     axs[0] = fig_obj.phys_panel(axs[0], dat_2D_rf, title='T%i: Reconstruction' %idx, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
-            #     if params.dfft_first_guess:
-            #         axs[1] = fig_obj.fft_freq_panel(axs[1], ampls_rf, kls_fa[0], kls_fa[1], typ='real')
-            #         axs[2] = fig_obj.fft_freq_panel(axs[2], uw_rf, kls_fa[0], kls_fa[1], title="PMF spectrum", typ='real')
-            #     else:
-            #         axs[1] = fig_obj.freq_panel(axs[1], ampls_rf)
-            #         axs[2] = fig_obj.freq_panel(axs[2], uw_rf, title="PMF spectrum")
-            #     plt.tight_layout()
-            #     # plt.savefig('../output/T%i.pdf' %idx)
-            #     plt.show()
-
         corrected = True
         rel_err = diag.get_rel_err(refinement_pair)
         print(rel_err)
         print(diag)
 
-        # sa.n_modes /= 2
-        sa.params.lmbda_sa = 1e-1
-
     if corrected:
         triangle_pair = refinement_pair
-    # print(rel_err)
 
     diag.update_pair(triangle_pair)
 
@@ -367,13 +241,11 @@ plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, comparison=np.arr
 
 
 # %%
-importlib.reload(io)
-importlib.reload(cart_plot)
 
 errors = np.zeros((len(tri.simplices)))
 errors[:] = np.nan
-errors[params.rect_set] = pmf_percent_diff
-errors[np.array(params.rect_set)+1] = pmf_percent_diff
+errors[params.rect_set] = diag.rel_errs
+errors[np.array(params.rect_set)+1] = diag.rel_errs
 
 levels = np.linspace(-1000.0, 3000.0, 5)
 cart_plot.error_delaunay(topo, tri, label_idxs=False, fs=(12,8), highlight_indices=params.rect_set, output_fig=False, iint=1, errors=errors, alpha_max=0.6)
