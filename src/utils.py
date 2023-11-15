@@ -240,6 +240,7 @@ def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=
         ampls *= np.exp(-(kls / (2.0 * np.pi / 5000))**2.0)
 
         cell.topo = np.fft.ifft2(ampls * ampls.size).real
+        cell.topo -= cell.topo.mean()
 
     if topo_mask is not None:
         cell.topo *= topo_mask
