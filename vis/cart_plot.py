@@ -96,15 +96,17 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     plt.show()
 
 
-def error_delaunay(topo, tri, fs=(8,4),   \
-                     label_idxs = False, \
-                     highlight_indices = [44,45, 88,89, 16,17], \
-                     fn = '../output/delaunay.pdf', \
-                     output_fig = False, \
-                     iint = 1, \
-                     errors = None, \
-                     alpha_max = 0.5, \
-                     v_extent = [-25.0, 25.0], \
+def error_delaunay(topo, tri, fs=(8,4),   
+                     label_idxs = False, 
+                     highlight_indices = [44,45, 88,89, 16,17], 
+                     fn = '../output/delaunay.pdf', 
+                     output_fig = False, 
+                     iint = 1, 
+                     errors = None, 
+                     alpha_max = 0.5, 
+                     v_extent = [-25.0, 25.0], 
+                     raster=True,
+                     fontsize = 12
                   ):
     fig = plt.figure(figsize=fs)
     # ax = plt.axes(projection=ccrs.PlateCarree())
@@ -112,11 +114,15 @@ def error_delaunay(topo, tri, fs=(8,4),   \
 
 
     ax.coastlines(alpha=0.5)
-    ax.contourf(topo.lon_grid[::iint], topo.lat_grid[::iint], topo.topo[::iint],
+    im = ax.contourf(topo.lon_grid[::iint], topo.lat_grid[::iint], topo.topo[::iint],
                 alpha=1.0,
                 transform=ccrs.PlateCarree(),
                 cmap='binary',
                 )
+    
+    if raster:
+        for c in im.collections:
+            c.set_rasterized(True)
     
     points = tri.points
 
@@ -128,7 +134,7 @@ def error_delaunay(topo, tri, fs=(8,4),   \
     my_cmap[:,-1] = np.concatenate((np.linspace(0, alpha_max, int(lcmap_ov2 - zeros_len/2))[::-1], np.zeros(zeros_len), np.linspace(0, alpha_max, int(lcmap_ov2 - zeros_len/2))))
     my_cmap = ListedColormap(my_cmap)
 
-    im = ax.tripcolor(points[:,0], points[:,1], tri.simplices.copy(), facecolors=errors, edgecolors='k', cmap=my_cmap, alpha=0.5, vmin=v_extent[0],vmax=v_extent[1])
+    im = ax.tripcolor(points[:,0], points[:,1], tri.simplices.copy(), facecolors=errors, edgecolors='k', cmap=my_cmap, alpha=0.5, vmin=v_extent[0],vmax=v_extent[1], linewidth=0.05)
 
     if label_idxs:
         highlight_indices = np.array(highlight_indices)
@@ -166,10 +172,10 @@ def error_delaunay(topo, tri, fs=(8,4),   \
     
     ax.text(-0.05, 0.5, 'latitude [deg]', va='bottom', ha='center',
             rotation='vertical', rotation_mode='anchor',
-            transform=ax.transAxes)
-    ax.text(0.5, -0.08, 'longitude [deg]', va='bottom', ha='center',
+            transform=ax.transAxes, fontsize=fontsize)
+    ax.text(0.5, -0.1, 'longitude [deg]', va='bottom', ha='center',
             rotation='horizontal', rotation_mode='anchor',
-            transform=ax.transAxes)
+            transform=ax.transAxes, fontsize=fontsize)
     
     
     plt.tight_layout()

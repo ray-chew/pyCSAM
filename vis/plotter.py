@@ -135,30 +135,37 @@ def error_bar_plot( idx_name,
                     gen_title=False,
                     output_fig=False,
                     fn="../output/error_plot.pdf",
-                    ylim=[-100,100]
+                    ylim=[-100,100],
+                    fs=(10.0,6.0),
+                    ylabel="",
+                    fontsize=8
                     ):
 
     data = pd.DataFrame(pmf_diff,index=idx_name, columns=['values'])
-    fig, (ax1) = plt.subplots(1,1,sharex=True,
-                         figsize=(10.0,6.0))
+
+    plt.subplots(1, 1, figsize=fs)
 
     if comparison is not None:
         comp_data = pd.DataFrame(comparison, index=idx_name, columns=['values'])
 
-        comp_data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(comp_data['values'] > 0).map({True: 'C7', False: 'C7'}))
+        comp_data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(comp_data['values'] > 0).map({True: 'C7', False: 'C7'}), fontsize=fontsize)
 
     true_col = 'g'
     false_col = 'C4' if params.dfft_first_guess else 'r'
 
-    data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}))
+    data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}), fontsize=fontsize)
 
     plt.grid()
 
-    plt.xlabel("grid idx")
-    plt.ylabel("percentage rel. pmf diff")
+    plt.xlabel("first grid pair index", fontsize=fontsize+3)
+
+    # if len(ylabel) == 0:
+    #     ylabel = "percentage rel. pmf diff"
+    plt.ylabel(ylabel, fontsize=fontsize+3)
 
     avg_err = np.abs(pmf_diff).mean()
     err_input = np.around(avg_err,2)
+    print(err_input)
 
     if params.dfft_first_guess:
         spec_dom = "(from FFT)"
@@ -174,11 +181,11 @@ def error_bar_plot( idx_name,
 
     if gen_title: title = fg_tag + '+FF' + ' ' + rfn_tag + ' avg err: ' + str(err_input)
 
-    plt.title(title, fontsize=12, pad=-10)
+    plt.title(title, pad=-10, fontsize=fontsize+5)
     plt.ylim(ylim)
     plt.tight_layout()
 
-    if output_fig: plt.savefig('../output/'+fn+'_poster.pdf')
+    if output_fig: plt.savefig(fn)
     plt.show()
 
 
