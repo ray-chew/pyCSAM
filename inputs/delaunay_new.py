@@ -17,7 +17,7 @@ from vis import plotter, cart_plot
 %autoreload
 
 # %%
-# from runs.lam_run import params
+from runs.lam_run import params
 from runs.selected_run_dfft import params
 # from runs.debug_run import params
 from copy import deepcopy
@@ -72,7 +72,7 @@ writer.write_all_attrs(params)
 # cart_plot.lat_lon(topo, int=1)
 
 levels = np.linspace(-500.0, 3500.0, 9)
-cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(20,12), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/delaunay.pdf', int=1, raster=True)
+cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(12,7), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/delaunay.pdf', int=1, raster=True)
 
 # %%
 # del topo.lat_grid
@@ -175,23 +175,34 @@ for rect_idx in params.rect_set:
     ref_topo = np.copy(cell_ref.topo)
     topo_sum = np.zeros_like(ref_topo)
     rel_err = diag.get_rel_err(triangle_pair)
-    rel_errs_orig.append(rel_err)
+    if not params.no_corrections: 
+        rel_errs_orig.append(rel_err)
+        v_extent_orig = np.copy(v_extent)
     print(rel_err)
     print(diag)
     corrected = False        
+
+    # sa.n_modes /= 2
+
+    # topo_tmp = triangle_pair[0].analysis.recon + triangle_pair[0].analysis.recon
     
     while np.abs(rel_err) > 0.2 and (not params.no_corrections): 
-        print("correcting underestimation... with n_modes=", sa.n_modes)
+        mode = "overestimation" if np.sign(rel_err) > 0 else "underestimation"
+        print("correcting %s... with n_modes = %i" %(mode, sa.n_modes))
 
         refinement_pair = np.zeros(2, dtype='object')
 
         topo_sum += dat_2D_fa
+        # topo_sum -= topo_sum.mean()
         res_topo = -np.sign(rel_err) * (ref_topo - topo_sum)
         res_topo -= res_topo.mean()
 
         cell_fa, ampls_fa, uw_fa, dat_2D_fa = fa.do(simplex_lat, simplex_lon, res_topo=res_topo)
 
         v_extent = [dat_2D_fa.min(), dat_2D_fa.max()]
+
+        sols = (cell_fa, ampls_fa, uw_fa, dat_2D_fa)
+        dplot.show(idx, sols, v_extent=v_extent)
 
         for cnt, idx in enumerate(range(rect_idx, rect_idx+2)):
             cell, ampls_rf, uw_rf, dat_2D_rf = sa.do(idx, ampls_fa, res_topo = res_topo)
@@ -207,9 +218,9 @@ for rect_idx in params.rect_set:
             triangle_pair[cnt].analysis.ampls = ampls_sum
 
             ideal = physics.ideal_pmf(U=params.U, V=params.V)
-            uw_pmf_refined = ideal.compute_uw_pmf(cell.analysis, summed=True)
+            uw_pmf_refined = ideal.compute_uw_pmf(cell.analysis, summed=False)
 
-            print("uw_pmf_refined", uw_pmf_refined)
+            print("uw_pmf_refined", uw_pmf_refined.sum())
 
             cell.uw = uw_pmf_refined
             refinement_pair[cnt] = cell
@@ -221,33 +232,42 @@ for rect_idx in params.rect_set:
         rel_err = diag.get_rel_err(refinement_pair)
         print(rel_err)
         print(diag)
+        # topo_tmp = refinement_pair[0].analysis.recon + refinement_pair[1].analysis.recon
+
+    sa.n_modes = params.n_modes
 
     if corrected:
         triangle_pair = refinement_pair
+        
+        topo_sum += dat_2D_fa
+        sols = (cell, triangle_pair[0].analysis.ampls + triangle_pair[1].analysis.ampls, triangle_pair[0].uw + triangle_pair[1].uw, topo_sum)
+        dplot.show(idx, sols, v_extent=v_extent_orig)
 
     diag.update_pair(triangle_pair)
 
 
+# %%
 diag.end(verbose=True)
 
-
-
 # %%
-print(rel_errs_orig)
+# print(rel_errs_orig)
 print(diag.rel_errs)
 %autoreload
 plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, comparison=np.array(rel_errs_orig)*100, gen_title=True)
+# plotter.error_bar_plot(params.rect_set, diag.rel_errs, prams, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12)
 
+# %%
+plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fn='../manuscript/mre_bar.pdf', fontsize=12)
 
 
 # %%
-
+%autoreload
 errors = np.zeros((len(tri.simplices)))
 errors[:] = np.nan
-errors[params.rect_set] = diag.rel_errs
-errors[np.array(params.rect_set)+1] = diag.rel_errs
+errors[params.rect_set] = diag.max_errs
+errors[np.array(params.rect_set)+1] = diag.max_errs
 
 levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.error_delaunay(topo, tri, label_idxs=False, fs=(12,8), highlight_indices=params.rect_set, output_fig=False, iint=1, errors=errors, alpha_max=0.6)
+cart_plot.error_delaunay(topo, tri, label_idxs=False, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_fine.pdf', iint=1, errors=errors, alpha_max=0.6)
 
 # %%
