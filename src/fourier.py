@@ -123,13 +123,15 @@ class f_trans(object):
             Nsin = bsin
 
         else:
-            if (self.nhar_j % 2 == 0):
-                Ncos = bcos[:,int(self.nhar_j/2-1):]
-                Nsin = bsin[:,int(self.nhar_j/2):]
-            else:
-                Ncos = bcos[:,int(self.nhar_j/2-1):]
-                Nsin = bsin[:,int(self.nhar_j/2):]
-        
+            # if (self.nhar_j % 2 == 0):
+            #     Ncos = bcos[:,int(self.nhar_j/2-1):]
+            #     Nsin = bsin[:,int(self.nhar_j/2):]
+            # else:
+                # Ncos = bcos[:,int(self.nhar_j/2-1):]
+                # Nsin = bsin[:,int(self.nhar_j/2):]
+            Ncos = bcos
+            Nsin = np.delete(bsin, int(self.nhar_j/2)-1, axis=1)
+
         self.bf_cos = Ncos
         self.bf_sin = Nsin
         self.nc = self.bf_cos.shape[1]
@@ -174,8 +176,9 @@ class f_trans(object):
         fourier_coeff = np.zeros((nhar_i, nhar_j))
         nc = self.nc
 
-        zrs = np.zeros((int(self.nhar_j/2)-1))
-        zrs[:] = np.nan
+        # zrs = np.zeros((int(self.nhar_j/2)-1))
+        # zrs[:] = np.nan
+        zrs = []
 
         if ((self.typ == 'full') and (not self.pick_kls)):
             cos_terms = a_m[:nc]
