@@ -8,13 +8,13 @@ import numpy as np
 import pandas as pd
 import importlib
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 from src import io, var, utils
 from runs import interface
 from vis import plotter
 
 %load_ext autoreload
-%autoreload
 
 # %%
 # generate random values for the artificial terrain
@@ -62,7 +62,7 @@ ref_sum = freqs_ref.sum()
 
 n_modes = 14
 lmbda_reg = 8.0*1e-5
-lmbda_fg = 0.0
+lmbda_fg = 1e-1
 lmbda_sg = 1e-6
 
 #### define wavenumber range
@@ -86,7 +86,7 @@ cell.gen_mgrids()
 cell.topo = np.cos(1.0 * cell.lat_grid) + np.sin(5.0 * cell.lon_grid)
 cell.topo[...] = 0.0
 
-def sinusoidal_basis(Ak, nk, Al, nl, sc, typ):        
+def sinusoidal_basis(Ak, nk, Al, nl, sc, typ):
     if sc == 0:
         bf = Ak * np.cos(nk * cell.lon_grid + nl * cell.lat_grid)
     else:
@@ -124,7 +124,7 @@ def csam_run(cell, n_modes, lmbda_fg, lmbda_sg):
     cell.wlat = np.diff(cell.lat).mean()
     cell.wlon = np.diff(cell.lon).mean()
 
-    freqs_fg, _, dat_2D_fg = first_guess.sappx(cell, lmbda=lmbda_fg)
+    freqs_fg, _, dat_2D_fg = first_guess.sappx(cell, lmbda=lmbda_fg, iter_solve=False)
 
     fq_cpy = np.copy(freqs_fg)
     fq_cpy[np.isnan(fq_cpy)] = 0.0 # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
@@ -151,7 +151,7 @@ def csam_run(cell, n_modes, lmbda_fg, lmbda_sg):
     cell.wlat = np.diff(cell.lat).mean()
     cell.wlon = np.diff(cell.lon).mean()
 
-    freqs, _, dat_2D = second_guess.sappx(cell, lmbda=lmbda_sg, updt_analysis=True, do_scale=False, scale=1.0, iter_solve=True)
+    freqs, _, dat_2D = second_guess.sappx(cell, lmbda=lmbda_sg, updt_analysis=True, scale=1.0, iter_solve=False)
 
     return freqs, _, dat_2D
 
@@ -159,9 +159,9 @@ def csam_run(cell, n_modes, lmbda_fg, lmbda_sg):
 
 freqs_arr[0], dat_arr[0] = freqs_ref, cell.topo * cell.mask
 
-freqs_arr[1], _, dat_arr[1] = first_guess.sappx(cell, lmbda=0.0)
+freqs_arr[1], _, dat_arr[1] = first_guess.sappx(cell, lmbda=0.0, iter_solve=False)
 
-freqs_arr[2], _, dat_arr[2] = first_guess.sappx(cell, lmbda=lmbda_reg)
+freqs_arr[2], _, dat_arr[2] = first_guess.sappx(cell, lmbda=lmbda_reg, iter_solve=False)
 
 freqs_arr[3], _, dat_arr[3] = csam_run(cell, sz, lmbda_fg, lmbda_sg)
 
@@ -180,10 +180,11 @@ sum_errs = np.array([np.abs(freq.sum() - freqs_arr[0].sum()) / freqs_arr[0].sum(
 
 
 # %%
+%autoreload
 
-fs = (20,8.5)
-fig, axs = plt.subplots(2,len(idxs), figsize=fs)
-fig_obj = plotter.fig_obj(fig, fobj.nhar_i, fobj.nhar_j)
+fs = (10,4.5)
+fig, axs = plt.subplots(2,len(idxs), figsize=fs, sharey='row')
+fig_obj = plotter.fig_obj(fig, fobj.nhar_i, fobj.nhar_j, cbar=False, set_label=False)
 
 selected_errs = []
 selected_sums = []
@@ -204,15 +205,26 @@ for cnt, idx in enumerate(idxs):
         selected_sum_errs.append(sum_errs[idx])
     selected_sums.append(sums[idx])
 
+fig.colorbar(axs[0,-1].get_images()[0], ax=axs[0, :], fraction=0.046, pad=0.04)
+fig.colorbar(axs[1,-1].get_children()[0], ax=axs[1, :], fraction=0.046, pad=0.04)
+
+axs[1,0].set_ylabel("$l_m$", fontsize=12)
+
+# plt.tight_layout()
+plt.savefig('../manuscript/idealized_plots.pdf', bbox_inches="tight")
 plt.show()
+
 
 # %%
 
 print(sums)
-plotter.error_bar_abs_plot(selected_errs, phys_lbls[1:])
-plotter.error_bar_abs_plot(selected_sums, phys_lbls, color=['C0','C1','C2','C3'], ylims=[0,1800])
+plotter.error_bar_abs_plot(selected_errs, phys_lbls[1:], color=['C0', 'C1','C2'], ylims=[0,140], title=r'$L_2$-error in the spectrum', fontsize=14, fs=(3.5,2.5), output_fig=True, fn='../manuscript/l2_errs.pdf')
+plotter.error_bar_abs_plot(selected_sums, phys_lbls, color=['C3','C0','C1','C2'], ylims=[0,2200], title='total amplitude', fontsize=14, fs=(4.5,2.5), output_fig=True, fn='../manuscript/powers.pdf')
 
+# plotter.error_bar_split_plot(sums[1:], ["ref", "no_reg", "lsff", "opt\ncsam", "sub\ncsam"][1:], 650, [750000,760000], np.arange(750000,770000,10000))
 
-plotter.error_bar_split_plot(sums[1:], ["ref", "no_reg", "lsff", "opt\ncsam", "sub\ncsam"][1:], 650, [750000,760000], np.arange(750000,770000,10000))
-
+# %%
+np.set_printoptions(suppress=True)
+print(np.around(sum_errs,5)*100)
+print(errs)
 # %%
