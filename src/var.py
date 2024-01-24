@@ -62,7 +62,7 @@ class topo_cell(topo):
         lat_lon_points = self.__get_lat_lon_points()
         init_poly = triangle.vec_get_mask
 
-        self.mask = np.array([init_poly(elem) for elem in lat_lon_points]).reshape(self.topo.shape).astype('bool_')
+        self.mask = np.array([init_poly(elem) for elem in lat_lon_points]).reshape(self.lat.size, self.lon.size).astype('bool_')
 
 
     def get_masked(self, triangle = None, mask = None):
@@ -75,6 +75,8 @@ class topo_cell(topo):
         self.lon_m = self.lon_grid[self.mask]
         self.lat_m = self.lat_grid[self.mask]
         self.topo_m = self.topo[self.mask]
+        
+        self.topo_m -= self.topo_m.mean()
 
 
     def get_grad_topo(self, triangle):

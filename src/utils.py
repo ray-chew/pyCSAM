@@ -23,19 +23,48 @@ def rad2deg(val):
     return np.rad2deg(val)
 
 
-def isoceles(grid, cell, res=480):
-    grid.clon_vertices = np.array([[0-1e-7, np.pi, (2.0 * np.pi)+1e-7],])
-    grid.clat_vertices = np.array([[0-1e-7, (2.0 * np.pi)+1e-7, 0-1e-7],])
+def isosceles(grid, cell, xmax = 2.0 * np.pi, 
+    ymax = 2.0 * np.pi, res=480, tri='mid'):
 
-    cell.lat = np.linspace(0, 2.0 * np.pi, res)
-    cell.lon = np.linspace(0, 2.0 * np.pi, res)
+    if tri == 'mid':
+        grid.clon_vertices = np.array([[0+1e-7, xmax / 2.0, xmax-1e-7],])
+        grid.clat_vertices = np.array([[0+1e-7, ymax-1e-7, 0+1e-7],])
+
+        cell.lon = np.linspace(0, xmax, res)
+        cell.lat = np.linspace(0, ymax, res)
+
+    elif tri == 'left':
+        grid.clon_vertices = np.array([[0+1e-7, 0+1e-7, xmax / 2.0],])
+        grid.clat_vertices = np.array([[0+1e-7, ymax-1e-7, ymax-1e-7],])
+
+        cell.lon = np.linspace(0, xmax, res)
+        cell.lat = np.linspace(0, ymax, res)
+
+    elif tri == 'right':
+        grid.clon_vertices = np.array([[xmax / 2.0, xmax-1e-7, xmax-1e-7],])
+        grid.clat_vertices = np.array([[ymax-1e-7, ymax-1e-7, 0+1e-7],])
+
+        cell.lon = np.linspace(0, xmax, res)
+        cell.lat = np.linspace(0, ymax, res)
+
+
+
+    # grid.clon_vertices = np.array([[-(np.pi)-1e-7, 0, (np.pi)+1e-7],])
+    # grid.clat_vertices = np.array([[-(np.pi)-1e-7, (np.pi)+1e-7, -(np.pi)-1e-7],])
+
+    # cell.lat = np.linspace(-np.pi, np.pi, res)
+    # cell.lon = np.linspace(-np.pi, np.pi, res)
 
     return 0
 
 def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi, 
-    ymax = 2.0 * np.pi):
-    grid.clon_vertices = np.array([[0-1e-7, 0-1e-7, xmax],])
-    grid.clat_vertices = np.array([[0-1e-7, ymax, 0-1e-7],])
+    ymax = 2.0 * np.pi, tri='lower'):
+    if tri == 'lower':
+        grid.clon_vertices = np.array([[0+1e-7, 0+1e-7, xmax-1e-7],])
+        grid.clat_vertices = np.array([[0+1e-7, ymax-1e-7, 0+1e-7],])
+    elif tri == 'upper':
+        grid.clon_vertices = np.array([[0+1e-7, xmax-1e-7, xmax-1e-7],])
+        grid.clat_vertices = np.array([[ymax-1e-7, ymax-1e-7, 0+1e-7],])
 
     cell.lat = np.linspace(0, ymax, res_x)
     cell.lon = np.linspace(0, xmax, res_y)

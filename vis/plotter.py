@@ -46,7 +46,7 @@ class fig_obj(object):
         else:
             vmin, vmax = None, None
 
-        im = axs.pcolormesh(np.abs(ampls), edgecolor='k', cmap='Greys', vmin=vmin, vmax=vmax)
+        im = axs.pcolormesh(np.abs(ampls), cmap='Greys', vmin=vmin, vmax=vmax)
         if self.cbar:
             self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
 
@@ -69,8 +69,16 @@ class fig_obj(object):
         axs.set_xlabel(r'$k_n$', fontsize=12)
         # axs.set_aspect('equal')
 
-        for label in axs.yaxis.get_ticklabels()[::2]:
+        # ref: https://stackoverflow.com/questions/20337664/cleanest-way-to-hide-every-nth-tick-label-in-matplotlib-colorbar
+        nint = 4
+        temp = axs.yaxis.get_ticklabels()
+        temp = list(set(temp) - set(temp[::nint]))
+        for label in temp:
             label.set_visible(False)
+
+        for label in axs.xaxis.get_ticklabels()[0::2]:
+            label.set_visible(False)
+
 
         return axs
 
@@ -150,7 +158,7 @@ def error_bar_plot( idx_name,
 
         comp_data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(comp_data['values'] > 0).map({True: 'C7', False: 'C7'}), fontsize=fontsize)
 
-    true_col = 'g'
+    true_col = 'g' # C5 and C4 respectively for DFFT vs LSFF plot
     false_col = 'C4' if params.dfft_first_guess else 'r'
 
     data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}), fontsize=fontsize)

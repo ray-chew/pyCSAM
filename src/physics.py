@@ -29,7 +29,7 @@ class ideal_pmf(object):
         #     ampls = analysis.ampls[np.nonzero(analysis.ampls)]
         # else:
         #     ampls = analysis.ampls
-        ampls = analysis.ampls
+        ampls = np.copy(analysis.ampls)
 
         wla = wlat #* self.AE
         wlo = wlon #* self.AE
@@ -37,11 +37,11 @@ class ideal_pmf(object):
         kks = kks / wlo
         lls = lls / wla
 
-        om = -kks * U -lls * V
+        om = -kks * U - lls * V
         omsq = om**2
 
         mms = (N**2 * (kks**2 + lls**2) / omsq) - (kks**2 + lls**2)
-        ampls[np.where(mms <= 0.0)] = 0.0
+        # ampls[np.where(mms <= 0.0)] = 0.0
         mms[np.isnan(mms)] = 0.0
         mms = np.sqrt(mms)
 
