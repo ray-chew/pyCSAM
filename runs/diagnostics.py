@@ -148,25 +148,57 @@ class diag_plotter(object):
         self.nhi = nhi
         self.nhj = nhj
 
-    def show(self, rect_idx, sols, kls=None, v_extent=None, dfft_plot=False):
+        self.output_dir = "../manuscript/"
+
+    def show(self, rect_idx, sols, kls=None, v_extent=None, dfft_plot=False, output_fig=True, fs = (14.0,4.0), ir_args=None, fn=None):
 
         cell, ampls, uw, dat_2D = sols
 
         if v_extent is None:
             v_extent = [dat_2D.min(), dat_2D.max()]
 
+        if ir_args is None:
+            if type(rect_idx) is int: 
+                idxs_tag = "Cell %i" %rect_idx
+                tag = "CSAM"
+                fn = "plots_CSAM_%i" %rect_idx
+            elif len(rect_idx) == 2:
+                idxs_tag = "(%i,%i)" %(rect_idx[0],rect_idx[1])
+                tag = "FFT" if dfft_plot else "FA LSFF"
+                fn = "plots_%s_%i_%i" %(tag.replace(" ","_"), rect_idx[0], rect_idx[1])
+            else:
+                idxs_tag = ""
+                tag = ""
+                fn = "plots_%s" %str(rect_idx)
+
+            t1 = '%s: %s reconstruction' %(idxs_tag,tag)
+            if dfft_plot:
+                t2 = "ref. power spectrum"
+                t3 = "ref. PMF spectrum"
+            else:
+                t2 = "approx. power spectrum"
+                t3 = "approx. PMF spectrum"
+            
+            freq_vext, pmf_vext = None, None
+        else:
+            t1, t2, t3, freq_vext, pmf_vext = ir_args
+            fn = "%s_%i_%i" %(fn, rect_idx[0], rect_idx[1])
+
+
         if self.params.plot:
-            fs = (15.0,4.0)
             fig, axs = plt.subplots(1,3, figsize=fs)
             fig_obj = plotter.fig_obj(fig, self.nhi, self.nhj)
-            axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title='T%i+T%i: FF reconstruction' %(rect_idx,rect_idx+1), xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+            axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title=t1, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
 
-            if self.params.dfft_first_guess or dfft_plot:
-                axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real')
-                axs[2] = fig_obj.fft_freq_panel(axs[2], uw, kls[0], kls[1], title="PMF spectrum", typ='real')
+            if dfft_plot:
+                axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real', title=t2)
+                axs[2] = fig_obj.fft_freq_panel(axs[2], uw, kls[0], kls[1], title=t3, typ='real')
             else:
-                axs[1] = fig_obj.freq_panel(axs[1], ampls)
-                axs[2] = fig_obj.freq_panel(axs[2], uw, title="PMF spectrum")
+                axs[1] = fig_obj.freq_panel(axs[1], ampls, title=t2, v_extent=freq_vext)
+                axs[2] = fig_obj.freq_panel(axs[2], uw, title=t3, v_extent=pmf_vext)
 
             plt.tight_layout()
+            if output_fig:
+                plt.savefig(self.output_dir + fn + '.pdf', dpi=200, bbox_inches="tight")
+
             plt.show()
