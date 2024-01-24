@@ -76,7 +76,7 @@ kk = np.arange(0,nhi)
 grid = var.grid()
 cell = var.topo_cell()
 
-vid = utils.isoceles(grid, cell)
+vid = utils.isosceles(grid, cell)
 
 lat_v = grid.clat_vertices[vid,:]
 lon_v = grid.clon_vertices[vid,:]
@@ -87,6 +87,9 @@ cell.topo = np.cos(1.0 * cell.lat_grid) + np.sin(5.0 * cell.lon_grid)
 cell.topo[...] = 0.0
 
 def sinusoidal_basis(Ak, nk, Al, nl, sc, typ):
+    nk = 2.0 * np.pi * nk / cell.lon.max()
+    nl = 2.0 * np.pi * nl / cell.lat.max()
+
     if sc == 0:
         bf = Ak * np.cos(nk * cell.lon_grid + nl * cell.lat_grid)
     else:
