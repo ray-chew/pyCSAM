@@ -9,7 +9,8 @@ params.fn_topo = '/home/ray/git-projects/spec_appx/data/topo_compact.nc'
 params.merit_cg = 10
 params.merit_path = '/home/ray/Documents/orog_data/MERIT/'
 
-params.output_fn = 'test_selected'
+params.output_fn = 'iterative_run_selected_cells'
+params.output_fn = 'test_selected_lsff'
 
 params.lat_extent = [52.,64.,64.]
 params.lon_extent = [-141.,-158.,-127.]
@@ -22,21 +23,22 @@ params.delaunay_xnp = 14
 params.delaunay_ynp = 11
 
 # (xnp x ynp) = (14 x 11); (16, 11)
-params.rect_set = np.sort([20,148,160,212,38,242])
+params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
+params.rect_set = np.sort([148,38,242])
 
 # worst underestimators
-params.rect_set = np.sort([152,160,42,200,202,238,180])
+# params.rect_set = np.sort([152,160,42,200,202,238,180])
 
 # worst overestimators
-params.rect_set = np.sort([92,24,28])
+# params.rect_set = np.sort([92,24, 152,160,42,200,202,238,180])
 
-# params.rect_set = np.sort([160])
+# params.rect_set = np.sort([42])
 
-# params.nhi = 32
-# params.nhj = 64
+params.nhi = 32
+params.nhj = 64
 
-params.nhi = 12
-params.nhj = 24
+# params.nhi = 12
+# params.nhj = 24
 params.n_modes = 100
 
 # (xnp x ynp) = (16 x 14)
@@ -68,26 +70,28 @@ params.n_modes = 100
 # params.rect_set = np.sort([0, 6, 212, 84, 174])
 # params.rect_set = np.sort([212, 174])
 
-
 params.lmbda_fa = 1e-1 # first guess
 params.lmbda_sa = 1e-1 # second step
 
 params.lxkm, params.lykm = 160, 160
 
-params.U, params.V = 10.0, 0.0
+params.U, params.V = 0.0, 10.0
 # params.V = 0.0
 
 params.run_full_land_model = False
 
-params.padding = 10
-
 params.dfft_first_guess = False
 
+params.padding = 10
 params.taper_ref = True
 params.taper_fa = True
 params.taper_sa = True
 params.taper_art_it = 20
 
-params.no_corrections = False
+params.fa_iter_solve = True
+params.sa_iter_solve = True
+
+params.no_corrections = True
 
 params.plot = True
+# params.ir_plot_titles = True

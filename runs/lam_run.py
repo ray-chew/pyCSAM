@@ -4,12 +4,12 @@ from src import var
 params = var.params()
 
 dfft_fa = False
-coarse = False
+coarse = True
 
 dfft_tag = 'dfft' if dfft_fa else 'lsff'
 coarse_tag = 'R2B4' if coarse else 'R2B5'
 
-params.fn_tag = 'lam_alaska_%s_fa_%s' %(dfft_tag, coarse_tag)
+params.fn_tag = 'lam_alaska_%s_fa_%s_highwinds' %(dfft_tag, coarse_tag)
 
 if dfft_fa:
     params.dfft_first_guess = True
@@ -46,7 +46,7 @@ params.rect_set = np.sort([0,1,2,3])
 params.lmbda_fa = 1e-1 # first guess
 params.lmbda_sa = 1e-1 # second step
 
-params.U, params.V = 10.0, 0.0
+params.U, params.V = np.sqrt(10.0), np.sqrt(10.0)
 
 params.run_full_land_model = True
 
