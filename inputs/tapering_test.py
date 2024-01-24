@@ -3,56 +3,47 @@ import sys
 # setting path
 sys.path.append('..')
 
-import matplotlib
-matplotlib.use('Qt5Agg')
-%matplotlib
-
 import numpy as np
-import pandas as pd
+import pandas as pdlot
 import matplotlib.pyplot as plt
 
-from src import io, var, utils, fourier, lin_reg, reconstruction, physics, delaunay
-from runs import interface
-from vis import plotter, cart_plot
+from src import io, var, utils, delaunay
+from vis import cart_plot
 
-import importlib
-importlib.reload(io)
-importlib.reload(var)
-importlib.reload(utils)
-importlib.reload(fourier)
-importlib.reload(lin_reg)
-importlib.reload(reconstruction)
-importlib.reload(physics)
-importlib.reload(delaunay)
-
-importlib.reload(interface)
-
-importlib.reload(plotter)
-importlib.reload(cart_plot)
+from copy import deepcopy
 
 # %%
 # initialise data objects
 grid = var.grid()
 topo = var.topo_cell()
 
+# we only keep the topography that is inside this lat-lon extent.
+params = var.params()
+
+params.merit_cg = 10
+params.merit_path = '/home/ray/Documents/orog_data/MERIT/'
+
+params.lat_extent = [48.,64.,64.]
+params.lon_extent = [-148.,-148.,-112.]
+
+# corresponds to approx (160x160)km
+params.delaunay_xnp = 14
+params.delaunay_ynp = 11
+
+params.padding = 10
+
 # read grid
-reader = io.ncdata()
-fn = '../data/icon_compact.nc'
-reader.read_dat(fn, grid)
+reader = io.ncdata(padding=params.padding, padding_tol=(60-params.padding))
+reader.read_dat(params.fn_grid, grid)
 grid.apply_f(utils.rad2deg) 
 
-# read topography
-fn = '../data/topo_compact.nc'
-reader.read_dat(fn, topo)
+# # read topography
+# fn = '../data/topo_compact.nc'
+# reader.read_dat(fn, topo)
 
-# we only keep the topography that is inside this lat-lon extent.
-lat_verts = np.array([52.,64.,64.])
-lon_verts = np.array([-141.,-158.,-127.])
-
-reader.read_topo(topo, topo, lon_verts, lat_verts)
-
-# path = "/home/ray/Documents/orog_data/MERIT/"
-# reader.read_merit_topo(topo, path, lat_verts, lon_verts)
+# reader.read_topo(topo, topo, lon_verts, lat_verts)
+reader.read_merit_topo(topo, params)
+topo.topo[np.where(topo.topo < -500.0)] = -500.0
 
 topo.gen_mgrids()
 
@@ -61,38 +52,10 @@ cart_plot.lat_lon(topo, int=1)
 
 # %%
 # Setup Delaunay triangulation domain.
-
-#8x6
-# tri = delaunay.get_decomposition(topo, xnp=8, ynp=6)
-# rect_set = np.sort([24,62,32,40,66,68,48,30,0,12])
-# rect_set = np.sort([0,48,68])
-# rect_set = np.sort([40,48])
-
-#11x6
-# rect_set = np.sort([0,4,54,92,52,16,44,48,88,58,94])
-
-# 11x9
-# tri = delaunay.get_decomposition(topo, xnp=11, ynp=9)
-# rect_set = np.sort([36,58,74,118,24,54,98,130,102,34])
-# lxkm, lykm = 160, 160
-
-#11x11
-# tri = delaunay.get_decomposition(topo, xnp=11, ynp=11)
-# rect_set = np.sort([20,26,4,74,130,168,180,102,40,112])
-# lxkm, lykm = 160, 120
-# rect_set = np.array([102])
-
-#16x11
-tri = delaunay.get_decomposition(topo, xnp=16, ynp=11)
-rect_set = np.sort([156,154,32,72,68,160,96,162,276,60])
-lxkm, lykm = 120, 120
-# rect_set = np.array([68])
-
-#22x22
-# tri = delaunay.get_decomposition(topo, xnp=22, ynp=22)
-# rect_set = np.sort([88,320,126,392,714,262,732,784,112])
-# lxkm, lykm = 85, 60
-# # rect_set = np.array([392])
+#14x11
+tri = delaunay.get_decomposition(topo, xnp=params.delaunay_xnp, ynp=params.delaunay_ynp, padding = reader.padding)
+lxkm, lykm = 160, 160
+rect_set = np.array([158])
 
 print("rect_set = ", rect_set)
 
@@ -110,49 +73,121 @@ print("computing idx:", idx)
 simplex_lat = tri.tri_lat_verts[idx]
 simplex_lon = tri.tri_lon_verts[idx]
 
-triangle = utils.triangle(simplex_lon, simplex_lat)
-utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=rect)
+utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect, load_topo=True, filtered=True)
 
-taper = utils.taper(cell, 50, art_it=1000)
+cell_orig = deepcopy(cell)
+
+p_length = 20
+
+taper = utils.taper(cell, p_length, art_it=40)
 taper.do_tapering()
 
-utils.get_lat_lon_segments(tri.tri_lat_verts[idx], tri.tri_lon_verts[idx], cell, topo, triangle, rect=rect, padding=50)
+utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect, padding=p_length, load_topo=True, filtered=True)
 
-test = cell.topo * taper.p
+utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect, padding=p_length, topo_mask=taper.p, mask=(taper.p > 1e-2).astype(bool), filtered=False)
 
+test = cell.topo
 
 # %%
+ele = 5
+azi = 230
+cpad = 0.01
+
+plt.rcParams.update({'font.size': 15})
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
 
 # Make data.
-x = np.arange(taper.p.shape[0])
-y = np.arange(taper.p.shape[1])
-X,Y = np.meshgrid(y,x)
-# Z = taper.p
-Z = cell.topo * cell.mask
-Z = test
+x = cell.lon / 1000.0
+y = cell.lat / 1000.0
+X,Y = np.meshgrid(x,y)
+
+p_topo = np.pad(cell_orig.topo, (p_length,p_length), mode='constant')
+p_mask = np.pad(cell_orig.mask, (p_length,p_length), mode='constant')
+Z = p_topo * p_mask
 
 # Plot the surface.
 surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
                        linewidth=0, antialiased=False)
 
 # Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.5, aspect=5)
+fig.colorbar(surf, shrink=0.4, pad=cpad)
+ax.view_init(ele, azi)
+ax.set_xlabel( "longitude [km]", labelpad=10)
+ax.set_ylabel( "latitude [km]" , labelpad=10)
+ax.set_zlabel( "elevation [m]")
+# ax.set_title("orography before tapering")
 
+for label in ax.yaxis.get_ticklabels()[0::2]:
+    label.set_visible(False)
+
+plt.tight_layout()
+plt.savefig("../manuscript/before_taper.pdf", dpi=200, bbox_inches="tight")
 plt.show()
 
 
 # %%
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
 
 # Make data.
-x = np.arange(taper.p.shape[0])
-y = np.arange(taper.p.shape[1])
-X,Y = np.meshgrid(y,x)
+x = cell.lon / 1000.0
+y = cell.lat / 1000.0
+X,Y = np.meshgrid(x,y)
+Z = cell.topo
+
+# Plot the surface.
+surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+
+# Add a color bar which maps values to colors.
+fig.colorbar(surf, shrink=0.4, pad=cpad)
+ax.view_init(ele, azi)
+ax.set_xlabel( "longitude [km]", labelpad=10)
+ax.set_ylabel( "latitude [km]" , labelpad=10)
+ax.set_zlabel( "elevation [m]")
+
+for label in ax.yaxis.get_ticklabels()[0::2]:
+    label.set_visible(False)
+
+plt.tight_layout()
+plt.savefig("../manuscript/after_taper.pdf", dpi=200, bbox_inches="tight")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
+
+# Make data.
+x = cell.lon / 1000.0
+y = cell.lat / 1000.0
+X,Y = np.meshgrid(x,y)
+Z = p_mask
+
+# Plot the surface.
+surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+
+# Add a color bar which maps values to colors.
+fig.colorbar(surf, shrink=0.4, pad=cpad)
+ax.view_init(ele, azi)
+ax.set_xlabel( "longitude [km]", labelpad=10)
+ax.set_ylabel( "latitude [km]" , labelpad=10)
+ax.set_zlabel( "mask", rotation=90)
+
+for label in ax.yaxis.get_ticklabels()[0::2]:
+    label.set_visible(False)
+
+plt.tight_layout()
+plt.savefig("../manuscript/mask_before_taper.pdf", dpi=200, bbox_inches="tight")
+plt.show()
+
+# %%
+fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
+
+# Make data.
+x = cell.lon / 1000.0
+y = cell.lat / 1000.0
+X,Y = np.meshgrid(x,y)
 Z = taper.p
 
 # Plot the surface.
@@ -160,8 +195,30 @@ surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
                        linewidth=0, antialiased=False)
 
 # Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.5, aspect=5)
+fig.colorbar(surf, shrink=0.4, pad=cpad)
+ax.view_init(ele, azi)
+ax.set_xlabel( "longitude [km]", labelpad=10)
+ax.set_ylabel( "latitude [km]" , labelpad=10)
+ax.set_zlabel( "mask", rotation=90)
 
+
+for label in ax.yaxis.get_ticklabels()[0::2]:
+    label.set_visible(False)
+
+plt.tight_layout()
+plt.savefig("../manuscript/mask_after_taper.pdf", dpi=200, bbox_inches="tight")
 plt.show()
 
 # %%
+
+x = np.arange(taper.p.shape[0])
+y = np.arange(taper.p.shape[1])
+
+plt.figure()
+plt.imshow( (p_topo * p_mask) - cell.topo)
+plt.show()
+# %%
+
+plt.figure()
+plt.imshow(cell.topo)
+plt.show()
