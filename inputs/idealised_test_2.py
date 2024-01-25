@@ -6,6 +6,7 @@ import noise
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
+from copy import deepcopy
 
 import sys
 import os
@@ -52,7 +53,7 @@ bg_terrain = np.zeros(shape)
 bg = -(scale_fac / 2.0) * (np.cos(kl * X + kl * Y))
 
 total = world# + bg
-total = bg
+# total = bg
 
 plt.imshow(world,cmap='terrain', origin='lower')
 plt.colorbar()
@@ -68,7 +69,7 @@ plt.show()
 
 
 # %%
-U, V = 0.0, 10.0
+U, V = 10.0, 0.0
 nhi, nhj = 24, 48
 
 run = interface.get_pmf(nhi, nhj, U, V)
@@ -105,7 +106,7 @@ print(ampls_ref.max())
 params = var.params()
 params.plot = True
 params.lmbda_fa = 0.0
-params.lmbda_sa = 0.01
+params.lmbda_sa = 0.1
 dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0,1), sols, kls=kls_ref, v_extent = v_extent, dfft_plot=True)
 
@@ -118,6 +119,7 @@ print(uw_ref.sum())
 %autoreload
 
 delaunay_decomposition = True
+do_rhs_recomputation = True
 
 topo = var.topo_cell()
 topo.topo = total
@@ -125,7 +127,11 @@ topo.lat = cell.lat
 topo.lon = cell.lon
 
 params.dfft_first_guess = False
-params.n_modes = 1
+params.n_modes = 100
+
+###########################################
+# cell_fa
+###########################################
 
 cell = var.topo_cell()
 cell.topo = total
@@ -153,6 +159,8 @@ else:
 
     ampls_fa, uw_fa, dat_2D_fa = first_guess.sappx(cell, lmbda=params.lmbda_fa, iter_solve=params.fa_iter_solve)
 
+cell_ref = deepcopy(cell)
+
 indices = []
 modes_cnt = 0
 fq_cpy = np.copy(ampls_fa)
@@ -166,6 +174,10 @@ while modes_cnt < params.n_modes:
 k_idxs = [pair[1] for pair in indices]
 l_idxs = [pair[0] for pair in indices]
 
+###########################################
+# cell_01
+###########################################
+
 second_guess = interface.get_pmf(nhi, nhj, U, V)
 
 triangle = utils.gen_triangle(lon_v, lat_v)
@@ -176,7 +188,10 @@ if params.dfft_first_guess:
 else:
     second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-ampls_01, uw_01, dat_2D_01 = second_guess.sappx(cell, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve)
+ampls_01, uw_01, dat_2D_01 = second_guess.sappx(cell, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve, save_am=True)
+
+if do_rhs_recomputation:
+    ampls_01_rc, uw_01_rc, dat_2D_01_rc = second_guess.recompute_rhs(cell_ref, second_guess.fobj, save_coeffs = True)
 
 ###########################################
 # cell_02
@@ -216,8 +231,10 @@ if params.dfft_first_guess:
 else:
     second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-ampls_02, uw_02, dat_2D_02 = second_guess.sappx(cell_02, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve)
+ampls_02, uw_02, dat_2D_02 = second_guess.sappx(cell_02, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve, save_am=True)
 
+if do_rhs_recomputation:
+    ampls_02_rc, uw_02_rc, dat_2D_02_rc = second_guess.recompute_rhs(cell_ref, second_guess.fobj, save_coeffs = True)
 
 ###########################################
 # cell_03
@@ -241,7 +258,11 @@ if not delaunay_decomposition:
     cell_03.wlat = np.diff(cell_03.lat).mean()
     cell_03.wlon = np.diff(cell_03.lon).mean()
 
-    ampls_03, uw_03, dat_2D_03 = second_guess.sappx(cell_03, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve)
+    ampls_03, uw_03, dat_2D_03 = second_guess.sappx(cell_03, lmbda=params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=params.sa_iter_solve, save_am=True)
+
+    if do_rhs_recomputation:
+        ampls_03_rc, uw_03_rc, dat_2D_03_rc = second_guess.recompute_rhs(cell_ref, second_guess.fobj, save_coeffs = True)
+
 
 # %%
 sols_fa = (cell, ampls_fa, uw_fa, dat_2D_fa)
@@ -258,12 +279,28 @@ dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0,1), sols_01, v_extent = v_extent)
 print(uw_01.sum())
 
+if do_rhs_recomputation:
+    sols_01_rc = (cell, ampls_01_rc, uw_01_rc, dat_2D_01_rc)
+    params = var.params()
+    params.plot = True
+    dplot = diagnostics.diag_plotter(params, nhi, nhj)
+    dplot.show((0,1), sols_01_rc, v_extent = v_extent)
+    print(uw_01_rc.sum())
+
 sols_02 = (cell_02, ampls_02, uw_02, dat_2D_02)
 params = var.params()
 params.plot = True
 dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0,1), sols_02, v_extent = v_extent)
 print(uw_02.sum())
+
+if do_rhs_recomputation:
+    sols_02_rc = (cell, ampls_02_rc, uw_02_rc, dat_2D_02_rc)
+    params = var.params()
+    params.plot = True
+    dplot = diagnostics.diag_plotter(params, nhi, nhj)
+    dplot.show((0,1), sols_02_rc, v_extent = v_extent)
+    print(uw_02_rc.sum())
 
 if not delaunay_decomposition:
     sols_03 = (cell_03, ampls_03, uw_03, dat_2D_03)
@@ -273,6 +310,15 @@ if not delaunay_decomposition:
     dplot.show((0,1), sols_03, v_extent = v_extent)
     print(uw_03.sum())
 
+    if do_rhs_recomputation:
+        sols_03_rc = (cell, ampls_03_rc, uw_03_rc, dat_2D_03_rc)
+        params = var.params()
+        params.plot = True
+        dplot = diagnostics.diag_plotter(params, nhi, nhj)
+        dplot.show((0,1), sols_03_rc, v_extent = v_extent)
+        print(uw_03_rc.sum())
+
+
 print("")
 
 print(ampls_ref.max())
@@ -281,8 +327,9 @@ print(ampls_01.max())
 print(ampls_02.max())
 
 if delaunay_decomposition:
-    print(uw_fa.sum(), uw_01.sum()+uw_02.sum(), (uw_01.sum()+uw_02.sum()) / uw_fa.sum() - 1.0)
+    print(uw_ref.sum(), uw_01.sum()+uw_02.sum(), (uw_01.sum()+uw_02.sum()) / uw_fa.sum() - 1.0)
 else:
     print(ampls_03.max())
-    print(uw_fa.sum(), uw_01.sum()+0.5*uw_02.sum()+0.5*uw_03.sum())
+    # print(uw_fa.sum(), uw_01.sum()+0.5*uw_02.sum()+0.5*uw_03.sum())
+    print(uw_ref.sum(), uw_01.sum()+uw_02.sum()+uw_03.sum())
 # %%

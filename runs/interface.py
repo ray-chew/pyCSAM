@@ -12,20 +12,24 @@ class get_pmf(object):
 
         self.debug = debug
 
-    def sappx(self, cell, lmbda=0.1, summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
+    def sappx(self, cell, 
+              lmbda = 0.1, 
+              scale = 1.0,
+              **kwargs):
+            #   summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
         self.fobj.do_full(cell)
 
-        if iter_solve:
-            am, data_recons = lin_reg.do_iter(self.fobj, cell, lmbda)    
-        else:
-            am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
+        am, data_recons = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True), kwargs.get('save_coeffs', False))
+
+        if kwargs.get('save_am', False): self.fobj.a_m = am
+
 
         self.fobj.get_freq_grid(am)
         freqs = scale * np.abs(self.fobj.ampls)
 
-        if refine:
+        if kwargs.get('refine', False):
             cell.topo_m -= data_recons
-            am, data_recons = lin_reg.do(self.fobj, cell, lmbda)
+            am, data_recons = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True))
 
             self.fobj.get_freq_grid(am)
             freqs += scale * np.abs(self.fobj.ampls)
@@ -40,10 +44,10 @@ class get_pmf(object):
         analysis.get_attrs(self.fobj, freqs)
         analysis.recon = dat_2D
 
-        if updt_analysis: cell.analysis = analysis
+        if kwargs.get('updt_analysis'): cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
-        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
+        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=kwargs.get('summed', False))
 
         return freqs, uw_pmf_freqs, dat_2D
 
@@ -101,6 +105,30 @@ class get_pmf(object):
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
+
+        return freqs, uw_pmf_freqs, dat_2D
+
+
+    def recompute_rhs(self, cell, fobj, lmbda = 0.1, **kwargs):
+        self.fobj.do_full(cell)
+
+        _, _ = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True), kwargs.get('save_coeffs', False))
+
+        am = fobj.a_m
+        self.fobj.get_freq_grid(am)
+        freqs = np.abs(self.fobj.ampls)
+
+        data_recons = self.fobj.coeff.dot(am)
+        dat_2D = reconstruction.recon_2D(data_recons, cell)
+        
+        analysis = var.analysis()
+        analysis.get_attrs(fobj, freqs)
+        analysis.recon = dat_2D
+
+        if kwargs.get('updt_analysis', True): cell.analysis = analysis
+
+        ideal = physics.ideal_pmf(U=self.U, V=self.V)
+        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=kwargs.get('summed', False))
 
         return freqs, uw_pmf_freqs, dat_2D
     
