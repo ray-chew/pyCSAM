@@ -1,10 +1,33 @@
+"""
+Contains the classes and functions for single-cell plots.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 class fig_obj(object):
+    """
+    A figure object class to plot physical and spectral panels.
+    """
 
     def __init__(self, fig, nhi, nhj, cbar=True, set_label=True):
+        """
+        Initialises the figure object and the methods fill the axes.
+
+        Parameters
+        ----------
+        fig : matplotlib.figure.Figure
+            matplotlib figure
+        nhi : int
+            number of harmonics in the first horizontal direction
+        nhj : int
+            number of harmonics in the second horizontal direction
+        cbar : bool, optional
+            user-defined colorbar, by default True
+        set_label : bool, optional
+            toggle axis labels, by default True
+        """
         self.nhi = nhi
         self.nhj = nhj
         self.fig = fig
@@ -13,6 +36,32 @@ class fig_obj(object):
 
 
     def phys_panel(self, axs, data, title="", extent=None, xlabel="", ylabel="", v_extent=None):
+        """
+        Plots a physical depiction of the input data.
+
+        Parameters
+        ----------
+        axs : plt.Axes
+            matplotlib figure axis
+        data : array-like
+            2D image data
+        title : str, optional
+            panel title, by default ""
+        extent : list, optional
+            [x0,x1,y0,y1], by default ""
+        xlabel : str, optional
+            x-axis label, by default ""
+        ylabel : str, optional
+            y-axis label, by default ""
+        v_extent : list, optional
+            [h0,h1]; vertical extent of the data, by default None
+
+        Returns
+        -------
+        plt.Axes
+            matplotlib figure axis
+        """
+
         if extent is None:
             extent = [-data.shape[1]/2., data.shape[1]/2., -data.shape[0]/2., data.shape[0]/2. ]
         if v_extent is not None:
@@ -37,6 +86,29 @@ class fig_obj(object):
 
 
     def freq_panel(self, axs, ampls, nhi=None, nhj=None, title="Power spectrum", v_extent=None):
+        """
+        Plots the spectrum in a dense truncated spectral space.
+
+        Parameters
+        ----------
+        axs : plt.Axes
+            matplotlib figure axis
+        ampls : array-like
+            2D (abs.) spectral data
+        nhi : int, optional
+            number of harmonics in the first horizontal direction, by default None
+        nhj : _type_, optional
+            number of harmonics in the second horizontal direction, by default None
+        title : str, optional
+            user-defined panel title, by default "Power spectrum"
+        v_extent : _type_, optional
+            [h0,h1]; vertical extent of the data, by default None
+
+        Returns
+        -------
+        plt.Axes
+            matplotlib figure axis
+        """
         if ((nhi is None) and (nhj is None)):
             nhi = self.nhi
             nhj = self.nhj
@@ -59,14 +131,11 @@ class fig_obj(object):
         axs.set_xticks(xlocs, m_i, rotation=-90)
         axs.set_yticks(ylocs, m_j)
         axs.set_title(title)
-        # axs.grid(which='minor', color='k', linestyle='-', linewidth=1)
-        # axs.set_xlabel(r'$k_n \times 2 \pi / L_x$', fontsize=12)
-        # axs.set_ylabel(r'$l_m \times 2 \pi / L_y$', fontsize=12)
 
         if self.set_label:
-            axs.set_ylabel(r'$l_m$', fontsize=12)
+            axs.set_ylabel(r'$m$', fontsize=12)
         
-        axs.set_xlabel(r'$k_n$', fontsize=12)
+        axs.set_xlabel(r'$n$', fontsize=12)
         # axs.set_aspect('equal')
 
         # ref: https://stackoverflow.com/questions/20337664/cleanest-way-to-hide-every-nth-tick-label-in-matplotlib-colorbar
@@ -88,6 +157,25 @@ class fig_obj(object):
                        interval = 20, \
                        typ='imag'
                        ):
+        """
+        Plots the spectrum in the full spectral space.
+
+        Parameters
+        ----------
+        axs : plt.Axes
+            matplotlib figure axis
+        ampls : array-like
+            2D (abs.) spectral data
+        kks : list
+            list of first horizontal wavenumbers
+        lls : list
+            list of second horizontal wavenumbers
+
+        Returns
+        -------
+        plt.Axes
+            matplotlib figure axis
+        """
         
         xmid = int(len(kks)/2)
         ymid = int(len(lls)/2)
@@ -148,6 +236,36 @@ def error_bar_plot( idx_name,
                     ylabel="",
                     fontsize=8
                     ):
+    """
+    Bar plot of errors.
+
+    Parameters
+    ----------
+    idx_name : list
+        labels of the error plots, e.g., cell index
+    pmf_diff : list
+        list containing the errors. Same size as `idx_name`.
+    params : :class:`src.var.params`
+        user parameter class
+    comparison : list, optional
+        a second error list to be compared to `pmf_diff`. Same size as `pmf_diff`, by default None
+    title : str, optional
+        user-defined panel title, by default ""
+    gen_title : bool, optional
+        automatically generate panel title from `params`, by default False
+    output_fig : bool, optional
+        toggle writing figure output, by default False
+    fn : str, optional
+        path to write output figure, by default "../output/error_plot.pdf"
+    ylim : list, optional
+        extent of the error bar plot, by default [-100,100]
+    fs : tuple, optional
+        figure size, by default (10.0,6.0)
+    ylabel : str, optional
+        y-axis label, by default ""
+    fontsize : int, optional
+        by default 8
+    """
 
     data = pd.DataFrame(pmf_diff,index=idx_name, columns=['values'])
 
@@ -203,7 +321,10 @@ def error_bar_split_plot(errs, lbls, bs, ts, ts_ticks,
                          output_fig=False, 
                          fn='output/errors.pdf'
                          ):
-    
+    """
+    Function to generate error bar plots with a split in the middle, e.g., when space in limited on a presentation slide or poster.
+
+    """
     errs = [np.around(err,2) for err in errs]
     print(errs)
 

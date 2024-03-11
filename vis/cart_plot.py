@@ -1,3 +1,9 @@
+"""
+Contains functions for regional limited-area plots.
+
+Requires the `cartopy` package.
+"""
+
 import matplotlib.pyplot as plt
 from   matplotlib.collections import PolyCollection
 from   matplotlib.colors import ListedColormap
@@ -9,6 +15,19 @@ from cartopy.mpl.ticker import (LongitudeFormatter,
 
 
 def lat_lon(topo, fs=(10,6), int=1):
+    """
+    Does a simple Plate-Carre projection of a lat-lon topography data.
+
+    Parameters
+    ----------
+    topo : array-like
+        2D topography data
+    fs : tuple, optional
+        figure size, by default (10,6)
+    int : int, optional
+        for high-resolution datasets, do we only plot every `int` pixel? By default 1, i.e., everything is plotted.
+    """
+
     fig = plt.figure(figsize=fs)
     ax = plt.axes(projection=ccrs.PlateCarree())
 
@@ -56,6 +75,21 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
                      int = 1, \
                      raster=False
                      ):
+    """
+    Plots a Plate-Carrée projection of the topography with a Delunay triangulated grid.
+
+    Parameters
+    ----------
+    topo : array-like
+        2D topography data
+    tri : list
+        list containing tuples of the three vertice coordinates of a triangle
+    levels : list
+        user-defined elevation levels for the plot
+    fs : tuple, optional
+        figure size, by default (8,4)
+    """
+
     plt.figure(figsize=fs)
 
     im = plt.contourf(topo.lon_grid[::int], topo.lat_grid[::int], topo.topo[::int], levels=levels, cmap='GnBu')
@@ -108,6 +142,38 @@ def error_delaunay(topo, tri, fs=(8,4),
                      raster=True,
                      fontsize = 12
                   ):
+    """
+    Plots the Delaunay triangulation of a lat-lon domain with the correponding errors.
+
+    Parameters
+    ----------
+    topo : array-like
+        2D topography data
+    tri : list
+        list containing tuples of the three vertice coordinates of a triangle
+    fs : tuple, optional
+        figure size, by default (8,4)
+    label_idxs : bool, optional
+        toggles index labels, by default False
+    highlight_indices : list, optional
+        toggles highlighting of given indices, by default [44,45, 88,89, 16,17]
+    fn : str, optional
+        output file name, by default '../output/delaunay.pdf'
+    output_fig : bool, optional
+        toggles writing of output figure, by default False
+    iint : int, optional
+        how many data points to skip in plotting the topography, by default 1, i.e., the full resolution is used.
+    errors : list, optional
+        list of errors computed within each triangle, by default None
+    alpha_max : float, optional
+        alpha of the error overlay, by default 0.5
+    v_extent : list, optional
+        vertical extent of the error, by default [-25.0, 25.0]
+    raster : bool, optional
+        toggles vector or raster output, by default True
+    fontsize : int, optional
+        fontsize, by default 12
+    """
     fig = plt.figure(figsize=fs)
     # ax = plt.axes(projection=ccrs.PlateCarree())
     ax = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
@@ -193,8 +259,20 @@ def lat_lon_icon(topo, triangles, \
                  fn = '../output/icon_lam.pdf', \
                  output_fig = False, \
                  **kwargs):
-    # Taken from https://docs.dkrz.de/doc/visualization/sw/python/source_code/python-matplotlib-example-unstructured-icon-triangles-plot-python-3.html
+    """
+    Plots the topography given an ICON grid.
 
+    Parameters
+    ----------
+    topo : array-like
+        2D topography data
+    triangles : list
+        list containing tuples of the three vertice coordinates of a triangle
+
+    Note
+    ----
+    Reference used: https://docs.dkrz.de/doc/visualization/sw/python/source_code/python-matplotlib-example-unstructured-icon-triangles-plot-python-3.html
+    """
     #-- set projection
     projection = ccrs.PlateCarree()
 
