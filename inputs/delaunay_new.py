@@ -5,9 +5,6 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
-import pandas as pd
-import importlib
-import matplotlib.pyplot as plt
 
 from src import io, var, utils, fourier, physics, delaunay
 from runs import interface, diagnostics
@@ -20,7 +17,7 @@ import time
 
 # %%
 from runs.lam_run import params
-from runs.selected_run_dfft import params
+# from runs.selected_run_dfft import params
 # from runs.debug_run import params
 from copy import deepcopy
 
@@ -318,7 +315,7 @@ plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=True)
 # plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12)
 
 # %%
-
+print(diag.max_errs)
 plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fontsize=12)
 
 # plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fn='../manuscript/mre_bar.pdf', fontsize=12)
