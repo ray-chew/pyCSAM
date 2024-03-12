@@ -1,3 +1,7 @@
+"""
+This module contains miscellaneous helper functions and classes
+"""
+
 import numpy as np
 import numba as nb
 import scipy.signal as signal
@@ -5,6 +9,10 @@ import scipy.interpolate as interpolate
 import sys
 
 def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
+    """
+    .. deprecated:: 0.90.0
+
+    """
     clat, clon = grid.clat, grid.clon
     index = np.nonzero((np.abs(clat-lat_ref)<=radius) & 
                        (np.abs(clon-lon_ref)<=radius))[0]
@@ -20,11 +28,42 @@ def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
 
 
 def rad2deg(val):
+    """Radians to degrees converter
+
+    Parameters
+    ----------
+    val : float
+        argument in units of radians
+
+    Returns
+    -------
+    float
+        argument in units of degrees
+    """
     return np.rad2deg(val)
 
 
 def isosceles(grid, cell, xmax = 2.0 * np.pi, 
     ymax = 2.0 * np.pi, res=480, tri='mid'):
+    """
+    Populates a :class:`cell <src.var.topo_cell>` instance with an idealised triangle
+
+    Parameters
+    ----------
+    grid : :class:`src.var.grid`
+        instance of the grid class
+    cell : :class:`src.var.topo_cell`
+        instance of the cell class
+    xmax : float, optional
+        first horizontal extent, by default 2.0*np.pi
+    ymax : float, optional
+        second horizontal extent, by default 2.0*np.pi
+    res : int, optional
+        resolution of the triangle, by default 480
+    tri : str, optional
+        ``mid`` generates an isosceles triangle, ``left`` generates a lower and ``right`` an upper triangle. By default 'mid'
+
+    """
 
     if tri == 'mid':
         grid.clon_vertices = np.array([[0+1e-7, xmax / 2.0, xmax-1e-7],])
@@ -54,11 +93,29 @@ def isosceles(grid, cell, xmax = 2.0 * np.pi,
 
     # cell.lat = np.linspace(-np.pi, np.pi, res)
     # cell.lon = np.linspace(-np.pi, np.pi, res)
-
-    return 0
+        
 
 def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi, 
     ymax = 2.0 * np.pi, tri='lower'):
+    """Generates an idealised Delaunay triangle
+
+    Parameters
+    ----------
+    grid : :class:`src.var.grid`
+        instance of the grid class
+    cell : :class:`src.var.topo_cell`
+        instance of the cell class
+    res_x : int, optional
+        resolution of the first horizontal extent, by default 480
+    res_y : int, optional
+        resolution of the second horizontal extent, by default 480
+    xmax : float, optional
+        first horizontal extent, by default 2.0*np.pi
+    ymax : float, optional
+        second horizontal extent, by default 2.0*np.pi
+    tri : str, optional
+        ``lower`` generates a lower triangle, and ``upper`` an upper triangle. By default 'lower'
+    """
     if tri == 'lower':
         grid.clon_vertices = np.array([[0+1e-7, 0+1e-7, xmax-1e-7],])
         grid.clat_vertices = np.array([[0+1e-7, ymax-1e-7, 0+1e-7],])
@@ -69,10 +126,15 @@ def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi,
     cell.lat = np.linspace(0, ymax, res_x)
     cell.lon = np.linspace(0, xmax, res_y)
 
-    return 0
-
 
 def gen_art_terrain(shp, seed = 555, iters = 1000):
+    """
+    Generates an artificial terrain
+
+    .. deprecated:: 0.90.0
+
+    .. note:: superceded by :mod:`src.runs.idealised_test` and :mod:`src.runs.idealised_test_2`
+    """
     np.random.seed(seed)
     k = np.random.random (shp)
 
@@ -93,8 +155,27 @@ def gen_art_terrain(shp, seed = 555, iters = 1000):
 
 
 class gen_triangle(object):
-
+    """
+    Defines a triangle generator given the coordinates of its vertices
+    """
     def __init__(self, vx, vy, x_rng=None, y_rng=None):
+        """
+        Defines the triangle's properties
+
+        Parameters
+        ----------
+        vx : list
+            ``[x1, x2, x3]``, list of the first coordinate of the vertices
+        vy : list
+            ``[y1, y2, y3]``, list of the second coordinate of the vertices
+        x_rng : list, optional
+            ``[x_min, x_max]``: the full first horizontal extent of the domain encompassing the triangle, by default None
+        y_rng : list, optional
+            ``[y_min, y_max]``: the full second horizontal extent of the domain encompassing the triangle, by default None
+
+        .. note:: ``x_rng`` and ``y_rng`` are required if the triangle does not span the full extent of the grid cell.
+
+        """
         # self.x1, self.x2, self.x3 = vx
         # self.y1, self.y2, self.y3 = vy
         vx = np.append(vx, vx[0])
@@ -106,7 +187,7 @@ class gen_triangle(object):
         polygon = np.array([list(item) for item in zip(vx, vy)])
 
         # self.vec_get_mask = np.vectorize(self.get_mask)
-        self.vec_get_mask = self.mask_wrapper(polygon)
+        self.vec_get_mask = self.__mask_wrapper(polygon)
 
     # def get_mask(self, x, y):
 
@@ -131,15 +212,32 @@ class gen_triangle(object):
     # def vector(x1,y1,x2,y2):
     #     return [x2-x1, y2-y1]
     
-    def mask_wrapper(self, polygon):
-        return lambda p : self.is_inside_sm(p, polygon)
+    def __mask_wrapper(self, polygon):
+        return lambda p : self.__is_inside_sm(p, polygon)
 
 
-    # Define function that computes whether a point is in a polygon, and rescales the lat-lon grid to a local coordinate between [0,1].
-    # Taken from: https://github.com/sasamil/PointInPolygon_Py/blob/master/pointInside.py
     @staticmethod
     @nb.njit(cache=True)
-    def is_inside_sm(point, polygon):
+    def __is_inside_sm(point, polygon):
+        """Defines function that computes whether a point is in a polygon, and rescales the lat-lon grid to a local coordinate between [0,1].
+
+        Parameters
+        ----------
+        point : tuple
+            ``(float, float)``, coordinates of the data point
+        polygon : tuple
+            ``((x1,y1),(x2,y2),(x3,y3))`` describing the triangle's vertices
+
+        Returns
+        -------
+        bool
+            returs True if ``point`` is in ``polygon``, False otherwise
+
+        .. note::
+
+            Taken from: https://github.com/sasamil/PointInPolygon_Py/blob/master/pointInside.py
+        """
+
         length = len(polygon)-1
         dy2 = point[1] - polygon[0][1]
         intersections = 0
@@ -174,7 +272,23 @@ class gen_triangle(object):
     
 
 def rescale(arr, rng=None):
+    """Rescales a list to the interval of [0,1]
 
+    Parameters
+    ----------
+    arr : list
+        data points to be rescaled
+    rng : list, optional
+        extent to be rescaled, by default None
+
+    Returns
+    -------
+    list
+        ``arr`` values rescaled to [0,1]
+
+    .. note:: This rescaling is required to work with the fast :func:`triangle generator function <src.utils.gen_triangle.is_inside_sm>`.
+
+    """
     if rng is None:
         arr -= arr.min()
         arr /= arr.max()
@@ -186,9 +300,14 @@ def rescale(arr, rng=None):
     return arr
 
 
-# ref: https://github.com/bosswissam/pysize
+# 
 def get_size(obj, seen=None):
-    """Recursively finds size of objects"""
+    """
+    Recursively finds size of objects
+    
+    .. note:: Function taken from https://github.com/bosswissam/pysize. Useful in checking how much memory is required by the data objects generated by :mod:`src.var`.
+
+    """
     size = sys.getsizeof(obj)
     if seen is None:
         seen = set()
@@ -209,6 +328,32 @@ def get_size(obj, seen=None):
 
 
 def get_lat_lon_segments(lat_verts, lon_verts, cell, topo, rect=False, filtered=True, padding=0, topo_mask=None, mask=None, load_topo=False):
+    """
+    Populates an empty :class:`cell <src.var.topo_cell>` object given the vertices and underlying topography.
+
+    Parameters
+    ----------
+    lat_verts : list
+        vertices of the cell in the first horizontal direction
+    lon_verts : list
+        vertices of the cell in the second horizontal direction
+    cell : :class:`src.var.topo_cell`
+        instance of the cell object class
+    topo : :class:`src.var.topo`
+        instance of the topography object class
+    rect : bool, optional
+        do the vertices describe a quadrilateral grid cell? By default False
+    filtered : bool, optional
+        removes topographic features smaller than 5km in scale, by default True
+    padding : int, optional
+        number of data points in the padded region, by default 0
+    topo_mask : array-like, optional
+        tapering mask, by default None
+    mask : _type_, optional
+        mask to select for data points inside the non-quadrilateral grid cell, by default None
+    load_topo : bool, optional
+        explicitly replaces the topography attribute in the cell ``cell.topo`` with the data given in ``topo``, by default False
+    """
     lat_max = get_closest_idx(lat_verts.max(), topo.lat) + padding
     lat_min = get_closest_idx(lat_verts.min(), topo.lat) - padding
 
@@ -298,6 +443,22 @@ def get_closest_idx(val, arr):
 
 
 def latlon2m(arr, fix_pt, latlon):
+    """Wrapper function to compute the distance of a list of values from a given fixed point (in meters).
+
+    Parameters
+    ----------
+    arr : list
+        list of values in degrees 
+    fix_pt : float
+        given fixed point, e.g. the origin, in degrees
+    latlon : str
+        ``lat`` if the distance are to be computed in the latitudinal direction, ``lon`` otherwise.
+
+    Returns
+    -------
+    float
+        distance in meters
+    """
     arr = np.array(arr)
     assert arr.ndim == 1
     origin = arr[0]
@@ -308,16 +469,37 @@ def latlon2m(arr, fix_pt, latlon):
     for cnt, idx in enumerate(range(1,len(arr))):
         cnt += 1
         if latlon == 'lat':
-            res[cnt] = latlon2m_converter(fix_pt, fix_pt, origin, arr[idx])
+            res[cnt] = __latlon2m_converter(fix_pt, fix_pt, origin, arr[idx])
         elif latlon == 'lon':
-            res[cnt] = latlon2m_converter(origin, arr[idx], fix_pt, fix_pt)
+            res[cnt] = __latlon2m_converter(origin, arr[idx], fix_pt, fix_pt)
         else:
             assert 0
 
     return res * 1000
         
-# https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
-def latlon2m_converter(lon1, lon2, lat1, lat2):
+
+def __latlon2m_converter(lon1, lon2, lat1, lat2):
+    """Helper function for lat-lon to meters conversion
+
+    Parameters
+    ----------
+    lon1 : float
+        first longitude coordinate
+    lon2 : float
+        second longitude coordinate
+    lat1 : float
+        first latitude coordinate
+    lat2 : float
+        second latitude coordinate
+
+    Returns
+    -------
+    float
+        distance between ``(lat1,lon1)`` and ``(lat2,lon2)`` in meters.
+
+    .. note:: Taken from https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
+
+    """
     # Approximate radius of earth in km
     R = 6373.0
 
@@ -336,7 +518,7 @@ def latlon2m_converter(lon1, lon2, lat1, lat2):
     return distance
 
 
-# ref: https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a
+
 def sliding_window_view(arr, window_shape, steps):
     """ 
     Produce a view from a sliding, striding window over `arr`.
@@ -425,7 +607,26 @@ def sliding_window_view(arr, window_shape, steps):
 
 
 class taper(object):
+    """Helper class to apply tapering via artificial diffusion
+    """
     def __init__(self, cell, padding, stencil_typ='OP', scale_fac=1.0, art_dt=0.5, art_it=800):
+        """Initialises an artificial diffusion scenario
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell`
+            instance of the cell object class
+        padding : int
+            number of data points in the padded region
+        stencil_typ : str, optional
+            Laplacian stencil choice, by default 'OP' which is also the most stable
+        scale_fac : float, optional
+            scaling factor for the stencil, by default 1.0
+        art_dt : float, optional
+            artificial diffusion time-step size, by default 0.5
+        art_it : int, optional
+            number of iterations for the artificial discussion, by default 800
+        """
         if stencil_typ == 'OP':
             self.stencil = self.__stencil(0.5)
         elif stencil_typ == '5pt':
@@ -448,6 +649,8 @@ class taper(object):
         self.p = np.copy(self.p0)
 
     def do_tapering(self):
+        """Get tapered mask via artificial diffusion
+        """
         for _ in range(self.art_it):
             # artificial diffusion / Shapiro filter
             self.p = self.p + self.art_dt * signal.convolve2d(self.p, self.stencil, mode='same')
@@ -459,11 +662,12 @@ class taper(object):
         del self.p0
 
 
-    # https://en.wikipedia.org/wiki/Nine-point_stencil
-    # I tried the 5pt stencil but it struggles when art_dt is large.
-    # From experience, the most robust stencil is the isotropic Oono-Puri, gam=1/3.
     @staticmethod
     def __stencil(gam):
+        """
+        .. note:: I tried the 5pt stencil but it struggles when art_dt is large. From experience, the most robust stencil is the isotropic Oono-Puri, gam=1/3. See https://en.wikipedia.org/wiki/Nine-point_stencil for more information.
+
+        """
         stencil_iso = np.zeros((3,3))
         stencil_iso[0,1] = 1.0
         stencil_iso[1,0] = 1.0

@@ -1,8 +1,20 @@
+"""
+This module defines the data objects used in the program.
+"""
+
 import numpy as np
 from src import utils, io
 
 class grid(object):
+    """
+    Grid class
+    """
     def __init__(self):
+        """
+        Contains the ``(lat,lon)`` of each triangular grid cell with the corresponding vertices ``(lat_1, lat_2, lat_3)``, ``(lon_1, lon_2, lon_3)``.
+
+        ``link`` is a lookup table linking the grid cell to the corresponding topography file.
+        """
         self.clat = None
         self.clat_vertices = None
         self.clon = None
@@ -10,6 +22,14 @@ class grid(object):
         self.links = None
 
     def apply_f(self, f):
+        """
+        Applies a function to all class attributes, except those listed in ``non_convertibles``
+
+        Parameters
+        ----------
+        f : ``function``
+            arbitrary function to be applied to class attributes, e.g. a radians-degrees converter.
+        """
         self.non_convertibles = ['non_convertibles', 'links']
         for key, value in vars(self).items():
             if key in self.non_convertibles:
@@ -20,6 +40,9 @@ class grid(object):
 
 
 class topo(object):
+    """
+    Topography class with its corresponding lat-lon values
+    """
     def __init__(self):
         self.lon = None
         self.lat = None
@@ -28,11 +51,22 @@ class topo(object):
 
 
 class topo_cell(topo):
+    """
+    Inherits and initialises an instance of :class:`src.var.topo`, to be used for storing data associated to a grid cell
+    """
     def __init__(self):
         super().__init__()
 
 
     def gen_mgrids(self, grad=False):
+        """
+        Generates a meshgrid based on the lat-lon values
+
+        Parameters
+        ----------
+        grad : bool, optional
+            deprecated by 0.90.0, by default False
+        """
         if not grad:
             lat, lon = self.lat, self.lon
             self.lon_grid, self.lat_grid = np.meshgrid(lon, lat)
@@ -44,6 +78,9 @@ class topo_cell(topo):
 
     
     def __get_lat_lon_points(self, grad=False):
+        """
+        Private method to get the (lat,lon) coordinate for each topographic data point
+        """
         if not grad:
             lat_grid, lon_grid = self.lat_grid, self.lon_grid
         else:
@@ -59,6 +96,14 @@ class topo_cell(topo):
 
 
     def __get_mask(self, triangle):
+        """
+        Private method to generate the mask based on which data points are inside the triangle grid cell.
+
+        Parameters
+        ----------
+        triangle : :class:`src.utils.gen_triangle`
+            instance of the generate-triangle class
+        """
         lat_lon_points = self.__get_lat_lon_points()
         init_poly = triangle.vec_get_mask
 
@@ -66,6 +111,15 @@ class topo_cell(topo):
 
 
     def get_masked(self, triangle = None, mask = None):
+        """Gets the masked attributes
+
+        Parameters
+        ----------
+        triangle : :class:`src.utils.gen_triangle`
+            instance of the generate-triangle class, by default None
+        mask : array-like, optional
+            2D array of the mask, by default None
+        """
 
         if (triangle is not None) and (mask is None):
             self.__get_mask(triangle)
@@ -80,6 +134,12 @@ class topo_cell(topo):
 
 
     def get_grad_topo(self, triangle):
+        """
+        Computes the gradient of the topography
+
+        .. deprecated:: 0.90.0
+
+        """
         lat, lon = self.lat, self.lon
         self.grad_lat = lat[:-1] + 0.5 * (lat[1:] - lat[:-1])
         self.grad_lon = lon[:-1] + 0.5 * (lon[1:] - lon[:-1])
@@ -107,7 +167,14 @@ class topo_cell(topo):
 
 
 class analysis(object):
+    """
+    Analysis object, contains all the attributes required to compute the idealised pseudo-momentum fluxes
+
+    """
     def __init__(self):
+        """
+        Initialises empty attributes
+        """
         self.wlat = None
         self.wlon = None
         self.ampls = None
@@ -119,6 +186,15 @@ class analysis(object):
         self.recon = None
 
     def get_attrs(self, fobj, freqs):
+        """Copies required attributes given the arguments
+
+        Parameters
+        ----------
+        fobj : :class:`src.fourier.f_trans`
+            instance of the Fourier transformer
+        freqs : array-like
+            2D (abs. valued real) spectrum 
+        """
         self.wlat = np.copy(fobj.wlat)
         self.wlon = np.copy(fobj.wlon)
         self.ampls = np.copy(freqs)
@@ -168,7 +244,10 @@ class analysis(object):
 # clon_vertices = ma.getdata(df.variables['clon_vertices'][:])
 
     def grid_kk_ll(self, fobj, dat):
+        """
+        .. deprecated:: 0.90.0
 
+        """
         m_i = fobj.m_i
         m_j = fobj.m_j
 
@@ -189,7 +268,8 @@ class analysis(object):
     
 
 class obj(object):
-    
+    """Helper object to generate class instances on the fly
+    """
     def __init__(self):
         pass
 
@@ -199,7 +279,14 @@ class obj(object):
 
 
 class params(obj):
+    """User parameter class
+
+    Defines required and optional parameters to run a simulation
+    """
     def __init__(self):
+        """
+        Defines the required parameters for a simulation run
+        """
         # Define filenames
         self.path = '/home/ray/git-projects/spec_appx/data/'
         self.fn_grid = self.path + 'icon_compact.nc'
@@ -262,6 +349,14 @@ class params(obj):
 
 
     def self_test(self):
+        """
+        Checker method if user-defined parameters contains sensible compulsory parameters. Calls :func:`src.var.params.check_init` and :func:`src.var.params.check_delaunay`.
+
+        Returns
+        -------
+        bool
+            True if test passed, False otherwise
+        """
         if self.output_fn is None:
             self.output_fn = io.fn_gen(self)
 
@@ -273,6 +368,8 @@ class params(obj):
         return True
 
     def check_init(self):
+        """Checks if all required parameters are defined.
+        """
         compulsory_params = [
                              'lat_extent',
                              'lon_extent'
@@ -282,6 +379,9 @@ class params(obj):
         assert len(offenders) == 0, "Compulsory run parameter(s) undefined: %s" %offenders
 
     def check_delaunay(self):
+        """
+        If run uses a Delaunay triangulation, this method checks if all required parameters are defined.
+        """
         compulsory_params = [
                              'delaunay_xnp',
                              'delaunay_ynp',
@@ -296,6 +396,9 @@ class params(obj):
 
     @staticmethod
     def checker(arg, compulsory_params):
+        """Auxiliary function that checks if ``arg`` is in ``compulsory_params``
+
+        """
         offenders = []
         for key, value in vars(arg).items():
             if key in compulsory_params:

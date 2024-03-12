@@ -6,7 +6,7 @@ class f_trans(object):
     """
     def __init__(self, nhar_i, nhar_j):
         """
-        Initalises a discrete spectral space with the corresponding Fourier coefficients spanning `nhar_i` and `nhar_j`.
+        Initalises a discrete spectral space with the corresponding Fourier coefficients spanning ``nhar_i`` and ``nhar_j``.
 
         Parameters
         ----------
@@ -91,7 +91,7 @@ class f_trans(object):
         l_rng : list
             list containing the selected k-wavenumber indices
         recompute_nhij : bool, optional
-            resets `nhar_i` and `nhar_j`, by default True
+            resets ``nhar_i`` and ``nhar_j``, by default True
         components : str, optional
             `real` recomputes the spectral space comprising only real spectral components, by default 'imag'
         """
@@ -118,9 +118,9 @@ class f_trans(object):
 
     def do_full(self, cell, grad=False):
         r"""
-        Assembles the sine and cosine terms that make up the Fourier coefficients in the `M` matrix required in the :func:`linear regression <src.lin_reg.do>` computation:
+        Assembles the sine and cosine terms that make up the Fourier coefficients in the ``M`` matrix required in the :func:`linear regression <src.lin_reg.do>` computation:
 
-        .. math:: Mx=h
+        .. math:: M a_m =h
 
         Parameters
         ----------
@@ -184,7 +184,7 @@ class f_trans(object):
 
     def do_axial(self, cell, alpha = 0.0):
         """
-        Computes spectral modes along the `(k,l)`-axes.
+        Computes spectral modes along the ``(k,l)``-axes.
 
         .. deprecated:: 0.90.0
 

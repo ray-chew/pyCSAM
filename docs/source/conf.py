@@ -22,7 +22,7 @@ copyright = '2024, Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achat
 author = 'Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achatz'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.1'
+release = 'v0.90.1'
 
 
 # -- General configuration ---------------------------------------------------

@@ -17,7 +17,7 @@ def get_coeffs(fobj):
     Returns
     -------
     array-like
-        2D array corresponding to the `M` matrix.
+        2D array corresponding to the ``M`` matrix.
     """
     Ncos = fobj.bf_cos
     Nsin = fobj.bf_sin
@@ -49,14 +49,14 @@ def do(fobj, cell, lmbda = 0.0,
     iter_solve : bool, optional
         toggles between using direct or iterative solver, by default True
     save_coeffs : bool, optional
-        skips the linear regression and just saves the generated `M` matrix for diagnostics and debugging, by default False
+        skips the linear regression and just saves the generated ``M`` matrix for diagnostics and debugging, by default False
 
     Returns
     -------
     a_m : list
-        list of Fourier amplitudes corresponding to the right-hand side of the linear problem
+        list of Fourier amplitudes corresponding to the unknown vector in the linear problem
     data_recons : like
-        vector-like topography reconstructed from `a_m`
+        vector-like topography reconstructed from ``a_m``
     """
     if fobj.grad:
         cell.get_grad()

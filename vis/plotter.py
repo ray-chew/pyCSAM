@@ -17,7 +17,7 @@ class fig_obj(object):
 
         Parameters
         ----------
-        fig : matplotlib.figure.Figure
+        fig : :class:`matplotlib.figure.Figure` instance
             matplotlib figure
         nhi : int
             number of harmonics in the first horizontal direction
@@ -41,7 +41,7 @@ class fig_obj(object):
 
         Parameters
         ----------
-        axs : plt.Axes
+        axs : :class:`plt.Axes`
             matplotlib figure axis
         data : array-like
             2D image data
@@ -58,7 +58,7 @@ class fig_obj(object):
 
         Returns
         -------
-        plt.Axes
+        :class:`plt.Axes`
             matplotlib figure axis
         """
 
@@ -91,7 +91,7 @@ class fig_obj(object):
 
         Parameters
         ----------
-        axs : plt.Axes
+        axs : :class:`plt.Axes`
             matplotlib figure axis
         ampls : array-like
             2D (abs.) spectral data
@@ -106,7 +106,7 @@ class fig_obj(object):
 
         Returns
         -------
-        plt.Axes
+        :class:`plt.Axes`
             matplotlib figure axis
         """
         if ((nhi is None) and (nhj is None)):
@@ -162,7 +162,7 @@ class fig_obj(object):
 
         Parameters
         ----------
-        axs : plt.Axes
+        axs : :class:`plt.Axes`
             matplotlib figure axis
         ampls : array-like
             2D (abs.) spectral data
@@ -173,7 +173,7 @@ class fig_obj(object):
 
         Returns
         -------
-        plt.Axes
+        :class:`plt.Axes`
             matplotlib figure axis
         """
         

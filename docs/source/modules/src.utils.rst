@@ -20,7 +20,6 @@ src.utils
       get_size
       isosceles
       latlon2m
-      latlon2m_converter
       pick_cell
       rad2deg
       rescale
