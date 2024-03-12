@@ -4,7 +4,7 @@ from src import utils, var
 
 def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
     """
-    Partition lat-lon domain into a number of coarser but regularly spaces points that comprises the vertices of the Delaunay triangles.
+    Partitions a lat-lon domain into a number of coarser but regularly spaced points that comprises the vertices of the Delaunay triangles.
 
     Parameters
     ----------
@@ -19,7 +19,7 @@ def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
 
     Returns
     -------
-    `scipy.spatial.qhull.Delaunay` instance
+    :class:`scipy.spatial.qhull.Delaunay` instance
         scipy Delaunary triangulation instance
     """
 

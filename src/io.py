@@ -1,3 +1,7 @@
+"""
+Input/Output routines
+"""
+
 import netCDF4 as nc
 import numpy as np
 import h5py
@@ -7,12 +11,33 @@ from datetime import datetime
 from src import utils
 
 class ncdata(object):
-
+    """Helper class to read NetCDF4 topographic data
+    """
     def __init__(self, read_merit = False, padding = 0, padding_tol = 50):
+        """
+
+        Parameters
+        ----------
+        read_merit : bool, optional
+            toggles between the `MERIT DEM <https://hydro.iis.u-tokyo.ac.jp/~yamadai/MERIT_DEM/>`_ and `USGS GMTED 2010 <https://www.usgs.gov/coastal-changes-and-impacts/gmted2010>`_ data files. By default False, i.e., read USGS GMTED 2010 data files.
+        padding : int, optional
+            number of data points to pad the loaded topography file, by default 0
+        padding_tol : int, optional
+            padding tolerance is added no matter the user-defined ``padding``, by default 50
+        """
         self.read_merit = read_merit
         self.padding = padding_tol + padding
 
     def read_dat(self, fn, obj):
+        """Reads data by attributes defined in the ``obj`` class.
+
+        Parameters
+        ----------
+        fn : str
+            filename
+        obj : :class:`src.var.grid` or :class:`src.var.topo` or :class:`src.var.topo_cell`
+            any data object in :mod:`src.var` accepting topography attributes
+        """
         df = nc.Dataset(fn)
 
         for key, _ in vars(obj).items():
@@ -21,10 +46,27 @@ class ncdata(object):
 
         df.close()
 
-    def get_truths(self, arr, vert_pts, d_pts):
+    def __get_truths(self, arr, vert_pts, d_pts):
+        """Assembles Boolean array selecting for data points within a given lat-lon range, including padded boundary.
+        """
         return (arr >= (vert_pts.min() - self.padding * d_pts)) & (arr <= vert_pts.max() + self.padding * d_pts)
 
     def read_topo(self, topo, cell, lon_vert, lat_vert):
+        """Reads USGS GMTED 2010 dataset
+
+        Parameters
+        ----------
+        topo : :class:`src.var.topo` or :class:`src.var.topo_cell`
+            instance of a topography class containing the full regional or global topography loaded via :func:`src.io.read_dat`.
+        cell : :class:`src.var.topo_cell`
+            instance of a cell object
+        lon_vert : list
+            extent of the longitudinal coordinates encompassing the region to be loaded
+        lat_vert : list
+            extent of the latitudinal coordinates encompassing the region to be loaded
+
+        .. note:: Loading the global topography in the ``topo`` argument may not be memory efficient. The notebook ``nc_compactifier.ipynb`` contains a script to extract a region of interest from the global GMTED 2010 dataset.
+        """
         lon, lat, z = topo.lon, topo.lat, topo.topo
         
         nrecords = np.shape(z)[0]
@@ -43,7 +85,7 @@ class ncdata(object):
 
             lon_nm, lat_nm = np.meshgrid(lon_n, lat_n)
 
-            bool_arr[n] = self.get_truths(lon_nm, lon_vert, dlon) & self.get_truths(lat_nm, lat_vert, dlat)
+            bool_arr[n] = self.__get_truths(lon_nm, lon_vert, dlon) & self.__get_truths(lat_nm, lat_vert, dlat)
 
             lat_arr[n] = lat_nm
             lon_arr[n] = lon_nm
@@ -70,8 +112,20 @@ class ncdata(object):
 
 
     class read_merit_topo(object):
-        
+        """Subclass to read MERIT topographic data
+        """
         def __init__(self, cell, params, verbose=False):
+            """Populates ``cell`` object instance with arguments from ``params``
+
+            Parameters
+            ----------
+            cell : :class:`src.var.topo` or :class:`src.var.topo_cell`
+                instance of an object with topograhy attribute
+            params : :class:`src.var.params`
+                user-defined run parameters
+            verbose : bool, optional
+                prints loading progression, by default False
+            """
             self.dir = params.merit_path
             self.verbose = verbose
 
@@ -83,18 +137,20 @@ class ncdata(object):
 
             self.merit_cg = params.merit_cg
 
-            lat_min_idx = self.compute_idx(self.lat_verts.min(), 'min', 'lat')
-            lat_max_idx = self.compute_idx(self.lat_verts.max(), 'max', 'lat')
+            lat_min_idx = self.__compute_idx(self.lat_verts.min(), 'min', 'lat')
+            lat_max_idx = self.__compute_idx(self.lat_verts.max(), 'max', 'lat')
 
-            lon_min_idx = self.compute_idx(self.lon_verts.min(), 'min', 'lon')
-            lon_max_idx = self.compute_idx(self.lon_verts.max(), 'max', 'lon')
+            lon_min_idx = self.__compute_idx(self.lon_verts.min(), 'min', 'lon')
+            lon_max_idx = self.__compute_idx(self.lon_verts.max(), 'max', 'lon')
 
-            fns, lon_cnt, lat_cnt = self.get_fns(lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx)
+            fns, lon_cnt, lat_cnt = self.__get_fns(lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx)
 
             self.get_topo(cell, fns, lon_cnt, lat_cnt)
 
 
-        def compute_idx(self, vert, typ, direction):
+        def __compute_idx(self, vert, typ, direction):
+            """Given a point ``vert``, look up which MERIT NetCDF file contains this point.
+            """
             if direction == 'lon':
                 fn_int = self.fn_lon
             else:
@@ -127,17 +183,19 @@ class ncdata(object):
                     
             return where_idx
 
-        def get_fns(self, lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx):
+        def __get_fns(self, lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx):
+            """Construct the full filenames required for the loading of the topographic data from the indices identified in :func:`src.io.ncdata.read_merit_topo.__compute_idx`
+            """
             fns = []
 
             for lat_cnt, lat_idx in enumerate(range(lat_max_idx, lat_min_idx)):
                 l_lat_bound, r_lat_bound = self.fn_lat[lat_idx], self.fn_lat[lat_idx+1]
-                l_lat_tag, r_lat_tag = self.get_NSEW(l_lat_bound, 'lat'), self.get_NSEW(r_lat_bound, 'lat')
+                l_lat_tag, r_lat_tag = self.__get_NSEW(l_lat_bound, 'lat'), self.__get_NSEW(r_lat_bound, 'lat')
                 
                 for lon_cnt, lon_idx in enumerate(range(lon_min_idx, lon_max_idx)):
 
                     l_lon_bound, r_lon_bound = self.fn_lon[lon_idx], self.fn_lon[lon_idx+1]
-                    l_lon_tag, r_lon_tag = self.get_NSEW(l_lon_bound, 'lon'), self.get_NSEW(r_lon_bound, 'lon')
+                    l_lon_tag, r_lon_tag = self.__get_NSEW(l_lon_bound, 'lon'), self.__get_NSEW(r_lon_bound, 'lon')
                         
                     name = "MERIT_%s%.2d-%s%.2d_%s%.3d-%s%.3d.nc4" %(l_lat_tag, np.abs(l_lat_bound), r_lat_tag, np.abs(r_lat_bound), l_lon_tag, np.abs(l_lon_bound), r_lon_tag, np.abs(r_lon_bound))
 
@@ -147,6 +205,15 @@ class ncdata(object):
         
 
         def get_topo(self, cell, fns, lon_cnt, lat_cnt, init=True, populate=True):
+            """
+            This method assembles a contiguous array in ``cell.topo`` containing the regional topography to be loaded. 
+            
+            However, this full regional array is assembled from an array of block arrays. Each block array is loaded from a separated MERIT data file and varies in shape that is not known beforehand.
+
+            Therefore, the ``get_topo`` method is run recursively:
+                1. The first run determines the shape of each constituting block array and subsequently the shape of the full regional array. An empty array in initialised.
+                2. The second run populates the empty array with the information of the block arrays obtained in the first run.
+            """
             if (cell.topo is None) and (init): 
                 self.get_topo(cell, fns, lon_cnt, lat_cnt, init=False, populate=False)
 
@@ -219,7 +286,9 @@ class ncdata(object):
                 cell.topo = utils.sliding_window_view(cell.topo, (iint,iint), (iint,iint)).mean(axis=(-1,-2))[::-1,:]
 
         @staticmethod
-        def get_NSEW(vert, typ):
+        def __get_NSEW(vert, typ):
+            """Method to determine `NSEW` in MERIT filename
+            """
             if typ == 'lat':
                 if vert >= 0.0:
                     dir_tag = 'N'
@@ -237,11 +306,22 @@ class writer(object):
     """
     HDF5 writer class. Contains methods to create HDF5 file, create data sets and populate them with output variables.
 
+    .. note:: This class was taken from an I/O routine originally written for the numerical flow solver used in `Chew et al. (2022) <https://journals.ametsoc.org/view/journals/mwre/150/9/MWR-D-21-0175.1.xml>`_ and `Chew et al. (2023) <https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/an-unstable-mode-of-the-stratified-atmosphere-under-the-nontraditional-coriolis-acceleration/FFC0AE491BE3425CE829610BCF7A1933>`_.
     """
     def __init__(self, fn, idxs, sfx='', debug=False):
         """
-        Creates HDF5 file based on filename given attribute `OUTPUT_FILENAME`.
+        Creates an empty HDF5 file with filename ``fn`` and a group for each index in ``idxs``
 
+        Parameters
+        ----------
+        fn : str
+            filename
+        idxs : list
+            list of cell indices
+        sfx : str, optional
+            suffixes to the filename, by default ''
+        debug : bool, optional
+            debug flag, by default False
         """
 
         self.FORMAT = ".h5"
@@ -301,7 +381,7 @@ class writer(object):
         Parameters
         ----------
         paths : list
-            List of strings containing the name of the data sets.
+            List of strings containing the name of the groups.
 
         Notes
         -----
@@ -327,6 +407,13 @@ class writer(object):
         file.close()
 
     def write_all(self, idx, *args):
+        """Write all attributes and datasets of a given class instance to the group ``idx``.
+
+        Parameters
+        ----------
+        idx : str or int
+            group name to write the attributes or datasets
+        """
         for arg in args:
             for attr in self.PATHS:
                 if hasattr(arg, attr):
@@ -337,8 +424,16 @@ class writer(object):
                     self.write_attr(idx, attr, getattr(arg, attr))
 
     def write_attr(self,idx,key,value):
-        """
-        Method to write attributes to HDF5 file.
+        """Write HDF5 attributes for a group
+
+        Parameters
+        ----------
+        idx : str or int
+            group name to write the attributes
+        key : str
+            attribute name
+        value : any
+            attribute value that is accepted by HDF5
         """
         file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
 
@@ -350,6 +445,13 @@ class writer(object):
         file.close()
 
     def write_all_attrs(self, obj):
+        """Write all attributes a given class instance to the HDF5 file
+
+        Parameters
+        ----------
+        obj : :class:`src.var.params`
+            write all user-defined parameters to the HDF5 file for reproducibility of the output
+        """
         file = h5py.File(self.OUTPUT_FULLPATH + self.SUFFIX + self.FORMAT, 'r+')
         for key, value in vars(obj).items():
             try:
@@ -358,20 +460,18 @@ class writer(object):
                 file.attrs.create(key,repr(value),dtype='<S' + str(len(repr(value))))
         file.close()
 
-    def populate(self,idx,name,data,options=None):
+    def populate(self,idx,name,data):
         """
         Helper function to write data into HDF5 dataset.
 
         Parameters
         ----------
+        idx  : int or str
+            The name of the group
         name : str
-            The time and additional suffix label for the dataset
-        path : str
-            Path of the dataset, e.g. `rhoY`.
+            The name of the dataset
         data : ndarray
             The output data to write to the dataset
-        options : list
-            `default == None`. Additional options to write to dataset, currently unused.
 
         """
         # name is the simulation time of the output array
@@ -388,8 +488,16 @@ class writer(object):
 
 
 class reader(object):
+    """Simple reader class to read HDF5 output written by :class:`src.io.writer`
 
+    """
     def __init__(self, fn):
+        """
+        Parameters
+        ----------
+        fn : str
+            filename of the file to be read
+        """
         self.fn = fn
 
         self.names = {
@@ -401,6 +509,13 @@ class reader(object):
                     }
 
     def get_params(self, params):
+        """Get the user-defined parameters from the HDF5 file attributes
+
+        Parameters
+        ----------
+        params : :class:`src.var.params`
+            empty instance of the user-defined parameters class to be populated
+        """
         file = h5py.File(self.fn)
 
         for key in file.attrs.keys():
@@ -410,6 +525,20 @@ class reader(object):
 
 
     def read_data(self, idx, name):
+        """Read a particular dataset ``name`` from a group ``idx``
+
+        Parameters
+        ----------
+        idx : str or int
+            the group name
+        name : str
+            the dataset name
+
+        Returns
+        -------
+        array-like
+            the dataset
+        """
         file = h5py.File(self.fn)
         dat = file[str(idx)][name][:]
         file.close()
@@ -418,6 +547,15 @@ class reader(object):
 
 
     def read_all(self, idx, cell):
+        """Populate ``cell`` with all datasets in a group ``idx``
+
+        Parameters
+        ----------
+        idx : int or str
+            the group name
+        cell : :class:`src.var.topo_cell`
+            empty instance of a cell object to be populated
+        """
         file = h5py.File(self.fn)
 
         idx = str(idx)
@@ -432,6 +570,19 @@ class reader(object):
 
 
 def fn_gen(params):
+    """Automatically generates HDF5 output filename from :class:`src.var.params`.
+
+    Parameters
+    ----------
+    params : :class:`src.var.params`
+        instance of the user parameter class
+
+    Returns
+    -------
+    str
+        automatically generated filename
+    """
+
     if hasattr(params, 'fn_tag'):
         tag = params.fn_tag
     else:
