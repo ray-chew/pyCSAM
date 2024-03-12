@@ -1,3 +1,7 @@
+"""
+Run script for the Delaunay triangulation tests
+"""
+
 # %%
 import sys
 import os
@@ -12,8 +16,12 @@ from vis import plotter, cart_plot
 
 import time
 
-%load_ext autoreload
-%autoreload
+from IPython import get_ipython
+ipython = get_ipython()
+
+if '__IPYTHON__' in globals():
+    ipython.run_line_magic('load_ext autoreload')
+    ipython.run_line_magic('autoreload')
 
 # %%
 from runs.lam_run import params
@@ -67,7 +75,6 @@ writer.populate('decomposition', 'rect_set', params.rect_set)
 
 # %%
 # Plot the loaded topography...
-%autoreload
 # cart_plot.lat_lon(topo, int=1)
 
 levels = np.linspace(-500.0, 3500.0, 9)
@@ -78,7 +85,6 @@ cart_plot.lat_lon_delaunay(topo, tri, levels, label_idxs=True, fs=(12,7), highli
 # del topo.lon_grid
 
 # %%
-%autoreload
 
 nhi = params.nhi
 nhj = params.nhj
@@ -308,7 +314,6 @@ print("time taken = %.2f" %(end-start))
 # %%
 # print(rel_errs_orig)
 print(diag.rel_errs)
-%autoreload
 plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=True)
 # plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-10,10], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
 # plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
@@ -322,7 +327,6 @@ plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, 
 
 
 # %%
-%autoreload
 errors = np.zeros((len(tri.simplices)))
 errors[:] = np.nan
 errors[params.rect_set] = diag.max_errs
