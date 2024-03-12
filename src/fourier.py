@@ -1,7 +1,20 @@
 import numpy as np
 
 class f_trans(object):
+    """
+    Fourier transformer class
+    """
     def __init__(self, nhar_i, nhar_j):
+        """
+        Initalises a discrete spectral space with the corresponding Fourier coefficients spanning `nhar_i` and `nhar_j`.
+
+        Parameters
+        ----------
+        nhar_i : int
+            number of spectral modes in the first horizontal direction
+        nhar_j : int
+            number of spectral modes in the second horizontal direction
+        """
         self.nhar_i = nhar_i
         self.nhar_j = nhar_j
 
@@ -12,6 +25,9 @@ class f_trans(object):
         self.components = 'imag'
 
     def __get_IJ(self, cell):
+        """
+        Private method to compute :math:`x / \Delta x`.
+        """
         if self.grad:
             lon, lat = cell.grad_lon, cell.grad_lat
             lon_m, lat_m = cell.grad_lon_m, cell.grad_lat_m
@@ -35,6 +51,9 @@ class f_trans(object):
 
 
     def __prepare_terms(self, cell):
+        """
+        Private method that defines the terms comprising the Fourier coefficients
+        """
         if self.grad:
             lon_m, lat_m = cell.grad_lon_m, cell.grad_lat_m
         else:
@@ -62,6 +81,20 @@ class f_trans(object):
 
 
     def set_kls(self, k_rng, l_rng, recompute_nhij=True, components='imag'):
+        """
+        Method to select a smaller subset of the dense spectral space, e.g., in the Second Approximation step of the algorithm if the First Approximation is computed with a fast-Fourier transform.
+
+        Parameters
+        ----------
+        k_rng : list
+            list containing the selected k-wavenumber indices
+        l_rng : list
+            list containing the selected k-wavenumber indices
+        recompute_nhij : bool, optional
+            resets `nhar_i` and `nhar_j`, by default True
+        components : str, optional
+            `real` recomputes the spectral space comprising only real spectral components, by default 'imag'
+        """
         self.k_idx = np.array(k_rng).astype(int)
         self.l_idx = np.array(l_rng).astype(int)
 
@@ -84,6 +117,18 @@ class f_trans(object):
 
 
     def do_full(self, cell, grad=False):
+        r"""
+        Assembles the sine and cosine terms that make up the Fourier coefficients in the `M` matrix required in the :func:`linear regression <src.lin_reg.do>` computation:
+
+        .. math:: Mx=h
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell` instance
+            cell object instance
+        grad : bool, optional
+            deprecated argument, by default False
+        """
         self.typ = 'full'
 
         if grad is True:
@@ -138,6 +183,12 @@ class f_trans(object):
 
 
     def do_axial(self, cell, alpha = 0.0):
+        """
+        Computes spectral modes along the `(k,l)`-axes.
+
+        .. deprecated:: 0.90.0
+
+        """
         self.typ = 'axial'
         self.__get_IJ(cell)
         self.__prepare_terms(cell)
@@ -163,6 +214,12 @@ class f_trans(object):
 
 
     def do_cg_spsp(self, cell):
+        """
+        Computes the coarse-grained sparse spectral space
+
+        .. deprecated:: 0.90.0
+
+        """
         self.typ = 'full'
         self.grad = False
         
@@ -171,6 +228,14 @@ class f_trans(object):
 
 
     def get_freq_grid(self, a_m):
+        """
+        Assembles a dense representation of the sparse spectral space given the Fourier amplitudes computed in the linear regression step.
+
+        Parameters
+        ----------
+        a_m : list
+            list of (sparse) Fourier amplitudes
+        """
         nhar_i, nhar_j = self.nhar_i, self.nhar_j
 
         fourier_coeff = np.zeros((nhar_i, nhar_j))

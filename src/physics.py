@@ -1,9 +1,19 @@
 import numpy as np
 
-
 class ideal_pmf(object):
+    """
+    Helper class to compute the idealised pseudo-momentum fluxes under one setting.
+    """
 
     def __init__(self, **kwarg):
+        """
+        Sets up the default values
+
+        Parameters
+        ----------
+        **kwargs : any  
+            user-defined values to replace default background wind (``U``, ``V``), Earth's radius (``AE``), and Brunt-Väisälä frequency (``N``)
+        """
         self.N = 0.02       # reference brunt-väisälä frequnecy [s^{-1}]
         self.U = -10.0      # reference horizontal wind [m s^{-1}]
         self.V = 2.0        # reference vertical wind [m s^{-1}]
@@ -14,6 +24,21 @@ class ideal_pmf(object):
             setattr(self, key, value)
 
     def compute_uw_pmf(self, analysis, summed=True):
+        """
+        Computation method
+
+        Parameters
+        ----------
+        analysis : :class:`src.var.analysis`
+            instance of the `analysis` class.
+        summed : bool, optional
+            by default True, i.e., returns a sum of the spectrum. Other, return a 2D-like array of the spectrum.
+
+        Returns
+        -------
+        array-like or float
+            depends on the value of ``summed``
+        """
         N = self.N
         U = self.U
         V = self.V

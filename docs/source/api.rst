@@ -4,3 +4,4 @@ API
 
    modules/runs
    modules/vis
+   modules/src

@@ -3,7 +3,26 @@ from scipy.spatial import Delaunay
 from src import utils, var
 
 def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
-    # Partition lat-lon domain into a number of coarser but regularly spaces points that will form the vertices of the Delaunay triangles.
+    """
+    Partition lat-lon domain into a number of coarser but regularly spaces points that comprises the vertices of the Delaunay triangles.
+
+    Parameters
+    ----------
+    topo : array-like
+        2D topography data
+    xnp : int, optional
+        number of points in the first horizontal direction, by default 11
+    ynp : int, optional
+        number of points in the second horizontal direction, by default 6
+    padding : int, optional
+        number of grid points to include as a boundary (padded) region, by default 0
+
+    Returns
+    -------
+    `scipy.spatial.qhull.Delaunay` instance
+        scipy Delaunary triangulation instance
+    """
+
     xlen = len(topo.lon) - padding
     ylen = len(topo.lat) - padding
     xPoints = np.linspace(padding,xlen-1,xnp)
@@ -41,6 +60,25 @@ def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
 
 
 def get_land_cells(tri, topo, height_tol=0.5, percent_tol=0.95):
+    """
+    Land cell selector based on how much of a grid cell contains topography of a certain elevation.
+
+    Parameters
+    ----------
+    tri : :class:`scipy.spatial.qhull.Delaunay` instance
+        scipy Delaunay triangulation instance containing tuples of the three vertice coordinates of a triangle
+    topo : array-like
+        2D topographic data
+    height_tol : float, optional
+        elevation above `height_tol` are considered as land, by default 0.5 [m]
+    percent_tol : float, optional
+        cut-off percentage of topography in the given grid cell below `height_tol`. By default 0.95, i.e., at least 5% of the grid cell has to be above `heigh_tol` to be considered a land cell.
+
+    Returns
+    -------
+    list
+        list of land cell indices
+    """
     rect_set = []
     n_tri = len(tri.tri_lat_verts)
 

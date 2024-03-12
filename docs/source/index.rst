@@ -1,7 +1,10 @@
-Contents
---------
+CSAM's Home
+-----------
 
 .. toctree::
+   :hidden:
 
-   usage
+   self
+   quick_start
    api
+   refs

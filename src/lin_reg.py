@@ -1,8 +1,24 @@
+"""
+Linear regression module
+"""
+
 import numpy as np
 import scipy.linalg as la
 from scipy.sparse.linalg import gmres
 
 def get_coeffs(fobj):
+    """Assembles the Fourier coefficients from the sine and cosine terms generated in the :class:`Fourier transformer class <src.fourier.f_trans>`.
+
+    Parameters
+    ----------
+    fobj : :class:`src.fourier.f_trans` instance
+        instance of the Fourier transformer class.
+
+    Returns
+    -------
+    array-like
+        2D array corresponding to the `M` matrix.
+    """
     Ncos = fobj.bf_cos
     Nsin = fobj.bf_sin
 
@@ -19,6 +35,29 @@ def get_coeffs(fobj):
 def do(fobj, cell, lmbda = 0.0, 
        iter_solve = True,
        save_coeffs = False):
+    """
+    Does the linear regression
+
+    Parameters
+    ----------
+    fobj : :class:`src.fourier.f_trans` instance
+        instance of the Fourier transformer class.
+    cell : :class:`src.var.topo_cell` instance
+        cell object instance
+    lmbda : float, optional
+        regularisation parameter, by default 0.0
+    iter_solve : bool, optional
+        toggles between using direct or iterative solver, by default True
+    save_coeffs : bool, optional
+        skips the linear regression and just saves the generated `M` matrix for diagnostics and debugging, by default False
+
+    Returns
+    -------
+    a_m : list
+        list of Fourier amplitudes corresponding to the right-hand side of the linear problem
+    data_recons : like
+        vector-like topography reconstructed from `a_m`
+    """
     if fobj.grad:
         cell.get_grad()
         data = cell.grad_topo_m

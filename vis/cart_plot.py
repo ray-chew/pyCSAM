@@ -1,7 +1,7 @@
 """
 Contains functions for regional limited-area plots.
 
-Requires the `cartopy` package.
+Requires the `cartopy <https://scitools.org.uk/cartopy/docs/latest/>`_ package.
 """
 
 import matplotlib.pyplot as plt
@@ -82,8 +82,8 @@ def lat_lon_delaunay(topo, tri, levels, fs=(8,4),   \
     ----------
     topo : array-like
         2D topography data
-    tri : list
-        list containing tuples of the three vertice coordinates of a triangle
+    tri : :class:`scipy.spatial.qhull.Delaunay` object
+        scipy Delaunay triangulation object containing tuples of the three vertice coordinates of a triangle
     levels : list
         user-defined elevation levels for the plot
     fs : tuple, optional
@@ -149,8 +149,8 @@ def error_delaunay(topo, tri, fs=(8,4),
     ----------
     topo : array-like
         2D topography data
-    tri : list
-        list containing tuples of the three vertice coordinates of a triangle
+    tri : :class:`scipy.spatial.qhull.Delaunay` object
+        scipy Delaunay triangulation object containing tuples of the three vertice coordinates of a triangle
     fs : tuple, optional
         figure size, by default (8,4)
     label_idxs : bool, optional
