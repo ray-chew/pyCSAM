@@ -62,7 +62,11 @@ def isosceles(grid, cell, xmax = 2.0 * np.pi,
         resolution of the triangle, by default 480
     tri : str, optional
         ``mid`` generates an isosceles triangle, ``left`` generates a lower and ``right`` an upper triangle. By default 'mid'
-
+   
+    Returns
+    -------
+    int
+        always returns 0, as this function generates only one triangle at index 0.
     """
 
     if tri == 'mid':
@@ -94,6 +98,8 @@ def isosceles(grid, cell, xmax = 2.0 * np.pi,
     # cell.lat = np.linspace(-np.pi, np.pi, res)
     # cell.lon = np.linspace(-np.pi, np.pi, res)
         
+    return 0
+        
 
 def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi, 
     ymax = 2.0 * np.pi, tri='lower'):
@@ -115,6 +121,12 @@ def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi,
         second horizontal extent, by default 2.0*np.pi
     tri : str, optional
         ``lower`` generates a lower triangle, and ``upper`` an upper triangle. By default 'lower'
+
+
+    Returns
+    -------
+    int
+        always returns 0, as this function generates only one triangle at index 0.
     """
     if tri == 'lower':
         grid.clon_vertices = np.array([[0+1e-7, 0+1e-7, xmax-1e-7],])
@@ -125,6 +137,8 @@ def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi,
 
     cell.lat = np.linspace(0, ymax, res_x)
     cell.lon = np.linspace(0, xmax, res_y)
+
+    return 0
 
 
 def gen_art_terrain(shp, seed = 555, iters = 1000):

@@ -304,7 +304,9 @@ class ncdata(object):
 
 class writer(object):
     """
-    HDF5 writer class. Contains methods to create HDF5 file, create data sets and populate them with output variables.
+    HDF5 writer class 
+    
+    Contains methods to create HDF5 file, create data sets and populate them with output variables.
 
     .. note:: This class was taken from an I/O routine originally written for the numerical flow solver used in `Chew et al. (2022) <https://journals.ametsoc.org/view/journals/mwre/150/9/MWR-D-21-0175.1.xml>`_ and `Chew et al. (2023) <https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/an-unstable-mode-of-the-stratified-atmosphere-under-the-nontraditional-coriolis-acceleration/FFC0AE491BE3425CE829610BCF7A1933>`_.
     """
