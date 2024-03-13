@@ -1,10 +1,33 @@
+"""
+Interface wrapper module to ease setting up the CSAM building blocks
+"""
+
+
 from src import fourier, lin_reg, physics, reconstruction
 from src import utils, var, io
 import numpy as np
 
 class get_pmf(object):
+    """A simple wrapper class for the constrained spectral approximation method
 
+    This class is used in the idealised experiments
+    """
     def __init__(self, nhi, nhj, U, V, debug=False):
+        """
+
+        Parameters
+        ----------
+        nhi : int
+            number of harmonics in the first horizontal direction
+        nhj : int
+            number of harmonics in the second horizontal direction
+        U : float
+            wind speed in the first horizontal direction
+        V : float
+            wind speed in the second horizontal direction
+        debug : bool, optional
+            debug flag, by default False
+        """
         self.fobj = fourier.f_trans(nhi, nhj)
 
         self.U = U
@@ -16,6 +39,17 @@ class get_pmf(object):
               lmbda = 0.1, 
               scale = 1.0,
               **kwargs):
+        """Method to perform the constraint spectral approximation method
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell`
+            instance of the cell object
+        lmbda : float, optional
+            regulariser factor, by default 0.1
+        scale : float, optional
+            scales the amplitudes for debugging purposes, by default 1.0
+        """
             #   summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
         self.fobj.do_full(cell)
 
@@ -53,6 +87,26 @@ class get_pmf(object):
 
 
     def dfft(self, cell, summed=False, updt_analysis=False):
+        r"""Wrapper that performs discrete fast-Fourier transform on a quadrilateral grid cell
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell`
+            instance of the cell object
+        summed : bool, optional
+            toggles whether to sum the spectral components, by default False
+        updt_analysis : bool, optional
+            toggles update of the <analysis :class:`src.var.analysis`>, by default False
+
+        Returns
+        -------
+        tuple
+            returns tuple containing:
+                | (FFT-computed spectrum, 
+                | computed idealised pseudo-momentum fluxes, 
+                | the reconstructed physical data,
+                | list containing the range of horizontal wavenumbers :math:`[\vec{n},\vec{m}]`)
+        """
         ampls = np.fft.rfft2(cell.topo - cell.topo.mean())
         ampls /= ampls.size
 
@@ -90,6 +144,10 @@ class get_pmf(object):
 
 
     def cg_spsp(self, cell, freqs, kklls, dat_2D, summed=False, updt_analysis=False, scale=1.0):
+        """Method to perform a coarse-graining of spectral space
+
+        .. deprecated:: 0.90.0
+        """
         self.fobj.do_cg_spsp(cell)
 
         self.fobj.m_i = kklls[0]
@@ -110,6 +168,25 @@ class get_pmf(object):
 
 
     def recompute_rhs(self, cell, fobj, lmbda = 0.1, **kwargs):
+        """Method to recompute the reconstructed physical data given a set of spectral amplitudes
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell`
+            instance of the cell object
+        fobj : :class:`src.fourier.f_trans`
+            instance of the Fourier transformer class
+        lmbda : float, optional
+            regularisation factor, by default 0.1
+
+        Returns
+        -------
+        tuple
+            returns tuple containing:
+                | (FFT-computed spectrum, 
+                | computed idealised pseudo-momentum fluxes, 
+                | the reconstructed physical data)
+        """
         self.fobj.do_full(cell)
 
         _, _ = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True), kwargs.get('save_coeffs', False))
@@ -134,7 +211,22 @@ class get_pmf(object):
     
 
 
-def taper_quad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
+def taper_quad(params, simplex_lat, simplex_lon, cell, topo):
+    """Applies tapering to a quadrilateral grid cell
+
+    Parameters
+    ----------
+    params : :class:`src.var.params`
+        instance of the user-defined parameters class
+    simplex_lat : list
+        list of latitudinal coordinates of the vertices 
+    simplex_lon : list
+        list of longitudinal coordinates of the vertices
+    cell : :class:`src.var.topo_cell`
+        instance of a cell object
+    topo : :class:`src.var.topo` or :class:`src.var.topo_cell`
+        instance of an object with topography attribute
+    """
     # get quadrilateral mask
     utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True)
 
@@ -146,6 +238,23 @@ def taper_quad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
     utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding, topo_mask=taper.p)
 
 def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
+    """Applies tapering to a non-quadrilateral grid cell
+
+    Parameters
+    ----------
+    params : :class:`src.var.params`
+        instance of the user-defined parameters class
+    simplex_lat : list
+        list of latitudinal coordinates of the vertices 
+    simplex_lon : list
+        list of longitudinal coordinates of the vertices
+    cell : :class:`src.var.topo_cell`
+        instance of a cell object
+    topo : :class:`src.var.topo` or :class:`src.var.topo_cell`
+        instance of an object with topography attributes
+    res_topo : array-like, optional
+        residual orography, only required in iterative refinement, by default None
+    """
     # get tapered mask with padding
     taper = utils.taper(cell, params.padding, art_it=params.taper_art_it)
     taper.do_tapering()
@@ -169,13 +278,53 @@ def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
 
 
 class first_appx(object):
+    """Wrapper class corresponding to the First Approximation step
+
+    Use this routine to apply tapering and to separate the first and second approximation steps
+    """
 
     def __init__(self, nhi, nhj, params, topo):
+        """
+        Parameters
+        ----------
+        nhi : int
+            number of harmonics in the first horizontal direction
+        nhj : int
+            number of harmonics in the second horizontal direction
+        params : :class:`src.var.params`
+            instance of the user-defined parameters class
+        topo : :class:`src.var.topo` or :class:`src.var.topo_cell`
+            instance of an object with topography attribute
+        """
         self.nhi, self.nhj = nhi, nhj
         self.params = params
         self.topo = topo
 
     def do(self, simplex_lat, simplex_lon, res_topo=None):
+        """Do the First Approximation step
+
+        Parameters
+        ----------
+        simplex_lat : list
+            list of latitudinal coordinates of the vertices 
+        simplex_lon : list
+            list of longitudinal coordinates of the vertices
+            _description_
+        res_topo : array-like, optional
+            residual orography, only required in iterative refinement, by default None
+
+        Returns
+        -------
+        tuple
+            contains the data for plotting: 
+
+               | (:class:`src.var.topo_cell` instance, 
+               | computed CSAM spectrum, 
+               | computed idealised pseudo-momentum fluxes, 
+               | the reconstructed physical data)
+
+            corresponding to ``sols`` in :func:`runs.diagnostics.diag_plotter.show`
+        """
         cell_fa = var.topo_cell()
 
         if res_topo is None:
@@ -192,9 +341,28 @@ class first_appx(object):
         ampls_fa, uw_fa, dat_2D_fa = first_guess.sappx(cell_fa, lmbda=self.params.lmbda_fa, iter_solve=self.params.fa_iter_solve)
         return cell_fa, ampls_fa, uw_fa, dat_2D_fa
 
-class second_appx(object):
 
+
+class second_appx(object):
+    """Wrapper class corresponding to the Second Approximation step
+
+    Use this routine to apply tapering and to separate the first and second approximation steps
+    """
     def __init__(self, nhi,nhj, params, topo, tri):
+        """
+        Parameters
+        ----------
+        nhi : int
+            number of harmonics in the first horizontal direction
+        nhj : int
+            number of harmonics in the second horizontal direction
+        params : :class:`src.var.params`
+            instance of the user-defined parameters class
+        topo : :class:`src.var.topo` or :class:`src.var.topo_cell`
+            instance of an object with topography attribute
+        tri : :class:`scipy.spatial.qhull.Delaunay`
+            instance of the scipy Delaunay triangulation class
+        """
         self.params = params
         self.topo = topo
         self.tri = tri
@@ -202,7 +370,29 @@ class second_appx(object):
         self.n_modes = params.n_modes
 
     def do(self, idx, ampls_fa, res_topo=None):
+        """Do the Second Approximation step
 
+        Parameters
+        ----------
+        idx : int
+            index of the non-quadrilateral grid cell
+        ampls_fa : array-like
+            spectral modes identified in the first approximation step
+        res_topo : array-like, optional
+            residual orography, only required in iterative refinement, by default None
+
+        Returns
+        -------
+        tuple
+            contains the data for plotting: 
+
+               | (:class:`src.var.topo_cell` instance, 
+               | computed CSAM spectrum, 
+               | computed idealised pseudo-momentum fluxes, 
+               | the reconstructed physical data)
+               
+            corresponding to ``sols`` in :func:`runs.diagnostics.diag_plotter.show`
+        """
         # make a copy of the spectrum obtained from the FA.
         fq_cpy = np.copy(ampls_fa)
         fq_cpy[np.isnan(fq_cpy)] = 0.0 # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
