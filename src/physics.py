@@ -11,8 +11,9 @@ class ideal_pmf(object):
 
         Parameters
         ----------
-        **kwargs : any  
+        \*\*kwargs : any  
             user-defined values to replace default background wind (``U``, ``V``), Earth's radius (``AE``), and Brunt-Väisälä frequency (``N``)
+
         """
         self.N = 0.02       # reference brunt-väisälä frequnecy [s^{-1}]
         self.U = -10.0      # reference horizontal wind [m s^{-1}]

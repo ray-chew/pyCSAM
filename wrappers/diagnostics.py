@@ -58,7 +58,7 @@ class delaunay_metrics(object):
 
 
     def get_rel_err(self, triangle_pair):
-        """Method to get the relative error explicitly before :func:`runs.diagnostics.delaunay_metrics.end` is called.
+        """Method to get the relative error explicitly before :func:`wrappers.diagnostics.delaunay_metrics.end` is called.
 
         Parameters
         ----------
@@ -244,7 +244,7 @@ class diag_plotter(object):
                | computed idealised pseudo-momentum fluxes, 
                | the reconstructed physical data)
 
-            ``sols`` is the tuple returned by :func:`runs.interface.first_appx.do` and :func:`runs.interface.second_appx.do`
+            ``sols`` is the tuple returned by :func:`wrappers.interface.first_appx.do` and :func:`wrappers.interface.second_appx.do`
         kls : list, optional
             list of size 2, each element is a vector containing the (k,l)-wavenumbers, by default None. Only required to plot FFT spectra.
         v_extent : list, optional
