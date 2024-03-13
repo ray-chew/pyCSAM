@@ -8,8 +8,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from src import io, var, utils, fourier, physics, delaunay
-from runs import interface
+from wrappers import interface
 from vis import plotter, cart_plot
+
+from sys import exit
+if __name__ != "__main__": exit(0)
 
 # %%
 

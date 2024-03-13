@@ -10,8 +10,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import numpy as np
 
-from src import io, var, utils, fourier, physics, delaunay
-from runs import interface, diagnostics
+from src import io, var, utils, physics, delaunay
+from wrappers import interface, diagnostics
 from vis import plotter, cart_plot
 
 import time
@@ -22,6 +22,9 @@ ipython = get_ipython()
 if '__IPYTHON__' in globals():
     ipython.run_line_magic('load_ext autoreload')
     ipython.run_line_magic('autoreload')
+
+from sys import exit
+if __name__ != "__main__": exit(0)
 
 # %%
 from runs.lam_run import params

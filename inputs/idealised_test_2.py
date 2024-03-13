@@ -1,7 +1,4 @@
 # %%
-%load_ext autoreload
-
-# %%
 import noise
 import numpy as np
 from matplotlib import pyplot as plt
@@ -14,9 +11,20 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from src import utils, var
-from runs import interface, diagnostics
+from wrappers import interface, diagnostics
 
-%autoreload
+from IPython import get_ipython
+ipython = get_ipython()
+
+if '__IPYTHON__' in globals():
+    ipython.run_line_magic('load_ext autoreload')
+
+def autoreload():
+    if '__IPYTHON__' in globals():
+        ipython.run_line_magic('autoreload')
+
+autoreload()
+
 
 # %%
 # ref: https://jackmckew.dev/3d-terrain-in-python.html
@@ -102,11 +110,11 @@ max_idx = np.unravel_index(ampls_ref.argmax(), ampls_ref.shape)
 print(max_idx)
 print(ampls_ref.max())
 
-%matplotlib inline
+
 params = var.params()
 params.plot = True
 params.lmbda_fa = 0.0
-params.lmbda_sa = 0.1
+params.lmbda_sa = 0.01
 dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0,1), sols, kls=kls_ref, v_extent = v_extent, dfft_plot=True)
 
@@ -116,10 +124,10 @@ print(uw_ref.sum())
 
 
 # %%
-%autoreload
+autoreload()
 
 delaunay_decomposition = True
-do_rhs_recomputation = True
+do_rhs_recomputation = False
 
 topo = var.topo_cell()
 topo.topo = total

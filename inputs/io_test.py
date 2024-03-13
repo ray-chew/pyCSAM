@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from src import io, var, utils, fourier, physics, delaunay
-from runs import interface
+from wrappers import interface
 from vis import plotter, cart_plot
 
 import h5py

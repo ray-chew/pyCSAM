@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 
 from src import io, var, utils
-from runs import interface
+from wrappers import interface
 from vis import plotter
 
 %load_ext autoreload

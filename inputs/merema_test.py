@@ -4,7 +4,7 @@ import sys
 sys.path.append('..')
 
 from src import io, var, utils, fourier, lin_reg, reconstruction, physics, delaunay
-from runs import interface
+from wrappers import interface
 from vis import plotter, cart_plot
 
 from netCDF4 import Dataset
