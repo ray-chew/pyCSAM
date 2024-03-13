@@ -4,38 +4,29 @@
 .. automodule:: runs
 
 
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
 
 
 .. rubric:: Modules
 
+.. toctree::
+
+   runs.idealised_isosceles
+   runs.idealised_delaunay
+   runs.delaunay
+   runs.icon_usgs_test
 .. .. autosummary::
 ..    :toctree:
    :recursive:
 
-..    inputs.delaunay_new
-..    inputs.delaunay_test
-..    inputs.error_metric_test
-..    inputs.icon_usgs_test
-..    inputs.idealised_test
-..    inputs.idealised_test_2
-..    inputs.io_test
-..    inputs.iterative_solver_test
-..    inputs.merema_test
-..    inputs.projection_test
-..    inputs.tapering_test
+..    runs.delaunay_new
+..    runs.delaunay_test
+..    runs.error_metric_test
+..    runs.icon_usgs_test
+..    runs.idealised_test
+..    runs.idealised_test_2
+..    runs.io_test
+..    runs.iterative_solver_test
+..    runs.merema_test
+..    runs.projection_test
+..    runs.tapering_test
 
