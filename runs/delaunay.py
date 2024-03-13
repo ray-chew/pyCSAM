@@ -1,7 +1,3 @@
-"""
-Run script for the Delaunay triangulation tests
-"""
-
 # %%
 import sys
 import os
@@ -23,8 +19,6 @@ if '__IPYTHON__' in globals():
     ipython.run_line_magic('load_ext autoreload')
     ipython.run_line_magic('autoreload')
 
-from sys import exit
-if __name__ != "__main__": exit(0)
 
 # %%
 from inputs.lam_run import params

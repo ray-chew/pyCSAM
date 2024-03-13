@@ -14,7 +14,17 @@ from src import io, var, utils
 from wrappers import interface
 from vis import plotter
 
-%load_ext autoreload
+from IPython import get_ipython
+ipython = get_ipython()
+
+if '__IPYTHON__' in globals():
+    ipython.run_line_magic('load_ext autoreload')
+
+def autoreload():
+    if '__IPYTHON__' in globals():
+        ipython.run_line_magic('autoreload')
+
+autoreload()
 
 # %%
 # generate random values for the artificial terrain
@@ -183,8 +193,6 @@ sum_errs = np.array([np.abs(freq.sum() - freqs_arr[0].sum()) / freqs_arr[0].sum(
 
 
 # %%
-%autoreload
-
 fs = (10,4.5)
 fig, axs = plt.subplots(2,len(idxs), figsize=fs, sharey='row')
 fig_obj = plotter.fig_obj(fig, fobj.nhar_i, fobj.nhar_j, cbar=False, set_label=False)
