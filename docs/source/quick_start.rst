@@ -65,13 +65,13 @@ Introduction
         vargrid [
             label="src.var.grid",
             fontcolor=red, 
-            URL="module/src.var.html#src.var.grid"
+            URL="modules/src.var.html#src.var.grid"
             target="_top"
             ];
 
         delaunay [
             label=<regional Delaunay<br/>triangulation:<br/><font color="red">src.delaunay</font>>, 
-            URL="modules/src.delaunay.html", 
+            URL="modules/src.delaunay.html#src.delaunay.get_decomposition", 
             target="_top"
             ];
 
@@ -171,6 +171,9 @@ Introduction
 
 Requirements
 ^^^^^^^^^^^^
+.. literalinclude:: ../../requirements.txt
+
+
 
 Example
 -------

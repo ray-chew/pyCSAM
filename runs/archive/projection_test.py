@@ -13,9 +13,6 @@ from src import io, var, utils, fourier, physics, delaunay
 from wrappers import interface
 from vis import plotter, cart_plot
 
-%load_ext autoreload
-%autoreload
-
 # %%
 # from inputs.lam_run import params
 from inputs.selected_run import params
@@ -67,7 +64,6 @@ params_orig = deepcopy(params)
 writer.write_all_attrs(params)
 # %%
 # Plot the loaded topography...
-%autoreload
 cart_plot.lat_lon(topo, int=1)
 
 levels = np.linspace(-500.0, 3000.0, 8)

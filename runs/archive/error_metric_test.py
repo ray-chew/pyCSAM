@@ -12,9 +12,6 @@ from vis import plotter, cart_plot
 
 import h5py
 
-%load_ext autoreload
-%autoreload
-
 # %%
 fn = '../outputs/backup/lam_alaska_merit_191023_151813.h5'
 file = h5py.File(fn)
