@@ -3,22 +3,39 @@
 
 .. automodule:: runs
 
+
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
 .. rubric:: Modules
 
-.. toctree::
-   :maxdepth: 2
-
-   runs.lam_run
-   runs.selected_run
-   runs.selected_run_dfft
-   
+.. .. autosummary::
 ..    :toctree:
-..    :recursive:
+   :recursive:
 
-..    runs.corrections_diagnostics
-..    runs.debug_run
-..    runs.diagnostics
-..    runs.iter_solve
-..    runs.lam_alaska_pmf_selector
-..    
+..    inputs.delaunay_new
+..    inputs.delaunay_test
+..    inputs.error_metric_test
+..    inputs.icon_usgs_test
+..    inputs.idealised_test
+..    inputs.idealised_test_2
+..    inputs.io_test
+..    inputs.iterative_solver_test
+..    inputs.merema_test
+..    inputs.projection_test
+..    inputs.tapering_test
 

@@ -1,5 +1,5 @@
 wrappers.diagnostics
-================
+====================
 
 .. automodule:: wrappers.diagnostics
    

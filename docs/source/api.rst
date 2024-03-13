@@ -2,6 +2,7 @@ API
 ===
 .. toctree::
 
+   modules/inputs
    modules/runs
    modules/wrappers
    modules/src
