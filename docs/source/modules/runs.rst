@@ -8,8 +8,6 @@
 .. toctree::
    :maxdepth: 2
 
-   runs.diagnostics
-   runs.interface
    runs.lam_run
    runs.selected_run
    runs.selected_run_dfft

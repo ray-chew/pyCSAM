@@ -1,7 +1,7 @@
-runs.diagnostics
+wrappers.diagnostics
 ================
 
-.. automodule:: runs.diagnostics
+.. automodule:: wrappers.diagnostics
    
    .. rubric:: Classes
 
