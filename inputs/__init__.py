@@ -1,3 +1,3 @@
 """
-This subpackage contains the modules for user-defined experiments and tests.
+This subpackage contains the user-defined parameters for the run scripts in :mod:`runs`.
 """

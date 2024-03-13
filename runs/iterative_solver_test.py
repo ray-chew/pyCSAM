@@ -14,11 +14,11 @@ from vis import plotter, cart_plot
 
 
 # %%
-# from runs.lam_run import params
-# from runs.selected_run import params
-from runs.iter_solve import params
+# from inputs.lam_run import params
+# from inputs.selected_run import params
+from inputs.iter_solve import params
 from copy import deepcopy
-# from runs.debug_run import params
+# from inputs.debug_run import params
 
 # print run parameters, for sanity check.
 params.print()

@@ -24,9 +24,9 @@ from sys import exit
 if __name__ != "__main__": exit(0)
 
 # %%
-# from runs.lam_run import params
-from runs.selected_run_dfft import params
-# from runs.debug_run import params
+# from inputs.lam_run import params
+from inputs.selected_run_dfft import params
+# from inputs.debug_run import params
 from copy import deepcopy
 
 # print run parameters, for sanity check.
