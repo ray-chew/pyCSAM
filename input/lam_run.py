@@ -3,13 +3,33 @@ from src import var
 
 params = var.params()
 
+# run_case = "R2B4"
+# run_case = "R2B5"
+run_case = "R2B4_STRW"
+
+if run_case == "R2B4":
+    coarse = True
+    params.U, params.V = 10.0, 0.0
+elif run_case == "R2B5":
+    coarse = False
+    params.U, params.V = 10.0, 0.0
+elif run_case == "R2B4_STRW":
+    coarse = True
+    params.U, params.V = -40.0, 20.0
+else:
+    assert False
+
+
+#np.sqrt(10.0), np.sqrt(10.0)
+    
+
+if len(run_case) > 0:
+    suffix_tag = '_' + run_case
+
 dfft_fa = False
-coarse = True
-
 dfft_tag = 'dfft' if dfft_fa else 'lsff'
-coarse_tag = 'R2B4' if coarse else 'R2B5'
-
-params.fn_tag = 'lam_alaska_%s_fa_%s_highwinds' %(dfft_tag, coarse_tag)
+params.run_case = run_case
+params.fn_tag = 'lam_alaska%s_%s_fa' %(suffix_tag, dfft_tag)
 
 if dfft_fa:
     params.dfft_first_guess = True
@@ -20,9 +40,9 @@ params.lat_extent = [48.,64.,64.]
 params.lon_extent = [-148.,-148.,-112.]
 
 params.get_delaunay_triangulation = True
-# corresponds to approx (160x160)km
 
 if coarse:
+    # corresponds to approx (160x160)km
     params.delaunay_xnp = 14
     params.delaunay_ynp = 11
 
@@ -46,8 +66,6 @@ params.rect_set = np.sort([0,1,2,3])
 params.lmbda_fa = 1e-1 # first guess
 params.lmbda_sa = 1e-1 # second step
 
-params.U, params.V = np.sqrt(10.0), np.sqrt(10.0)
-
 params.run_full_land_model = True
 
 params.padding = 10
@@ -55,3 +73,6 @@ params.taper_ref = True
 params.taper_fa = True
 params.taper_sa = True
 params.taper_art_it = 20
+
+params.fa_iter_solve = True
+params.sa_iter_solve = True

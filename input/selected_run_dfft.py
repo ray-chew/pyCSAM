@@ -3,17 +3,36 @@ from src import var
 
 params = var.params()
 
-params.fn_grid = '/home/ray/git-projects/spec_appx/data/icon_compact.nc'
-params.fn_topo = '/home/ray/git-projects/spec_appx/data/topo_compact.nc'
+# params.output_fn = 'iterative_run_selected_cells'
+# params.output_fn = 'test_selected_lsff'
 
-params.merit_cg = 10
-params.merit_path = '/home/ray/Documents/orog_data/MERIT/'
+run_case = "POT_BIAS"
+run_case = "ITER_REF"
 
-params.output_fn = 'iterative_run_selected_cells'
-params.output_fn = 'test_selected_lsff'
+if run_case == "POT_BIAS":
+    # potential biases study
+    params.rect_set = np.sort([24,200])
+    params.no_corrections = True
+    params.plot = True
+elif run_case == "ITER_REF":
+    params.plot = True
+    params.no_corrections = False
+    params.ir_plot_titles = True
 
-params.lat_extent = [52.,64.,64.]
-params.lon_extent = [-141.,-158.,-127.]
+    # iterative refinement: worst offenders
+    params.rect_set = np.sort([92,24, 152,160,42,200,202,238,180])
+
+    # iterative refinement: focus
+    # params.rect_set = np.sort([42])
+
+
+if len(run_case) > 0:
+    suffix_tag = '_' + run_case
+
+dfft_fa = False
+dfft_tag = 'dfft' if dfft_fa else 'lsff'
+params.run_case = run_case
+params.fn_tag = 'selected_alaska%s_%s_fa' %(suffix_tag, dfft_tag)
 
 params.lat_extent = [48.,64.,64.]
 params.lon_extent = [-148.,-148.,-112.]
@@ -23,16 +42,9 @@ params.delaunay_xnp = 14
 params.delaunay_ynp = 11
 
 # (xnp x ynp) = (14 x 11); (16, 11)
-params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
-params.rect_set = np.sort([148,38,242])
-
-# worst underestimators
-# params.rect_set = np.sort([152,160,42,200,202,238,180])
-
-# worst overestimators
-# params.rect_set = np.sort([92,24, 152,160,42,200,202,238,180])
-
-# params.rect_set = np.sort([42])
+# FA dfft vs lsff comparison
+# params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
+# params.rect_set = np.sort([148,38,242])
 
 params.nhi = 32
 params.nhj = 64
@@ -75,8 +87,7 @@ params.lmbda_sa = 1e-1 # second step
 
 params.lxkm, params.lykm = 160, 160
 
-params.U, params.V = 0.0, 10.0
-# params.V = 0.0
+params.U, params.V = 10.0, 0.0
 
 params.run_full_land_model = False
 
@@ -91,7 +102,4 @@ params.taper_art_it = 20
 params.fa_iter_solve = True
 params.sa_iter_solve = True
 
-params.no_corrections = True
-
-params.plot = True
-# params.ir_plot_titles = True
+params.self_test()
