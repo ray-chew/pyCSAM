@@ -323,7 +323,7 @@ class first_appx(object):
                | computed idealised pseudo-momentum fluxes, 
                | the reconstructed physical data)
 
-            corresponding to ``sols`` in :func:`runs.diagnostics.diag_plotter.show`
+            corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`
         """
         cell_fa = var.topo_cell()
 
@@ -391,7 +391,7 @@ class second_appx(object):
                | computed idealised pseudo-momentum fluxes, 
                | the reconstructed physical data)
                
-            corresponding to ``sols`` in :func:`runs.diagnostics.diag_plotter.show`
+            corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`
         """
         # make a copy of the spectrum obtained from the FA.
         fq_cpy = np.copy(ampls_fa)

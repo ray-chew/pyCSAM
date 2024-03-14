@@ -7,12 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src import io, var, utils, fourier, physics, delaunay
+from src import io, var, utils, fourier, physics
 from wrappers import interface
 from vis import plotter, cart_plot
-
-from sys import exit
-if __name__ != "__main__": exit(0)
 
 # %%
 
@@ -154,7 +151,7 @@ for tri_idx in tri_set:
     else:
         second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-    freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True, scale=np.sqrt(2.0))
+    freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True)
 
     cell.topo = topo_orig
 

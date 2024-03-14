@@ -1,9 +1,12 @@
 Quickstart
 ==========
+    
+Requirements
+^^^^^^^^^^^^
+.. literalinclude:: ../../requirements.txt
 
-
-Introduction
-------------
+Overview
+^^^^^^^^
 
 .. graphviz::
     :align: center
@@ -169,14 +172,10 @@ Introduction
         vis:n -> wrappers:e;
     }
 
-Requirements
-^^^^^^^^^^^^
-.. literalinclude:: ../../requirements.txt
-
 
 
 Example
--------
+^^^^^^^
 .. note::
 
     to be completed

@@ -122,7 +122,6 @@ def delaunay(grid, cell, res_x=480, res_y=480, xmax = 2.0 * np.pi,
     tri : str, optional
         ``lower`` generates a lower triangle, and ``upper`` an upper triangle. By default 'lower'
 
-
     Returns
     -------
     int

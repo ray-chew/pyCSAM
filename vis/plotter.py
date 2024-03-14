@@ -118,7 +118,7 @@ class fig_obj(object):
         else:
             vmin, vmax = None, None
 
-        im = axs.pcolormesh(np.abs(ampls), cmap='Greys', vmin=vmin, vmax=vmax)
+        im = axs.pcolormesh(np.abs(ampls), edgecolor='k', cmap='Greys', vmin=vmin, vmax=vmax)
         if self.cbar:
             self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
 

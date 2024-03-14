@@ -12,7 +12,7 @@
 
    runs.idealised_isosceles
    runs.idealised_delaunay
-   runs.delaunay
+   runs.delaunay_runs
    runs.icon_usgs_test
 .. .. autosummary::
 ..    :toctree:
