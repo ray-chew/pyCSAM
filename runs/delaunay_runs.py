@@ -2,28 +2,30 @@
 import sys
 import os
 # set system path to find local modules
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 import numpy as np
 
 from src import io, var, utils, physics, delaunay
 from wrappers import interface, diagnostics
 from vis import plotter, cart_plot
-
 import time
 
 from IPython import get_ipython
 ipython = get_ipython()
 
-if '__IPYTHON__' in globals():
-    ipython.run_line_magic('load_ext autoreload')
-    ipython.run_line_magic('autoreload')
+if ipython is not None:
+    ipython.run_line_magic('load_ext', 'autoreload')
 
+def autoreload():
+    if ipython is not None:
+        ipython.run_line_magic('autoreload', '2')
+
+autoreload()
 
 # %%
-from inputs.lam_run import params
-# from inputs.selected_run_dfft import params
-# from inputs.debug_run import params
+# from input.lam_run import params
+from input.selected_run_dfft import params
+# from params.debug_run import params
 from copy import deepcopy
 
 # print run parameters, for sanity check.
@@ -313,24 +315,29 @@ print("time taken = %.2f" %(end-start))
 print(diag.rel_errs)
 plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=True)
 # plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-10,10], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
-# plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
-# plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12)
+if params.run_case == "ITER_REF":
+    plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
+
+if params.run_case == "R2B4" or params.run_case == "R2B4_STRW":
+    plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar_%s.pdf' %params.run_case, fontsize=12)
+    plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fn='../manuscript/mre_bar_%s.pdf' %params.run_case, fontsize=12)
 
 # %%
 print(diag.max_errs)
 plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fontsize=12)
 
-# plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fn='../manuscript/mre_bar.pdf', fontsize=12)
 
 
 # %%
-errors = np.zeros((len(tri.simplices)))
-errors[:] = np.nan
-errors[params.rect_set] = diag.max_errs
-errors[np.array(params.rect_set)+1] = diag.max_errs
+if params.run_case == "R2B4" or params.run_case == "R2B5" or params.run_case == "R2B4_STRW":
+    label_idxs = True if params.run_case == "R2B4" else False
+    errors = np.zeros((len(tri.simplices)))
+    errors[:] = np.nan
+    errors[params.rect_set] = diag.max_errs
+    errors[np.array(params.rect_set)+1] = diag.max_errs
 
-levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.error_delaunay(topo, tri, label_idxs=False, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_fine.pdf', iint=1, errors=errors, alpha_max=0.6)
+    levels = np.linspace(-1000.0, 3000.0, 5)
+cart_plot.error_delaunay(topo, tri, label_idxs=label_idxs, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_%s.pdf' %params.run_case, iint=1, errors=errors, alpha_max=0.6)
 
 # %%
 print(np.abs(np.array(rel_errs_orig) * 100 ).mean())
@@ -343,4 +350,6 @@ print(np.linalg.norm(first_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
 # time taken = 67.91
 fft_rel_errs = np.copy(diag.rel_errs)
 fft_max_errs = np.copy(diag.max_errs)
+# %%
+print(diag.max_errs.max(), diag.max_errs.min())
 # %%

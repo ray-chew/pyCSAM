@@ -126,7 +126,7 @@ print(uw_ref.sum())
 autoreload()
 
 delaunay_decomposition = True
-do_rhs_recomputation = False
+do_rhs_recomputation = True
 
 topo = var.topo_cell()
 topo.topo = total
