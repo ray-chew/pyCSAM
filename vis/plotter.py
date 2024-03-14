@@ -85,7 +85,7 @@ class fig_obj(object):
         return axs
 
 
-    def freq_panel(self, axs, ampls, nhi=None, nhj=None, title="Power spectrum", v_extent=None):
+    def freq_panel(self, axs, ampls, nhi=None, nhj=None, title="Power spectrum", v_extent=None, show_edge=False):
         """
         Plots the spectrum in a dense truncated spectral space.
 
@@ -118,7 +118,11 @@ class fig_obj(object):
         else:
             vmin, vmax = None, None
 
-        im = axs.pcolormesh(np.abs(ampls), edgecolor='k', cmap='Greys', vmin=vmin, vmax=vmax)
+        if show_edge:
+            im = axs.pcolormesh(np.abs(ampls), edgecolor='k', cmap='Greys', vmin=vmin, vmax=vmax)
+        else:
+            im = axs.pcolormesh(np.abs(ampls), cmap='Greys', vmin=vmin, vmax=vmax)
+
         if self.cbar:
             self.fig.colorbar(im,ax=axs,fraction=0.2, pad=0.04, shrink=0.7)
 

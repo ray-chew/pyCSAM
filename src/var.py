@@ -288,7 +288,7 @@ class params(obj):
         Defines the required parameters for a simulation run
         """
         # Define filenames
-        self.path = '/home/ray/git-projects/spec_appx/data/'
+        self.path = '../data/'
         self.fn_grid = self.path + 'icon_compact.nc'
         self.fn_topo = self.path + 'topo_compact.nc'
 
@@ -316,7 +316,7 @@ class params(obj):
         self.n_modes = 100
 
         # Set artificial wind
-        self.U, self.V = 10.0, 0.1
+        self.U, self.V = 10.0, 0.0
 
         # Set Spec Appx parameters
         self.rect = True

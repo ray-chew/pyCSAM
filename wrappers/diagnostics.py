@@ -165,6 +165,9 @@ class delaunay_metrics(object):
         self.writer.populate('decomposition', 'pmf_sums', self.pmf_sums)
         self.writer.populate('decomposition', 'pmf_ssums', self.pmf_ssums)
 
+        self.writer.populate('decomposition', 'max_errs', self.max_errs)
+        self.writer.populate('decomposition', 'ref_errs', self.rel_errs)
+
     def __gen_percentage_errs(self):
         """Computes the relative and maximum errors in percentage
         """
@@ -302,7 +305,7 @@ class diag_plotter(object):
 
 
         if self.params.plot:
-            fig, axs = plt.subplots(1,3, figsize=fs)
+            fig, axs = plt.subplots(1,3, figsize=fs, subplot_kw=dict(box_aspect=1))
             fig_obj = plotter.fig_obj(fig, self.nhi, self.nhj)
             axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title=t1, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
 

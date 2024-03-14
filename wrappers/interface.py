@@ -329,7 +329,7 @@ class first_appx(object):
 
         if res_topo is None:
             if self.params.taper_fa:
-                taper_quad(self.params, simplex_lat, simplex_lon, cell_fa, self.topo, res_topo)
+                taper_quad(self.params, simplex_lat, simplex_lon, cell_fa, self.topo)
             else:
                 utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell_fa, self.topo, rect=self.params.rect)    
         else:
