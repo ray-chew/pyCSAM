@@ -205,7 +205,8 @@ for rect_idx in params.rect_set:
 
 
         if hasattr(params, "ir_plot_titles"):
-            freqs_vext = [ampls_fa.min(), ampls_fa.max()]
+            ampls_rng = ampls_fa[~np.isnan(ampls_fa)]
+            freqs_vext = [ampls_rng.min(), ampls_rng.max()]
             pmf_vext = [uw_fa.min(), uw_fa.max()]
             ir_args = [
                 "abs. diff in first FA recon.",
@@ -317,6 +318,8 @@ plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=True)
 # plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-10,10], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
 if params.run_case == "ITER_REF":
     plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
+
+    print(np.abs(np.array(rel_errs_orig) * 100).mean())
 
 if params.run_case == "R2B4" or params.run_case == "R2B4_STRW":
     plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar_%s.pdf' %params.run_case, fontsize=12)

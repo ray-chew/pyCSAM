@@ -14,10 +14,18 @@ if run_case == "POT_BIAS":
     params.rect_set = np.sort([24,200])
     params.no_corrections = True
     params.plot = True
+
+    params.nhi = 32
+    params.nhj = 64
+
 elif run_case == "ITER_REF":
+
     params.plot = True
     params.no_corrections = False
     params.ir_plot_titles = True
+
+    params.nhi = 16
+    params.nhj = 32
 
     # iterative refinement: worst offenders
     params.rect_set = np.sort([92,24, 152,160,42,200,202,238,180])
@@ -46,9 +54,6 @@ params.delaunay_ynp = 11
 # params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
 # params.rect_set = np.sort([148,38,242])
 
-params.nhi = 32
-params.nhj = 64
-
 # params.nhi = 12
 # params.nhj = 24
 params.n_modes = 100
@@ -60,8 +65,6 @@ params.n_modes = 100
 # params.delaunay_xnp = 28
 # params.delaunay_ynp = 22
 # params.rect_set = np.sort([20,148,160,678,312,698, 342])
-# params.nhi = 16
-# params.nhj = 32
 # params.n_modes = 50
 # look into 342!!
 # params.rect_set = np.sort([342])
