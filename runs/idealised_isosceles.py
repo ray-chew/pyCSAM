@@ -225,7 +225,7 @@ for cnt, idx in enumerate(idxs):
     dat = dat_arr[idx]
 
     axs[0,cnt] = fig_obj.phys_panel(axs[0,cnt], dat, title=phys_lbls[cnt], v_extent=[dat_arr[0].min(),dat_arr[0].max()])
-    axs[1,cnt] = fig_obj.freq_panel(axs[1,cnt], freq, title=spec_lbls[cnt], v_extent=[freqs_arr[0].min(), freqs_arr[0].max()])
+    axs[1,cnt] = fig_obj.freq_panel(axs[1,cnt], freq, title=spec_lbls[cnt], v_extent=[freqs_arr[0].min(), freqs_arr[0].max()], show_edge=True)
 
     if cnt > 0:
         selected_errs.append(errs[idx])
@@ -277,7 +277,7 @@ for cnt, idx in enumerate([1,5]):
     fig.colorbar(axs[cnt].get_images()[0], ax=axs[cnt])
 
     if cnt == 0:
-        axs[2] = fig_obj.freq_panel(axs[2], freq, title=spec_lbls[cnt], v_extent=[freqs_arr[cnt].min(), freqs_arr[cnt].max()])
+        axs[2] = fig_obj.freq_panel(axs[2], freq, title=spec_lbls[cnt], v_extent=[freqs_arr[cnt].min(), freqs_arr[cnt].max()], show_edge=True)
 
         fig.colorbar(axs[2].get_children()[0], ax=axs[2])
 
