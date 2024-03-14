@@ -12,6 +12,18 @@ from vis import cart_plot
 
 from copy import deepcopy
 
+from IPython import get_ipython
+ipython = get_ipython()
+
+if ipython is not None:
+    ipython.run_line_magic('load_ext', 'autoreload')
+
+def autoreload():
+    if ipython is not None:
+        ipython.run_line_magic('autoreload', '2')
+
+autoreload()
+
 # %%
 # initialise data objects
 grid = var.grid()
@@ -222,3 +234,4 @@ plt.show()
 plt.figure()
 plt.imshow(cell.topo)
 plt.show()
+# %%

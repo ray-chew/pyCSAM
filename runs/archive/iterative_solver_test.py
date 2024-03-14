@@ -16,7 +16,7 @@ from vis import plotter, cart_plot
 # %%
 # from inputs.lam_run import params
 # from inputs.selected_run import params
-from inputs.iter_solve import params
+from input.iter_solve import params
 from copy import deepcopy
 # from inputs.debug_run import params
 
