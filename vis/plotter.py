@@ -72,6 +72,12 @@ class fig_obj(object):
         # conversion from [m] to [km]
         extent = np.array(extent) / 1000.0
 
+        # manually added the plotting for the enclosing red triangle in Appendix E
+        # xys = [[extent[0], extent[-1]-0.1], [extent[1]-0.05, extent[2]], [extent[1]-0.05, extent[-1]-0.1]]
+        # tri = plt.Polygon(xys, fill=False, edgecolor='red', lw=2.0)
+
+        # axs.add_patch(tri)
+
         im = axs.imshow(data, extent=extent, origin='lower', aspect='equal', cmap='cividis', vmin=vmin, vmax=vmax)
         axs.set_title(title)
 
