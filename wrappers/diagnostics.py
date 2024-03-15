@@ -158,7 +158,7 @@ class delaunay_metrics(object):
 
         if verbose:
             print("avg. max err | avg. rel err:")
-            print("%.3f | %.3f" %np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean())
+            print("%.3f | %.3f" %(np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean()))
 
 
     def __write(self):
@@ -239,7 +239,7 @@ class diag_plotter(object):
 
         self.output_dir = "../manuscript/"
 
-    def show(self, rect_idx, sols, kls=None, v_extent=None, dfft_plot=False, output_fig=True, fs = (14.0,4.0), ir_args=None, fn=None):
+    def show(self, rect_idx, sols, kls=None, v_extent=None, dfft_plot=False, output_fig=True, fs = (14.0,4.0), ir_args=None, fn=None, phys_lbls=None):
         """Plots the data
 
         Parameters
@@ -275,6 +275,8 @@ class diag_plotter(object):
             By default None
         fn : str, optional
             output filename, by default None
+        phys_lbls : list, optional
+            axis labels for the physical plot, by default None
         """
 
         cell, ampls, uw, dat_2D = sols
@@ -310,10 +312,16 @@ class diag_plotter(object):
             fn = "%s_%i_%i" %(fn, rect_idx[0], rect_idx[1])
 
 
+        if phys_lbls is None:
+            phys_xlbl = 'longitude [km]'
+            phys_ylbl = 'latitude [km]'
+        else:
+            phys_xlbl, phys_ylbl = phys_lbls[0], phys_lbls[1]
+
         if self.params.plot:
             fig, axs = plt.subplots(1,3, figsize=fs, subplot_kw=dict(box_aspect=1))
             fig_obj = plotter.fig_obj(fig, self.nhi, self.nhj)
-            axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title=t1, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+            axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title=t1, xlabel=phys_xlbl, ylabel=phys_ylbl, extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
 
             if dfft_plot:
                 axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real', title=t2)
