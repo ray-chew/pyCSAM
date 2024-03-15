@@ -23,8 +23,8 @@ def autoreload():
 autoreload()
 
 # %%
-# from input.lam_run import params
-from input.selected_run import params
+from input.lam_run import params
+# from input.selected_run import params
 # from params.debug_run import params
 from copy import deepcopy
 
@@ -153,14 +153,24 @@ for rect_idx in params.rect_set:
         writer.populate(rect_idx, 'pmf_fg', uw_fa)
 
     if hasattr(params, "ir_plot_titles"):
-        ir_args = [
-            "reference FFT reconstruction",
-            "FA LSFF power spectrum",
-            "FA LSFF PMF spectrum",
-            None,
-            None
-        ]
-        sols = (cell_fa, ampls_fa, uw_fa, fft_2D_ref)
+        if params.run_case == "ITER_REF":
+            ir_args = [
+                "reference FFT reconstruction",
+                "FA LSFF power spectrum",
+                "FA LSFF PMF spectrum",
+                None,
+                None
+            ]
+            sols = (cell_fa, ampls_fa, uw_fa, fft_2D_ref)   
+        else:         
+            ir_args = [
+                "FA LSFF reconstruction",
+                "FA LSFF power spectrum",
+                "FA LSFF PMF spectrum",
+                None,
+                None
+            ]
+            sols = (cell_fa, ampls_fa, uw_fa, dat_2D_fa)
         fn = "plots_FA_LSFF"
     else:
         sols = (cell_fa, ampls_fa, uw_fa, dat_2D_fa)
@@ -295,7 +305,7 @@ for rect_idx in params.rect_set:
         print(diag)
         # topo_tmp = refinement_pair[0].analysis.recon + refinement_pair[1].analysis.recon
 
-    print(ir_cnt)
+    print("iteration count", ir_cnt+1)
     sa.n_modes = params.n_modes
 
     if corrected:
@@ -328,6 +338,7 @@ for rect_idx in params.rect_set:
 
 end = time.time()
 # %%
+autoreload()
 diag.end(verbose=True)
 print("time taken = %.2f" %(end-start))
 
@@ -354,9 +365,18 @@ if params.run_case == "DFFT_FA" or params.run_case == "LSFF_FA":
     plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-15,15], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
 
 if params.run_case == "ITER_REF":
-    plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
+    plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar_ir.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
 
+    print("avg. rel. error in percent:")
     print(np.abs(np.array(rel_errs_orig) * 100).mean())
+    print("\n")
+
+    if len(params.rect_set) == 1:
+        print("first rel. l2 error:")
+        print(np.linalg.norm(first_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
+        print("final rel. l2 error:")
+        print(np.linalg.norm(final_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
+
 
 if params.run_case == "R2B4" or params.run_case == "R2B4_STRW":
     plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar_%s.pdf' %params.run_case, fontsize=12)
@@ -385,9 +405,6 @@ if params.run_case == "FLUX_SDY":
 
 # print(np.abs(np.array(rel_errs_orig) * 100 ).mean())
 # np.abs(diag.rel_errs).mean()
-
-# print(np.linalg.norm(final_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
-# print(np.linalg.norm(first_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
 
 # print(diag.max_errs.max(), diag.max_errs.min())
 # %%
