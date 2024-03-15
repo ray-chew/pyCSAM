@@ -15,14 +15,15 @@ from wrappers import interface, diagnostics
 from IPython import get_ipython
 ipython = get_ipython()
 
-if '__IPYTHON__' in globals():
-    ipython.run_line_magic('load_ext autoreload')
+if ipython is not None:
+    ipython.run_line_magic('load_ext', 'autoreload')
 
 def autoreload():
-    if '__IPYTHON__' in globals():
-        ipython.run_line_magic('autoreload')
+    if ipython is not None:
+        ipython.run_line_magic('autoreload', '2')
 
 autoreload()
+
 
 
 # %%
@@ -57,10 +58,10 @@ X, Y = np.meshgrid(xx,xx)
 kl = 1.0 / scale_fac #2.0 * np.pi
 
 bg_terrain = np.zeros(shape)
-bg = -(scale_fac / 2.0) * (np.cos(kl * X + kl * Y))
+bg = -(scale_fac / 2.0) * (np.cos(kl * X + 0 * Y))
 
 total = world# + bg
-# total = bg
+total = bg
 
 plt.imshow(world,cmap='terrain', origin='lower')
 plt.colorbar()
@@ -272,6 +273,14 @@ if not delaunay_decomposition:
 
 
 # %%
+ir_args = [
+    "quad. reconstruction",
+    "approx. power spectrum",
+    "approx. PMF spectrum",
+    None,
+    None
+]
+
 sols_fa = (cell, ampls_fa, uw_fa, dat_2D_fa)
 params = var.params()
 params.plot = True
@@ -291,7 +300,7 @@ if do_rhs_recomputation:
     params = var.params()
     params.plot = True
     dplot = diagnostics.diag_plotter(params, nhi, nhj)
-    dplot.show((0,1), sols_01_rc, v_extent = v_extent)
+    dplot.show((0,1), sols_01_rc, v_extent = v_extent, ir_args = ir_args)
     print(uw_01_rc.sum())
 
 sols_02 = (cell_02, ampls_02, uw_02, dat_2D_02)
@@ -306,7 +315,7 @@ if do_rhs_recomputation:
     params = var.params()
     params.plot = True
     dplot = diagnostics.diag_plotter(params, nhi, nhj)
-    dplot.show((0,1), sols_02_rc, v_extent = v_extent)
+    dplot.show((0,1), sols_02_rc, v_extent = v_extent, ir_args = ir_args)
     print(uw_02_rc.sum())
 
 if not delaunay_decomposition:

@@ -126,12 +126,17 @@ class delaunay_metrics(object):
     def __repr__(self):
         """Redefines what printing the class instance does
         """
+
         errs = [self.uw_ref, self.uw_fa, self.uw_sum, self.uw_spec_sum]
-        errs = [str(err) for err in errs]
-        uw_strs = str(self.uw_0) + ', ' +  str(self.uw_1)
+        errs = ["%.3f" %err for err in errs]
+
+        uw_lbls = 'uw_0 | uw_1 : '
+        uw_strs = "%.3f" %self.uw_0 + ', ' +  "%.3f" %self.uw_1
+        err_lbls = 'uw_ref | uw_fa | uw_sum | uw_spec_sum:'
         err_strs = ', '.join(errs)
 
-        return uw_strs + '\n' + err_strs + '\n'
+
+        return uw_lbls + '\n' + uw_strs + '\n' + err_lbls + '\n' + err_strs + '\n'
     
     def __str__(self):
         return repr(self)
@@ -152,7 +157,8 @@ class delaunay_metrics(object):
             self.__write()
 
         if verbose:
-            print(np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean())
+            print("avg. max err | avg. rel err:")
+            print("%.3f | %.3f" %np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean())
 
 
     def __write(self):
