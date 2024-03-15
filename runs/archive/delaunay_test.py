@@ -25,7 +25,7 @@ if __name__ != "__main__": exit(0)
 
 # %%
 # from inputs.lam_run import params
-from input.selected_run_dfft import params
+from input.selected_run import params
 # from inputs.debug_run import params
 from copy import deepcopy
 
