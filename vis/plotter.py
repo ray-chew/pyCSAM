@@ -409,3 +409,82 @@ def error_bar_abs_plot(errs, lbls,
     plt.tight_layout()
     if output_fig: plt.savefig(fn, bbox_inches="tight")
     plt.show()
+
+
+class plot_3d(object):
+    """Helper class for 3D plots
+
+    """
+    def __init__(self, cell, ele=5, azi=230, cpad=0.01):
+        """
+
+        Parameters
+        ----------
+        cell : :class:`src.var.topo_cell`
+            instance of a cell object
+        ele : int, optional
+            elevation angle, by default 5
+        azi : int, optional
+            azimuthal angle, by default 230
+        cpad : float, optional
+            colour bar padding, by default 0.01
+        """
+        from matplotlib import cm
+
+        self.ele = ele
+        self.azi = azi
+        self.cpad = cpad
+
+        self.x = cell.lon / 1000.0
+        self.y = cell.lat / 1000.0
+
+        self.X, self.Y = np.meshgrid(self.x, self.y)
+        self.cm = cm
+
+    def plot(self, Z, output_fig=True, output_fn="plot_3D", lbls=None, fs=(10,10)):
+        """Does the plotting
+
+        Parameters
+        ----------
+        Z : array-like
+            2D elevation array
+        output_fig : bool, optional
+            toggles output of figure, by default True
+        output_fn : str, optional
+            output filnemae, by default "plot_3D"
+        lbls : list, optional
+            list of axis labels containing ``[x_label, y_label, z_label]``, by default None
+        fs : tuple, optional
+            figure size, by default (10,10)
+        """
+        if lbls == None:
+            x_lbl = "longitude [km]"
+            y_lbl = "latitude [km]"
+            z_lbl = "elevation [m]"
+        else:
+            x_lbl, y_lbl, z_lbl = lbls
+
+        plt.rcParams.update({'font.size': 15})
+
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=fs)
+        # Plot the surface.
+        surf = ax.plot_surface(self.X, self.Y, Z, cmap=self.cm.coolwarm,
+                       linewidth=0, antialiased=False)
+
+        # Add a color bar which maps values to colors.
+        fig.colorbar(surf, shrink=0.4, pad=self.cpad)
+        ax.view_init(self.ele, self.azi)
+        ax.set_xlabel( x_lbl , labelpad=10 )
+        ax.set_ylabel( y_lbl , labelpad=10 )
+        ax.set_zlabel( z_lbl , rotation=-90)
+
+        for label in ax.yaxis.get_ticklabels()[0::2]:
+            label.set_visible(False)
+
+        plt.tight_layout()
+        if output_fig:
+            plt.savefig("../manuscript/%s.pdf" %output_fn, dpi=200, bbox_inches="tight")
+        plt.show()
+
+
+

@@ -4,11 +4,10 @@ import sys
 sys.path.append('..')
 
 import numpy as np
-import pandas as pdlot
 import matplotlib.pyplot as plt
 
 from src import io, var, utils, delaunay
-from vis import cart_plot
+from vis import cart_plot, plotter
 
 from copy import deepcopy
 
@@ -101,125 +100,20 @@ utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=rect, padd
 test = cell.topo
 
 # %%
-ele = 5
-azi = 230
-cpad = 0.01
-
-plt.rcParams.update({'font.size': 15})
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
-
-# Make data.
-x = cell.lon / 1000.0
-y = cell.lat / 1000.0
-X,Y = np.meshgrid(x,y)
+autoreload()
+fig_3d = plotter.plot_3d(cell)
 
 p_topo = np.pad(cell_orig.topo, (p_length,p_length), mode='constant')
 p_mask = np.pad(cell_orig.mask, (p_length,p_length), mode='constant')
 Z = p_topo * p_mask
 
-# Plot the surface.
-surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
+fig_3d.plot(Z, output_fn = "before_taper")
+fig_3d.plot(cell.topo, output_fn="after_taper")
 
-# Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.4, pad=cpad)
-ax.view_init(ele, azi)
-ax.set_xlabel( "longitude [km]", labelpad=10)
-ax.set_ylabel( "latitude [km]" , labelpad=10)
-ax.set_zlabel( "elevation [m]")
-# ax.set_title("orography before tapering")
+lbls = ["longitude [km]", "latitude [km]", "mask"]
 
-for label in ax.yaxis.get_ticklabels()[0::2]:
-    label.set_visible(False)
-
-plt.tight_layout()
-plt.savefig("../manuscript/before_taper.pdf", dpi=200, bbox_inches="tight")
-plt.show()
-
-
-# %%
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
-
-# Make data.
-x = cell.lon / 1000.0
-y = cell.lat / 1000.0
-X,Y = np.meshgrid(x,y)
-Z = cell.topo
-
-# Plot the surface.
-surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-
-# Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.4, pad=cpad)
-ax.view_init(ele, azi)
-ax.set_xlabel( "longitude [km]", labelpad=10)
-ax.set_ylabel( "latitude [km]" , labelpad=10)
-ax.set_zlabel( "elevation [m]")
-
-for label in ax.yaxis.get_ticklabels()[0::2]:
-    label.set_visible(False)
-
-plt.tight_layout()
-plt.savefig("../manuscript/after_taper.pdf", dpi=200, bbox_inches="tight")
-plt.show()
-
-# %%
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
-
-# Make data.
-x = cell.lon / 1000.0
-y = cell.lat / 1000.0
-X,Y = np.meshgrid(x,y)
-Z = p_mask
-
-# Plot the surface.
-surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-
-# Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.4, pad=cpad)
-ax.view_init(ele, azi)
-ax.set_xlabel( "longitude [km]", labelpad=10)
-ax.set_ylabel( "latitude [km]" , labelpad=10)
-ax.set_zlabel( "mask", rotation=90)
-
-for label in ax.yaxis.get_ticklabels()[0::2]:
-    label.set_visible(False)
-
-plt.tight_layout()
-plt.savefig("../manuscript/mask_before_taper.pdf", dpi=200, bbox_inches="tight")
-plt.show()
-
-# %%
-fig, ax = plt.subplots(subplot_kw={"projection": "3d"}, figsize=(10,10))
-
-# Make data.
-x = cell.lon / 1000.0
-y = cell.lat / 1000.0
-X,Y = np.meshgrid(x,y)
-Z = taper.p
-
-# Plot the surface.
-surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
-
-# Add a color bar which maps values to colors.
-fig.colorbar(surf, shrink=0.4, pad=cpad)
-ax.view_init(ele, azi)
-ax.set_xlabel( "longitude [km]", labelpad=10)
-ax.set_ylabel( "latitude [km]" , labelpad=10)
-ax.set_zlabel( "mask", rotation=90)
-
-
-for label in ax.yaxis.get_ticklabels()[0::2]:
-    label.set_visible(False)
-
-plt.tight_layout()
-plt.savefig("../manuscript/mask_after_taper.pdf", dpi=200, bbox_inches="tight")
-plt.show()
+fig_3d.plot(p_mask, output_fn="mask_before_taper", lbls=lbls)
+fig_3d.plot(taper.p, output_fn="mask_after_taper", lbls=lbls)
 
 # %%
 
