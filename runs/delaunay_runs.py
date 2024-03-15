@@ -24,7 +24,7 @@ autoreload()
 
 # %%
 # from input.lam_run import params
-from input.selected_run_dfft import params
+from input.selected_run import params
 # from params.debug_run import params
 from copy import deepcopy
 
@@ -178,11 +178,30 @@ for rect_idx in params.rect_set:
     triangle_pair = np.zeros(2, dtype='object')
 
     for cnt, idx in enumerate(range(rect_idx, rect_idx+2)):
-        
-        cell, ampls_sa, uw_sa, dat_2D_sa = sa.do(idx, ampls_fa)
+        if params.recompute_rhs:
+            sols, sols_rc = sa.do(idx, ampls_fa)
+        else:
+            sols = sa.do(idx, ampls_fa)
 
-        sols = (cell, ampls_sa, uw_sa, dat_2D_sa)
+        cell, ampls_sa, uw_sa, dat_2D_sa = sols
         dplot.show(idx, sols, v_extent=v_extent)
+
+        if params.recompute_rhs:
+
+            fig_3d = plotter.plot_3d(cell_ref, azi=95)
+            fig_3d.plot(sols_rc[-1])
+
+            if cnt == 0:
+                recon0 = np.copy(sols_rc[-1])
+            if cnt == 1:
+                recon1 = np.copy(sols_rc[-1])
+                # dplot.show(idx, sols_rc, v_extent=v_extent, fn="recompute")
+
+                total_recon = recon0 + recon1
+                
+                fig_3d = plotter.plot_3d(cell_ref, azi=95)
+                # fig_3d.plot(np.abs(sols[-1] - sols_rc[-1]))
+                fig_3d.plot(np.abs(fft_2D_ref - total_recon))
 
         cell.uw = uw_sa
         triangle_pair[cnt] = cell
@@ -201,7 +220,6 @@ for rect_idx in params.rect_set:
     if not params.no_corrections: 
         rel_errs_orig.append(rel_err)
         v_extent_orig = np.copy(v_extent)
-
 
 
         if hasattr(params, "ir_plot_titles"):
@@ -244,7 +262,12 @@ for rect_idx in params.rect_set:
         # dplot.show(idx, sols, v_extent=v_extent)
 
         for cnt, idx in enumerate(range(rect_idx, rect_idx+2)):
-            cell, ampls_rf, uw_rf, dat_2D_rf = sa.do(idx, ampls_fa, res_topo = res_topo)
+            if params.recompute_rhs:
+                sols, sols_rc = sa.do(idx, ampls_fa, res_topo = res_topo)
+            else:
+                sols = sa.do(idx, ampls_fa, res_topo = res_topo)
+
+            cell, ampls_rf, uw_rf, dat_2D_rf = sols
 
             ampls_sum = triangle_pair[cnt].analysis.ampls - np.sign(rel_err) * ampls_rf
 
@@ -263,9 +286,6 @@ for rect_idx in params.rect_set:
 
             cell.uw = uw_pmf_refined
             refinement_pair[cnt] = cell
-
-            # sols = (cell, ampls_rf, uw_rf, dat_2D_rf)
-            # dplot.show(idx, sols, v_extent=v_extent)
 
         ir_cnt += 1
 
@@ -351,7 +371,12 @@ if params.run_case == "R2B4" or params.run_case == "R2B5" or params.run_case == 
     errors[np.array(params.rect_set)+1] = diag.max_errs
 
     levels = np.linspace(-1000.0, 3000.0, 5)
-cart_plot.error_delaunay(topo, tri, label_idxs=label_idxs, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_%s.pdf' %params.run_case, iint=1, errors=errors, alpha_max=0.6)
+    cart_plot.error_delaunay(topo, tri, label_idxs=label_idxs, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_%s.pdf' %params.run_case, iint=1, errors=errors, alpha_max=0.6)
+
+# %%
+if params.run_case == "FLUX_SDY":
+    pass
+
 
 # %%
 # code graveyard: to be removed once I am sure I do not need them.

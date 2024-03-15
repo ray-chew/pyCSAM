@@ -288,6 +288,7 @@ class params(obj):
         Defines the required parameters for a simulation run
         """
         # Define filenames
+        self.run_case = ""
         self.path = '../data/'
         self.fn_grid = self.path + 'icon_compact.nc'
         self.fn_topo = self.path + 'topo_compact.nc'
@@ -342,6 +343,7 @@ class params(obj):
 
         # Flags
         self.get_delaunay_triangulation = False
+        self.recompute_rhs = False
         self.debug = False
         self.debug_writer = True
         self.verbose = False

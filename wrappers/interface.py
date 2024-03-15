@@ -4,11 +4,12 @@ Interface wrapper module to ease setting up the CSAM building blocks
 
 
 from src import fourier, lin_reg, physics, reconstruction
-from src import utils, var, io
+from src import utils, var
+from copy import deepcopy
 import numpy as np
 
 class get_pmf(object):
-    """A simple wrapper class for the constrained spectral approximation method
+    """A wrapper class for the constrained spectral approximation method
 
     This class is used in the idealised experiments
     """
@@ -391,7 +392,9 @@ class second_appx(object):
                | computed idealised pseudo-momentum fluxes, 
                | the reconstructed physical data)
                
-            corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`
+            corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`.
+
+            If ``params.recompute_rhs = True``, the tuple contains two lists. The first list is the contains the data above, and the second list contains the data from the recomputation over the quadrilateral domain.
         """
         # make a copy of the spectrum obtained from the FA.
         fq_cpy = np.copy(ampls_fa)
@@ -404,6 +407,8 @@ class second_appx(object):
 
         # use the non-quadrilateral self.topography
         utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, self.topo, rect=True)
+
+        save_am = True if self.params.recompute_rhs else False
 
         if (res_topo is not None) and (not self.params.taper_sa):
             cell.topo = res_topo * cell.mask
@@ -437,6 +442,15 @@ class second_appx(object):
         else:
             second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
 
-        ampls_sa, uw_sa, dat_2D_sa = second_guess.sappx(cell, lmbda=self.params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=self.params.sa_iter_solve)      
+        ampls_sa, uw_sa, dat_2D_sa = second_guess.sappx(cell, lmbda=self.params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=self.params.sa_iter_solve, save_am=save_am)
+
+        if self.params.recompute_rhs:
+            cell_quad = deepcopy(cell)
+            cell_quad.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
+            ampls_02_rc, uw_02_rc, dat_2D_02_rc = second_guess.recompute_rhs(cell_quad, second_guess.fobj, save_coeffs = True)
+
+            return [cell_quad, ampls_sa, uw_sa, dat_2D_sa], [cell, ampls_02_rc, uw_02_rc, dat_2D_02_rc]
+        else:
+
+            return cell, ampls_sa, uw_sa, dat_2D_sa
         
-        return cell, ampls_sa, uw_sa, dat_2D_sa
