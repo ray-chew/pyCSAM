@@ -8,7 +8,7 @@ print(os.getcwd())
 
 
 # %%
-fidx = 200
+fidx = 24
 sidx = fidx+1
 
 dd = '.'
@@ -129,4 +129,35 @@ print(call)
 proc1 = subprocess.call(call)
 
 proc2 = subprocess.call(crop + [out_fn] + [out_fn])
+
+
+
+# %%
+dd = '.'
+p1 = '%s/upper_weak_reg_0_1.pdf' %dd 
+p2 = '%s/upper_strong_reg_0_1.pdf' %dd
+
+out_name = 'flux_sdy'
+
+ps = [p1,p2]
+
+crop = ['pdfcrop']
+for p in ps:
+    cmd = crop + [p] + [p]
+    proc = subprocess.call(cmd)
+    print(proc)
+
+call = ['pdfjam', '--nup', '1x2']
+for p in ps:
+    call += [p]
+
+out_fn = '%s/%s.pdf' %(dd,out_name)
+call += ['--outfile', out_fn]
+call += ['--delta', '0.2cm 0.2cm']
+print(call)
+
+proc1 = subprocess.call(call)
+
+proc2 = subprocess.call(crop + [out_fn] + [out_fn])
+
 # %%
