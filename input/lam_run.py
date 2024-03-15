@@ -3,19 +3,28 @@ from src import var
 
 params = var.params()
 
-# run_case = "R2B4"
+run_case = "R2B4"
 # run_case = "R2B5"
-run_case = "R2B4_STRW"
+# run_case = "R2B4_STRW"
+
+run_case = "R2B4_NN"
 
 if run_case == "R2B4":
     coarse = True
     params.U, params.V = 10.0, 0.0
+    
 elif run_case == "R2B5":
     coarse = False
     params.U, params.V = 10.0, 0.0
+
 elif run_case == "R2B4_STRW":
     coarse = True
     params.U, params.V = -40.0, 20.0
+
+elif run_case == "R2B4_NN":
+    coarse = True
+    params.U, params.V = 0.0, 10.0
+
 else:
     assert False
 

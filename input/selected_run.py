@@ -4,15 +4,15 @@ from src import var
 params = var.params()
 
 # potential biases study
-run_case = "POT_BIAS"
+# run_case = "POT_BIAS"
 # iterative refinement study
 run_case = "ITER_REF"
 # DFFT FA run for DFFT vs LSFF comparison
-run_case = "DFFT_FA"
+# run_case = "DFFT_FA"
 # LSFF FA run for DFFT vs LSFF comparison
-run_case = "LSFF_FA"
+# run_case = "LSFF_FA"
 # effective flux contribution study
-run_case = "FLUX_SDY"
+# run_case = "FLUX_SDY"
 
 if run_case == "POT_BIAS":
     params.rect_set = np.sort([24,200])
@@ -84,7 +84,7 @@ params.delaunay_ynp = 11
 params.n_modes = 100
 
 params.lmbda_fa = 1e-1 # first guess
-params.lmbda_sa = 1.0 # second step
+params.lmbda_sa = 1e-1 # second step
 
 params.lxkm, params.lykm = 160, 160
 
