@@ -58,7 +58,7 @@ X, Y = np.meshgrid(xx,xx)
 kl = 1.0 / scale_fac #2.0 * np.pi
 
 bg_terrain = np.zeros(shape)
-bg = -(scale_fac / 2.0) * (np.cos(kl * X + 0 * Y))
+bg = -(scale_fac / 2.0) * (np.cos(kl * X + kl * Y))
 
 total = world# + bg
 total = bg
@@ -114,7 +114,7 @@ print(ampls_ref.max())
 params = var.params()
 params.plot = True
 params.lmbda_fa = 0.0
-params.lmbda_sa = 0.01
+params.lmbda_sa = 0.1
 dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0,1), sols, kls=kls_ref, v_extent = v_extent, dfft_plot=True)
 
@@ -273,6 +273,7 @@ if not delaunay_decomposition:
 
 
 # %%
+autoreload()
 ir_args = [
     "quad. reconstruction",
     "approx. power spectrum",
@@ -280,6 +281,11 @@ ir_args = [
     None,
     None
 ]
+
+if params.lmbda_sa == 1e-6:
+    fn = "upper_weak_reg"
+elif params.lmbda_sa == 0.2:
+    fn = "upper_strong_reg"
 
 sols_fa = (cell, ampls_fa, uw_fa, dat_2D_fa)
 params = var.params()
@@ -300,7 +306,7 @@ if do_rhs_recomputation:
     params = var.params()
     params.plot = True
     dplot = diagnostics.diag_plotter(params, nhi, nhj)
-    dplot.show((0,1), sols_01_rc, v_extent = v_extent, ir_args = ir_args)
+    dplot.show((0,1), sols_01_rc, v_extent = v_extent, ir_args = ir_args, phys_lbls=["",""], fn=fn)
     print(uw_01_rc.sum())
 
 sols_02 = (cell_02, ampls_02, uw_02, dat_2D_02)
@@ -315,7 +321,7 @@ if do_rhs_recomputation:
     params = var.params()
     params.plot = True
     dplot = diagnostics.diag_plotter(params, nhi, nhj)
-    dplot.show((0,1), sols_02_rc, v_extent = v_extent, ir_args = ir_args)
+    dplot.show((0,1), sols_02_rc, v_extent = v_extent, ir_args = ir_args, phys_lbls=["",""], fn=fn)
     print(uw_02_rc.sum())
 
 if not delaunay_decomposition:
@@ -339,7 +345,9 @@ print("")
 
 print(ampls_ref.max())
 print(ampls_fa.max())
+print(dat_2D_01.max())
 print(ampls_01.max())
+print(dat_2D_02.max())
 print(ampls_02.max())
 
 if delaunay_decomposition:
@@ -348,4 +356,10 @@ else:
     print(ampls_03.max())
     # print(uw_fa.sum(), uw_01.sum()+0.5*uw_02.sum()+0.5*uw_03.sum())
     print(uw_ref.sum(), uw_01.sum()+uw_02.sum()+uw_03.sum())
+# %%
+np.linalg.norm(dat_2D_01 - cell.mask * fft_2D_ref)
+# %%
+plt.figure()
+plt.imshow(dat_2D_01 - cell.mask * fft_2D_ref,origin="lower")
+plt.show()
 # %%
