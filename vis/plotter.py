@@ -280,8 +280,15 @@ def error_bar_plot( idx_name,
 
         comp_data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(comp_data['values'] > 0).map({True: 'C7', False: 'C7'}), fontsize=fontsize)
 
-    true_col = 'g' # C5 and C4 respectively for DFFT vs LSFF plot
-    false_col = 'C4' if params.dfft_first_guess else 'r'
+    if params.run_case == "LSFF_FA":
+        true_col  = 'C8'
+        false_col = 'C4'
+    elif params.dfft_first_guess:
+        true_col  = 'g'
+        false_col = 'm'
+    else:
+        true_col  = 'g'
+        false_col = 'r'
 
     data['values'].plot(kind='bar', width=1.0, edgecolor='black', color=(data['values'] > 0).map({True: true_col, False: false_col}), fontsize=fontsize)
 

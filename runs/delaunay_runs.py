@@ -311,11 +311,28 @@ end = time.time()
 diag.end(verbose=True)
 print("time taken = %.2f" %(end-start))
 
+
+# %%
+if params.run_case == "DFFT_FA":
+    fft_time_taken = (end-start)
+    fft_rel_errs = np.copy(diag.rel_errs)
+    fft_max_errs = np.copy(diag.max_errs)
+
+    print(fft_time_taken)
+
+if params.run_case == "LSFF_FA":
+    print(r'avg. |FFT LRE| - |LSFFT LRE|:')
+    print((np.abs(fft_rel_errs) - np.abs(diag.rel_errs)).mean())
+
 # %%
 # print(rel_errs_orig)
+autoreload()
 print(diag.rel_errs)
 plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=True)
-# plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-10,10], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
+
+if params.run_case == "DFFT_FA" or params.run_case == "LSFF_FA":
+    plotter.error_bar_plot(params.rect_set, np.abs(fft_rel_errs) - np.abs(diag.rel_errs), params, fs=(14,5), ylim=[-15,15], title="| FFT LRE | - | LSFF LRE |", output_fig=True, fn='../manuscript/dfft_vs_lsff.pdf', fontsize=12)
+
 if params.run_case == "ITER_REF":
     plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar.pdf', fontsize=12, comparison=np.array(rel_errs_orig)*100)
 
@@ -324,12 +341,6 @@ if params.run_case == "ITER_REF":
 if params.run_case == "R2B4" or params.run_case == "R2B4_STRW":
     plotter.error_bar_plot(params.rect_set, diag.rel_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage LRE", fn='../manuscript/lre_bar_%s.pdf' %params.run_case, fontsize=12)
     plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fn='../manuscript/mre_bar_%s.pdf' %params.run_case, fontsize=12)
-
-# %%
-print(diag.max_errs)
-plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fontsize=12)
-
-
 
 # %%
 if params.run_case == "R2B4" or params.run_case == "R2B5" or params.run_case == "R2B4_STRW":
@@ -343,16 +354,15 @@ if params.run_case == "R2B4" or params.run_case == "R2B5" or params.run_case == 
 cart_plot.error_delaunay(topo, tri, label_idxs=label_idxs, fs=(12,8), highlight_indices=params.rect_set, output_fig=True, fn='../manuscript/error_delaunay_%s.pdf' %params.run_case, iint=1, errors=errors, alpha_max=0.6)
 
 # %%
-print(np.abs(np.array(rel_errs_orig) * 100 ).mean())
-np.abs(diag.rel_errs).mean()
+# code graveyard: to be removed once I am sure I do not need them.
+# print(diag.max_errs)
+# plotter.error_bar_plot(params.rect_set, diag.max_errs, params, gen_title=False, ylabel="", fs=(14,5), ylim=[-100,100], output_fig=True, title="percentage MRE", fontsize=12)
 
-# %%
-print(np.linalg.norm(final_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
-print(np.linalg.norm(first_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
-# %%
-# time taken = 67.91
-fft_rel_errs = np.copy(diag.rel_errs)
-fft_max_errs = np.copy(diag.max_errs)
-# %%
-print(diag.max_errs.max(), diag.max_errs.min())
+# print(np.abs(np.array(rel_errs_orig) * 100 ).mean())
+# np.abs(diag.rel_errs).mean()
+
+# print(np.linalg.norm(final_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
+# print(np.linalg.norm(first_diff - fft_2D_ref) / np.linalg.norm(fft_2D_ref))
+
+# print(diag.max_errs.max(), diag.max_errs.min())
 # %%
