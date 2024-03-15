@@ -81,39 +81,7 @@ params.lon_extent = [-148.,-148.,-112.]
 params.delaunay_xnp = 14
 params.delaunay_ynp = 11
 
-# (xnp x ynp) = (14 x 11); (16, 11)
-# params.rect_set = np.sort([148,38,242])
-
-# params.nhi = 12
-# params.nhj = 24
 params.n_modes = 100
-
-# (xnp x ynp) = (16 x 14)
-# params.rect_set = np.sort([20,148,160,212,256,242])
-
-# corresponds to approx (80x80)km
-# params.delaunay_xnp = 28
-# params.delaunay_ynp = 22
-# params.rect_set = np.sort([20,148,160,678,312,698, 342])
-# params.n_modes = 50
-# look into 342!!
-# params.rect_set = np.sort([342])
-# params.rect_set = np.sort([342,346,652,674,670,348,654,656])
-
-
-# params.rect_set = np.sort([598,908,906,902,896,898,622,902])
-
-# params.rect_set = np.sort([116])
-# all the main MERIT x10 offenders. To test implementation of correction strategy.
-# params.rect_set = [20, 66, 182, 240]
-# params.rect_set = [182]
-
-# MERIT full LAM top underestimators AFTER correction... Why does correction not work?
-# params.rect_set = np.sort([98, 210, 286, 80, 266])
-
-# MERIT full LAM top overestimators AFTER correction
-# params.rect_set = np.sort([0, 6, 212, 84, 174])
-# params.rect_set = np.sort([212, 174])
 
 params.lmbda_fa = 1e-1 # first guess
 params.lmbda_sa = 1.0 # second step
