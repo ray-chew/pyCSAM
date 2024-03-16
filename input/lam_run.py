@@ -8,11 +8,17 @@ run_case = "R2B4"
 # run_case = "R2B4_STRW"
 
 run_case = "R2B4_NN"
+run_case = "R2B4_NE"
+run_case = "R2B4_SE"
+# run_case = "R2B4_SS"
+# run_case = "R2B4_SW"
+# run_case = "R2B4_WW"
+# run_case = "R2B4_NW"
 
 if run_case == "R2B4":
     coarse = True
     params.U, params.V = 10.0, 0.0
-    
+
 elif run_case == "R2B5":
     coarse = False
     params.U, params.V = 10.0, 0.0
@@ -25,11 +31,34 @@ elif run_case == "R2B4_NN":
     coarse = True
     params.U, params.V = 0.0, 10.0
 
+elif run_case == "R2B4_NE":
+    coarse = True
+    params.U, params.V = np.sqrt(50.0), np.sqrt(50.0)
+
+elif run_case == "R2B4_SE":
+    coarse = True
+    params.U, params.V = np.sqrt(50.0), -np.sqrt(50.0)
+
+elif run_case == "R2B4_SS":
+    coarse = True
+    params.U, params.V = 0.0, -10.0
+
+elif run_case == "R2B4_SW":
+    coarse = True
+    params.U, params.V = -np.sqrt(50.0), -np.sqrt(50.0)
+
+elif run_case == "R2B4_WW":
+    coarse = True
+    params.U, params.V = -10.0, 0.0
+
+elif run_case == "R2B4_NW":
+    coarse = True
+    params.U, params.V = -np.sqrt(50.0), np.sqrt(50.0)
+
+
 else:
     assert False
 
-
-#np.sqrt(10.0), np.sqrt(10.0)
     
 
 if len(run_case) > 0:
