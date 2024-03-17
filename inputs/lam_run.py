@@ -10,10 +10,10 @@ run_case = "R2B4"
 run_case = "R2B4_NN"
 run_case = "R2B4_NE"
 run_case = "R2B4_SE"
-# run_case = "R2B4_SS"
-# run_case = "R2B4_SW"
-# run_case = "R2B4_WW"
-# run_case = "R2B4_NW"
+run_case = "R2B4_SS"
+run_case = "R2B4_SW"
+run_case = "R2B4_WW"
+run_case = "R2B4_NW"
 
 if run_case == "R2B4":
     coarse = True

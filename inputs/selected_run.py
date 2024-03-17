@@ -12,7 +12,7 @@ run_case = "ITER_REF"
 # LSFF FA run for DFFT vs LSFF comparison
 # run_case = "LSFF_FA"
 # effective flux contribution study
-# run_case = "FLUX_SDY"
+run_case = "FLUX_SDY"
 
 if run_case == "POT_BIAS":
     params.rect_set = np.sort([24,200])

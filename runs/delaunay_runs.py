@@ -2,7 +2,7 @@
 import sys
 import os
 # set system path to find local modules
-sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np
 
 from src import io, var, utils, physics, delaunay
@@ -23,8 +23,8 @@ def autoreload():
 autoreload()
 
 # %%
-from input.lam_run import params
-# from input.selected_run import params
+# from inputs.lam_run import params
+from inputs.selected_run import params
 # from params.debug_run import params
 from copy import deepcopy
 
