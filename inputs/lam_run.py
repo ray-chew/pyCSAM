@@ -1,3 +1,11 @@
+"""
+User input data for the run script :mod:`runs.delaunay_runs` for the studies:
+    * Coarse grid study over the Alaskan Rocky Mountains (``R2B4``)
+    * Fine grid study over the Alaskan Rocky Mountains (``R2B5``)
+    * Strong wind study over the coarse grid (``R2B4_STRW``)
+    * Wind direction studies
+"""
+
 import numpy as np
 from src import var
 

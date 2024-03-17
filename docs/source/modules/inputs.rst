@@ -10,8 +10,6 @@
 
    inputs.lam_run
    inputs.selected_run
-   inputs.selected_run_dfft
-   inputs.debug_run
    
 ..    :toctree:
 ..    :recursive:

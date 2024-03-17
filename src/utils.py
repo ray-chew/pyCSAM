@@ -555,15 +555,15 @@ def sliding_window_view(arr, window_shape, steps):
 
     Note
     -----
+    This function is taken from:
+    https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a
+
     In general, given::
 
         out = sliding_window_view(arr,
                                     window_shape=[Wx, (...), Wz],
                                     steps=[Sx, (...), Sz])
         out[ix, (...), iz] = arr[..., ix*Sx:ix*Sx+Wx,  (...), iz*Sz:iz*Sz+Wz]
-
-    This function is taken from:
-    https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a
 
     Example
     --------

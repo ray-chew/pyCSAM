@@ -1,7 +1,9 @@
-runs.delaunay_runs
-==================
+.. py:module:: runs.delaunay_runs
 
-Run script for the Delaunay triangulation experiments over the Alaskan Rocky Mountains.
+    runs.delaunay_runs
+    ==================
+
+    Run script for the Delaunay triangulation experiments over the Alaskan Rocky Mountains.
    
    
    

@@ -1,15 +1,31 @@
 Quickstart
 ==========
-    
+A quick and dirty guide to using the CSAM codebase.
+
 Requirements
 ^^^^^^^^^^^^
+To run the code, make sure the following packages are installed, preferably in a virtual environment.
+
 .. literalinclude:: ../../requirements.txt
+
+.. note::
+    The Sphinx dependencies can be found in ``docs/conf.py``.
 
 Overview
 ^^^^^^^^
+The CSAM codebase is structured modularly, see :numref:`structure` for a graphical overview.
+
+The package :mod:`wrappers` provides interfaces to the core code components in :mod:`src` and :mod:`vis`. For example, it defines the First and Second Approximation steps in the CSAM algorithm and applies the tapering of the physical data. Refer to the APIs for more details.
+
+Helper functions and data structures are provided for the processing of user-defined topographies (:mod:`src.var.topo`), grids (:mod:`src.var.grid`), and input parameters (:mod:`src.var.params`).
+
+These *building blocks* are the assembled for different kinds of experiments in the user-defined run scripts. Some examples can be found in the subpackage :mod:`runs`.
 
 .. graphviz::
     :align: center
+    :name: structure
+    :alt: CSAM program structure
+    :caption: CSAM program structure
 
     digraph {    
         graph [
@@ -172,10 +188,25 @@ Overview
         vis:n -> wrappers:e;
     }
 
+A first run
+^^^^^^^^^^^
 
+To reproduce the coarse grid study (*Coarse Delaunay triangulation (approximately R2B4)* in the manuscript):
 
-Example
-^^^^^^^
+1. Make the changes in the user-defined input file, :mod:`inputs.lam_run`. Specifically, enable the switch:
+
+.. code-block:: python
+
+    run_case = "R2B4"
+
+2. Execute the run script :mod:`runs.delaunay_runs`. Make sure to import the correct user-defined input file:
+
+.. code-block:: console
+
+    python3 ./runs/delaunay_runs.py
+
+Alternatively, the run script could be executed via ``ipython``.
+
 .. note::
 
-    to be completed
+    The development of the CSAM codebase frontend is currently ongoing. The current design approach of the program structure aims to simplify debugging and diagnostics using an ``ipython`` environment.
