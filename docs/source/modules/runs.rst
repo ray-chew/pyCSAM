@@ -14,6 +14,7 @@
    runs.idealised_delaunay
    runs.delaunay_runs
    runs.icon_usgs_test
+   runs.tapering_test
 .. .. autosummary::
 ..    :toctree:
    :recursive:
