@@ -21,7 +21,7 @@ This method is primarily used to represent terrain for weather forecasting purpo
 
 ----------
 
-Read the documentations here.
+Read the documentation here.
 
 ----------
 
@@ -70,3 +70,4 @@ Contributions
 Refer to the open issues that require attention.
 
 Any changes, improvements, or bug fixes can be submitted to upstream via a pull request.
+

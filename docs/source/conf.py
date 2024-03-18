@@ -22,7 +22,7 @@ copyright = '2024, Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achat
 author = 'Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achatz'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.90.1'
+release = 'v0.95.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,9 +31,10 @@ release = 'v0.90.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx_changelog',
+    'sphinx.ext.doctest',
     'sphinx.ext.graphviz'
 ]
 
