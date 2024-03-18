@@ -20,7 +20,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install sphinx furo sphinx-changelog 
+          pip install sphinx furo graphviz sphinx-changelog 
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
