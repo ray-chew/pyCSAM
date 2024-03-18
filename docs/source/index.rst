@@ -11,6 +11,14 @@ CSAM's Home
    changelog
    refs
 
+.. toctree::
+   :hidden:
+   :caption: Links
+
+   GitHub repo <https://github.com/ray-chew/spec_appx>
+   
+
+
 This page documents the codebase for the Constrained Spectral Approximation Method (CSAM). CSAM is a physically sound and robust method for approximating the spectrum of subgrid-scale orography. It operates under the following constraints:
 
 * Utilises a limited number of spectral modes (no more than 100)
