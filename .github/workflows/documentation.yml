@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ConorMacBride/install-package@v1
         with:
-          apt: libgeos-dev
+          apt: libgeos-dev graphviz
       - uses: actions/setup-python@v3
         with:
           python-version: '3.10.5' 
@@ -20,7 +20,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip install sphinx furo graphviz sphinx-changelog 
+          pip install sphinx furo sphinx-changelog 
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
