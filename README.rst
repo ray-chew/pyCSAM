@@ -1,19 +1,21 @@
-CSAM's Readme
-=============
-
 .. image:: docs/source/_statc/logo.png
   :width: 400
   :alt: CSAM's logo
+  :align: center
 
-.. class:: center
+.. raw:: html
 
-    Constrained Spectral Approximation Method
+    <div style="text-align:center">
+        <h2>Constrained Spectral Approximation Method</h2>
+    </div>
 
 .. image:: https://img.shields.io/badge/License-AGPL_v3-blue.svg
     :target: https://www.gnu.org/licenses/agpl-3.0
+    :align: center
     
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
+    :align: center
 
 
 The Constrained Spectral Approximation Method (CSAM) is a physically sound and robust method for approximating the spectrum of subgrid-scale orography. It operates under the following constraints:
@@ -35,7 +37,7 @@ Read the documentation here.
 Requirements
 ------------
 
-.. literalinclude:: ../../requirements.txt
+See ``requirements.txt``
 
 .. note::
     The Sphinx dependencies can be found in ``docs/conf.py``.
@@ -53,12 +55,12 @@ Make a fork and clone your remote forked repository.
 Configuration
 ^^^^^^^^^^^^^
 
-The user-defined input parameters are in the :mod:`inputs` subpackage. These parameters are imported into the run scripts in :mod:`runs`. 
+The user-defined input parameters are in the ``inputs`` subpackage. These parameters are imported into the run scripts in ``runs``. 
 
 Usage
 ^^^^^
 
-A simple setup can be found in :mod:`runs.idealised_isosceles`. To execute this run script:
+A simple setup can be found in ``runs.idealised_isosceles``. To execute this run script:
 
 .. code-block:: console
 
