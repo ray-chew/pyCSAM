@@ -1,7 +1,8 @@
 # %%
 import sys
+
 # set system path to find local modules
-sys.path.append('..')
+sys.path.append("..")
 
 import numpy as np
 import pandas as pd
@@ -13,12 +14,12 @@ from vis import plotter, cart_plot
 
 # %%
 
-fn_grid = '../data/icon_compact.nc'
-fn_topo = '../data/topo_compact.nc'
-lat_extent = [52.,64.,64.]
-lon_extent = [-141.,-158.,-127.]
+fn_grid = "../data/icon_compact.nc"
+fn_topo = "../data/topo_compact.nc"
+lat_extent = [52.0, 64.0, 64.0]
+lon_extent = [-141.0, -158.0, -127.0]
 
-tri_set = [13,104,105,106]
+tri_set = [13, 104, 105, 106]
 
 # Setup the Fourier parameters and object.
 nhi = 24
@@ -46,7 +47,7 @@ topo = var.topo_cell()
 reader = io.ncdata()
 
 reader.read_dat(fn_grid, grid)
-grid.apply_f(utils.rad2deg) 
+grid.apply_f(utils.rad2deg)
 
 # read topography
 reader.read_dat(fn_topo, topo)
@@ -60,7 +61,7 @@ reader.read_topo(topo, topo, lon_verts, lat_verts)
 topo.gen_mgrids()
 
 # %%
-#-- get coordinates and convert radians to degrees
+# -- get coordinates and convert radians to degrees
 clon = grid.clon
 clat = grid.clat
 clon_vertices = grid.clon_vertices
@@ -68,20 +69,20 @@ clat_vertices = grid.clat_vertices
 
 ncells, nv = clon_vertices.shape[0], clon_vertices.shape[1]
 
-#-- print information to stdout
-print('Cells:            %6d ' % clon.size)
+# -- print information to stdout
+print("Cells:            %6d " % clon.size)
 
-#-- create the triangles
-clon_vertices = np.where(clon_vertices < -180., clon_vertices + 360., clon_vertices)
-clon_vertices = np.where(clon_vertices >  180., clon_vertices - 360., clon_vertices)
+# -- create the triangles
+clon_vertices = np.where(clon_vertices < -180.0, clon_vertices + 360.0, clon_vertices)
+clon_vertices = np.where(clon_vertices > 180.0, clon_vertices - 360.0, clon_vertices)
 
 triangles = np.zeros((ncells, nv, 2), np.float32)
 
 for i in range(0, ncells, 1):
-    triangles[i,:,0] = np.array(clon_vertices[i,:])
-    triangles[i,:,1] = np.array(clat_vertices[i,:])
+    triangles[i, :, 0] = np.array(clon_vertices[i, :])
+    triangles[i, :, 1] = np.array(clat_vertices[i, :])
 
-print('--> triangles done')
+print("--> triangles done")
 
 
 # %%
@@ -97,20 +98,22 @@ for tri_idx in tri_set:
     # initialise cell object
     cell = var.topo_cell()
 
-    simplex_lon = triangles[tri_idx,:,0]
-    simplex_lat = triangles[tri_idx,:,1]
+    simplex_lon = triangles[tri_idx, :, 0]
+    simplex_lat = triangles[tri_idx, :, 1]
 
     triangle = utils.triangle(simplex_lon, simplex_lat)
-    utils.get_lat_lon_segments(simplex_lat,simplex_lon, cell, topo, triangle, rect=rect)
+    utils.get_lat_lon_segments(
+        simplex_lat, simplex_lon, cell, topo, triangle, rect=rect
+    )
 
     topo_orig = np.copy(cell.topo)
-    
+
     if dfft_first_guess:
         nhi = len(cell.lon)
         nhj = len(cell.lat)
 
-    first_guess = interface.get_pmf(nhi,nhj,U,V)
-    fobj_tri = fourier.f_trans(nhi,nhj)
+    first_guess = interface.get_pmf(nhi, nhj, U, V)
+    fobj_tri = fourier.f_trans(nhi, nhj)
 
     #######################################################
     # do fourier...
@@ -139,17 +142,21 @@ for tri_idx in tri_set:
         max_val = fq_cpy[max_idx]
         fq_cpy[max_idx] = 0.0
 
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, triangle, rect=False)
+    utils.get_lat_lon_segments(
+        simplex_lat, simplex_lon, cell, topo, triangle, rect=False
+    )
 
     k_idxs = [pair[1] for pair in indices]
     l_idxs = [pair[0] for pair in indices]
 
-    second_guess = interface.get_pmf(nhi,nhj,U,V)
+    second_guess = interface.get_pmf(nhi, nhj, U, V)
 
     if dfft_first_guess:
-        second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+        second_guess.fobj.set_kls(
+            k_idxs, l_idxs, recompute_nhij=True, components="real"
+        )
     else:
-        second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+        second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij=False)
 
     freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True)
 
@@ -158,25 +165,47 @@ for tri_idx in tri_set:
     cell.uw = uw
 
     if plot:
-        fs = (15,9.0)
+        fs = (15, 9.0)
         v_extent = [dat_2D_sg0.min(), dat_2D_sg0.max()]
 
-        fig, axs = plt.subplots(2,2, figsize=fs)
+        fig, axs = plt.subplots(2, 2, figsize=fs)
 
-        fig_obj = plotter.fig_obj(fig, second_guess.fobj.nhar_i, second_guess.fobj.nhar_j)
-        axs[0,0] = fig_obj.phys_panel(axs[0,0], dat_2D_sg0, title='T%i: Reconstruction' %tri_idx, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+        fig_obj = plotter.fig_obj(
+            fig, second_guess.fobj.nhar_i, second_guess.fobj.nhar_j
+        )
+        axs[0, 0] = fig_obj.phys_panel(
+            axs[0, 0],
+            dat_2D_sg0,
+            title="T%i: Reconstruction" % tri_idx,
+            xlabel="longitude [km]",
+            ylabel="latitude [km]",
+            extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()],
+            v_extent=v_extent,
+        )
 
-        axs[0,1] = fig_obj.phys_panel(axs[0,1], cell.topo * cell.mask, title='T%i: Reconstruction' %tri_idx, xlabel='longitude [km]', ylabel='latitude [km]', extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+        axs[0, 1] = fig_obj.phys_panel(
+            axs[0, 1],
+            cell.topo * cell.mask,
+            title="T%i: Reconstruction" % tri_idx,
+            xlabel="longitude [km]",
+            ylabel="latitude [km]",
+            extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()],
+            v_extent=v_extent,
+        )
 
         if dfft_first_guess:
-            axs[1,0] = fig_obj.fft_freq_panel(axs[1,0], freqs, kls[0], kls[1], typ='real')
-            axs[1,1] = fig_obj.fft_freq_panel(axs[1,1], uw, kls[0], kls[1], title="PMF spectrum", typ='real')
+            axs[1, 0] = fig_obj.fft_freq_panel(
+                axs[1, 0], freqs, kls[0], kls[1], typ="real"
+            )
+            axs[1, 1] = fig_obj.fft_freq_panel(
+                axs[1, 1], uw, kls[0], kls[1], title="PMF spectrum", typ="real"
+            )
         else:
-            axs[1,0] = fig_obj.freq_panel(axs[1,0], freqs)
-            axs[1,1] = fig_obj.freq_panel(axs[1,1], uw, title="PMF spectrum")
+            axs[1, 0] = fig_obj.freq_panel(axs[1, 0], freqs)
+            axs[1, 1] = fig_obj.freq_panel(axs[1, 1], uw, title="PMF spectrum")
 
         plt.tight_layout()
-        plt.savefig('../output/T%i.pdf' %tri_idx)
+        plt.savefig("../output/T%i.pdf" % tri_idx)
         plt.show()
 
         ideal = physics.ideal_pmf(U=U, V=V)

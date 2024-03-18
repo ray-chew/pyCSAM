@@ -6,6 +6,7 @@ import numpy as np
 import scipy.linalg as la
 from scipy.sparse.linalg import gmres
 
+
 def get_coeffs(fobj):
     """Assembles the Fourier coefficients from the sine and cosine terms generated in the :class:`Fourier transformer class <src.fourier.f_trans>`.
 
@@ -22,19 +23,18 @@ def get_coeffs(fobj):
     Ncos = fobj.bf_cos
     Nsin = fobj.bf_sin
 
-    coeff = np.hstack([Ncos,Nsin])
+    coeff = np.hstack([Ncos, Nsin])
 
     del fobj.bf_cos
     del fobj.bf_sin
 
-    if fobj.grad: coeff = np.vstack([coeff,coeff])
+    if fobj.grad:
+        coeff = np.vstack([coeff, coeff])
 
     return coeff
 
 
-def do(fobj, cell, lmbda = 0.0, 
-       iter_solve = True,
-       save_coeffs = False):
+def do(fobj, cell, lmbda=0.0, iter_solve=True, save_coeffs=False):
     """
     Does the linear regression
 
@@ -66,7 +66,7 @@ def do(fobj, cell, lmbda = 0.0,
 
     coeff = get_coeffs(fobj)
 
-    if save_coeffs: 
+    if save_coeffs:
         fobj.coeff = coeff
         return None, None
 
@@ -74,14 +74,14 @@ def do(fobj, cell, lmbda = 0.0,
 
     # E_tilda_lm = np.zeros((tot_coeff,tot_coeff))
 
-    h_tilda_l = np.dot(coeff.T, data.reshape(-1,1)).flatten()
+    h_tilda_l = np.dot(coeff.T, data.reshape(-1, 1)).flatten()
 
     E_tilda_lm = np.dot(coeff.T, coeff)
 
     trace = np.trace(E_tilda_lm) / len(np.diag(E_tilda_lm)) * lmbda
     szc = E_tilda_lm.shape[0]
     for ttr in range(szc):
-        E_tilda_lm[ttr,ttr] += trace 
+        E_tilda_lm[ttr, ttr] += trace
 
     if iter_solve:
         a_m, _ = gmres(E_tilda_lm, h_tilda_l)
@@ -91,7 +91,7 @@ def do(fobj, cell, lmbda = 0.0,
     # regular FFT considers normalization by total nu  mber of datapoints N=100
     # so multiply the Fourier coefficients by N here
     # a_m = a_m#*len(data)
-        
+
     data_recons = coeff.dot(a_m)
 
     return a_m, data_recons

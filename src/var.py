@@ -5,10 +5,12 @@ This module defines the data objects used in the program.
 import numpy as np
 from src import utils, io
 
+
 class grid(object):
     """
     Grid class
     """
+
     def __init__(self):
         """
         Contains the ``(lat,lon)`` of each triangular grid cell with the corresponding vertices ``(lat_1, lat_2, lat_3)``, ``(lon_1, lon_2, lon_3)``.
@@ -30,7 +32,7 @@ class grid(object):
         f : ``function``
             arbitrary function to be applied to class attributes, e.g. a radians-degrees converter.
         """
-        self.non_convertibles = ['non_convertibles', 'links']
+        self.non_convertibles = ["non_convertibles", "links"]
         for key, value in vars(self).items():
             if key in self.non_convertibles:
                 pass
@@ -38,11 +40,11 @@ class grid(object):
                 setattr(self, key, f(value))
 
 
-
 class topo(object):
     """
     Topography class with its corresponding lat-lon values
     """
+
     def __init__(self):
         self.lon = None
         self.lat = None
@@ -54,9 +56,9 @@ class topo_cell(topo):
     """
     Inherits and initialises an instance of :class:`src.var.topo`, to be used for storing data associated to a grid cell
     """
+
     def __init__(self):
         super().__init__()
-
 
     def gen_mgrids(self, grad=False):
         """
@@ -76,7 +78,6 @@ class topo_cell(topo):
             self.grad_lat_lon_grid, self.grad_lat_lat_grid = np.meshgrid(lon, grad_lat)
             self.grad_lon_lon_grid, self.grad_lon_lat_grid = np.meshgrid(grad_lon, lat)
 
-    
     def __get_lat_lon_points(self, grad=False):
         """
         Private method to get the (lat,lon) coordinate for each topographic data point
@@ -86,14 +87,13 @@ class topo_cell(topo):
         else:
             lat_grid, lon_grid = self.grad_lat_grid, self.grad_lon_grid
 
-        lat_grid_tmp = np.expand_dims(np.copy(lat_grid),-1)
-        lon_grid_tmp = np.expand_dims(np.copy(lon_grid),-1)
+        lat_grid_tmp = np.expand_dims(np.copy(lat_grid), -1)
+        lon_grid_tmp = np.expand_dims(np.copy(lon_grid), -1)
 
         lat_grid_tmp = utils.rescale(lat_grid_tmp)
         lon_grid_tmp = utils.rescale(lon_grid_tmp)
 
-        return np.stack((lon_grid_tmp, lat_grid_tmp), axis=2).reshape(-1,2)
-
+        return np.stack((lon_grid_tmp, lat_grid_tmp), axis=2).reshape(-1, 2)
 
     def __get_mask(self, triangle):
         """
@@ -107,10 +107,13 @@ class topo_cell(topo):
         lat_lon_points = self.__get_lat_lon_points()
         init_poly = triangle.vec_get_mask
 
-        self.mask = np.array([init_poly(elem) for elem in lat_lon_points]).reshape(self.lat.size, self.lon.size).astype('bool_')
+        self.mask = (
+            np.array([init_poly(elem) for elem in lat_lon_points])
+            .reshape(self.lat.size, self.lon.size)
+            .astype("bool_")
+        )
 
-
-    def get_masked(self, triangle = None, mask = None):
+    def get_masked(self, triangle=None, mask=None):
         """Gets the masked attributes
 
         Parameters
@@ -123,15 +126,14 @@ class topo_cell(topo):
 
         if (triangle is not None) and (mask is None):
             self.__get_mask(triangle)
-        elif (mask is not None):
+        elif mask is not None:
             self.mask = mask
 
         self.lon_m = self.lon_grid[self.mask]
         self.lat_m = self.lat_grid[self.mask]
         self.topo_m = self.topo[self.mask]
-        
-        self.topo_m -= self.topo_m.mean()
 
+        self.topo_m -= self.topo_m.mean()
 
     def get_grad_topo(self, triangle):
         """
@@ -146,20 +148,23 @@ class topo_cell(topo):
 
         self.gen_mgrids(grad=True)
 
-        dlat = np.diff(self.lat).reshape(1,-1)
-        dlon = np.diff(self.lon).reshape(-1,1)
+        dlat = np.diff(self.lat).reshape(1, -1)
+        dlon = np.diff(self.lon).reshape(-1, 1)
 
-        grad_lon_topo = (self.topo[1:,:] - self.topo[:-1,:]) / dlon
-        grad_lat_topo = (self.topo[:,1:] - self.topo[:,:-1]) / dlat
+        grad_lon_topo = (self.topo[1:, :] - self.topo[:-1, :]) / dlon
+        grad_lat_topo = (self.topo[:, 1:] - self.topo[:, :-1]) / dlat
 
         lat_lon_points = self.__get_lat_lon_points(grad=True)
         init_poly = triangle.vec_get_mask
 
-        self.grad_mask = np.array([init_poly(elem) for elem in lat_lon_points]).reshape(self.topo.shape).astype('bool_')
+        self.grad_mask = (
+            np.array([init_poly(elem) for elem in lat_lon_points])
+            .reshape(self.topo.shape)
+            .astype("bool_")
+        )
 
         grad_lon_topo = grad_lon_topo[self.grad_mask]
         grad_lat_topo = grad_lat_topo[self.grad_mask]
-
 
         self.grad_lon_m = self.grad_lon_grid[self.grad_mask]
         self.grad_lat_m = self.grad_lat_grid[self.grad_mask]
@@ -171,6 +176,7 @@ class analysis(object):
     Analysis object, contains all the attributes required to compute the idealised pseudo-momentum fluxes
 
     """
+
     def __init__(self):
         """
         Initialises empty attributes
@@ -193,7 +199,7 @@ class analysis(object):
         fobj : :class:`src.fourier.f_trans`
             instance of the Fourier transformer
         freqs : array-like
-            2D (abs. valued real) spectrum 
+            2D (abs. valued real) spectrum
         """
         self.wlat = np.copy(fobj.wlat)
         self.wlon = np.copy(fobj.wlon)
@@ -220,7 +226,7 @@ class analysis(object):
 
         #             if int(kk) == 0 and int(ll) == 0:
         #                 idx = cnt
-                    
+
         #             cnt += 1
 
         #     pts = np.array(pts)
@@ -234,14 +240,13 @@ class analysis(object):
 
         self.kks, self.lls = np.meshgrid(self.kks, self.lls)
 
-
         # self.kks = self.kks / self.kks.size
         # self.lls = self.lls / self.lls.size
 
-#         self.clat = ma.getdata(df.variables['clat'][:])
-# clat_vertices = ma.getdata(df.variables['clat_vertices'][:])
-# clon = ma.getdata(df.variables['clon'][:])
-# clon_vertices = ma.getdata(df.variables['clon_vertices'][:])
+    #         self.clat = ma.getdata(df.variables['clat'][:])
+    # clat_vertices = ma.getdata(df.variables['clat_vertices'][:])
+    # clon = ma.getdata(df.variables['clon'][:])
+    # clon_vertices = ma.getdata(df.variables['clon_vertices'][:])
 
     def grid_kk_ll(self, fobj, dat):
         """
@@ -263,13 +268,12 @@ class analysis(object):
                     freq_grid[l_idx, k_idx] = dat[cnt]
                     cnt += 1
 
-
         return freq_grid
-    
+
 
 class obj(object):
-    """Helper object to generate class instances on the fly
-    """
+    """Helper object to generate class instances on the fly"""
+
     def __init__(self):
         pass
 
@@ -283,21 +287,22 @@ class params(obj):
 
     Defines required and optional parameters to run a simulation
     """
+
     def __init__(self):
         """
         Defines the required parameters for a simulation run
         """
         # Define filenames
         self.run_case = ""
-        self.path = '../data/'
-        self.fn_grid = self.path + 'icon_compact.nc'
-        self.fn_topo = self.path + 'topo_compact.nc'
+        self.path = "../data/"
+        self.fn_grid = self.path + "icon_compact.nc"
+        self.fn_topo = self.path + "topo_compact.nc"
 
         self.output_fn = None
 
         self.enable_merit = True
         self.merit_cg = 10
-        self.merit_path = '/home/ray/Documents/orog_data/MERIT/'
+        self.merit_path = "/home/ray/Documents/orog_data/MERIT/"
 
         # Domain size
         self.lat_extent = None
@@ -324,22 +329,22 @@ class params(obj):
         self.dfft_first_guess = False
         self.refine = False
         self.no_corrections = True
-        self.cg_spsp = False # coarse grain the spectral space?
-        self.rect = False if self.cg_spsp else True 
+        self.cg_spsp = False  # coarse grain the spectral space?
+        self.rect = False if self.cg_spsp else True
 
         self.fa_iter_solve = True
         self.sa_iter_solve = True
 
         # Penalty terms
-        self.lmbda_fa = 1e-2 # first guess
-        self.lmbda_sa = 1e-1 # second step
+        self.lmbda_fa = 1e-2  # first guess
+        self.lmbda_sa = 1e-1  # second step
 
         # Tapering parameters
-        self.taper_ref       = False
-        self.taper_fa        = False
-        self.taper_sa        = False
-        self.taper_art_it    = 50
-        self.padding = 0 # must be less than 60
+        self.taper_ref = False
+        self.taper_fa = False
+        self.taper_sa = False
+        self.taper_art_it = 50
+        self.padding = 0  # must be less than 60
 
         # Flags
         self.get_delaunay_triangulation = False
@@ -348,7 +353,6 @@ class params(obj):
         self.debug_writer = True
         self.verbose = False
         self.plot = False
-
 
     def self_test(self):
         """
@@ -370,37 +374,28 @@ class params(obj):
         return True
 
     def check_init(self):
-        """Checks if all required parameters are defined.
-        """
-        compulsory_params = [
-                             'lat_extent',
-                             'lon_extent'
-                             ]
-        
+        """Checks if all required parameters are defined."""
+        compulsory_params = ["lat_extent", "lon_extent"]
+
         offenders = self.checker(self, compulsory_params)
-        assert len(offenders) == 0, "Compulsory run parameter(s) undefined: %s" %offenders
+        assert len(offenders) == 0, (
+            "Compulsory run parameter(s) undefined: %s" % offenders
+        )
 
     def check_delaunay(self):
         """
         If run uses a Delaunay triangulation, this method checks if all required parameters are defined.
         """
-        compulsory_params = [
-                             'delaunay_xnp',
-                             'delaunay_ynp',
-                             'rect_set',
-                             'lxkm',
-                             'lykm'
-                             ]
+        compulsory_params = ["delaunay_xnp", "delaunay_ynp", "rect_set", "lxkm", "lykm"]
 
         offenders = self.checker(self, compulsory_params)
-        assert len(offenders) == 0, "Compulsory Delaunay run parameter(s) undefined: %s" %offenders
-
+        assert len(offenders) == 0, (
+            "Compulsory Delaunay run parameter(s) undefined: %s" % offenders
+        )
 
     @staticmethod
     def checker(arg, compulsory_params):
-        """Auxiliary function that checks if ``arg`` is in ``compulsory_params``
-
-        """
+        """Auxiliary function that checks if ``arg`` is in ``compulsory_params``"""
         offenders = []
         for key, value in vars(arg).items():
             if key in compulsory_params:

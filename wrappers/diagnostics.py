@@ -9,10 +9,10 @@ from copy import deepcopy
 
 import matplotlib.pyplot as plt
 
-class delaunay_metrics(object):
-    """Helper class for evaluation of the CSAM on a Delaunay triangulated domain.
 
-    """
+class delaunay_metrics(object):
+    """Helper class for evaluation of the CSAM on a Delaunay triangulated domain."""
+
     def __init__(self, params, tri, writer=None):
         """
 
@@ -31,8 +31,8 @@ class delaunay_metrics(object):
         self.pmf_diff = []
         self.pmf_refs = []
         self.pmf_sums = []
-        self.pmf_fas  = []
-        self.pmf_ssums= []
+        self.pmf_fas = []
+        self.pmf_ssums = []
         self.idx_name = []
 
         self.writer = writer
@@ -56,7 +56,6 @@ class delaunay_metrics(object):
         self.pmf_refs.append(self.uw_ref)
         self.pmf_fas.append(self.uw_fa)
 
-
     def get_rel_err(self, triangle_pair):
         """Method to get the relative error explicitly before :func:`wrappers.diagnostics.delaunay_metrics.end` is called.
 
@@ -75,7 +74,6 @@ class delaunay_metrics(object):
 
         return self.rel_err
 
-
     def update_pair(self, triangle_pair, store_error=True):
         """Update metric computation instance with the data from the newly computed triangle pair
 
@@ -87,7 +85,7 @@ class delaunay_metrics(object):
             keep a list of the errors for each triangle pair, by default True. Otherwise, the errors are discarded and only the average error is stored.
         """
         for triangle in triangle_pair:
-            assert hasattr(triangle, 'analysis'), "triangle has no analysis object."
+            assert hasattr(triangle, "analysis"), "triangle has no analysis object."
 
         self.t0 = triangle_pair[0]
         self.t1 = triangle_pair[1]
@@ -99,20 +97,17 @@ class delaunay_metrics(object):
             self.pmf_sums.append(self.uw_sum)
             self.pmf_ssums.append(self.uw_spec_sum)
 
-
     def __get_pmf_sum(self):
         self.uw_0 = self.t0.uw.sum()
         self.uw_1 = self.t1.uw.sum()
 
         return self.uw_0 + self.uw_1
-        
 
     def __get_pmf_spec_sum(self):
-        """Compute the idealised pseudo-momentum fluxes from the sum of the spectra
-        """
+        """Compute the idealised pseudo-momentum fluxes from the sum of the spectra"""
         self.ampls_0 = self.t0.analysis.ampls
         self.ampls_1 = self.t1.analysis.ampls
-        self.ampls_sum = (self.ampls_0 + self.ampls_1)
+        self.ampls_sum = self.ampls_0 + self.ampls_1
 
         # consider replacing deepcopy with copy method.
         analysis_sum = deepcopy(self.t0.analysis)
@@ -122,25 +117,21 @@ class delaunay_metrics(object):
 
         return 0.5 * ideal.compute_uw_pmf(analysis_sum)
 
-
     def __repr__(self):
-        """Redefines what printing the class instance does
-        """
+        """Redefines what printing the class instance does"""
 
         errs = [self.uw_ref, self.uw_fa, self.uw_sum, self.uw_spec_sum]
-        errs = ["%.3f" %err for err in errs]
+        errs = ["%.3f" % err for err in errs]
 
-        uw_lbls = 'uw_0 | uw_1 : '
-        uw_strs = "%.3f" %self.uw_0 + ', ' +  "%.3f" %self.uw_1
-        err_lbls = 'uw_ref | uw_fa | uw_sum | uw_spec_sum:'
-        err_strs = ', '.join(errs)
+        uw_lbls = "uw_0 | uw_1 : "
+        uw_strs = "%.3f" % self.uw_0 + ", " + "%.3f" % self.uw_1
+        err_lbls = "uw_ref | uw_fa | uw_sum | uw_spec_sum:"
+        err_strs = ", ".join(errs)
 
+        return uw_lbls + "\n" + uw_strs + "\n" + err_lbls + "\n" + err_strs + "\n"
 
-        return uw_lbls + '\n' + uw_strs + '\n' + err_lbls + '\n' + err_strs + '\n'
-    
     def __str__(self):
         return repr(self)
-    
 
     def end(self, verbose=False):
         """Ends the metric computation
@@ -158,48 +149,48 @@ class delaunay_metrics(object):
 
         if verbose:
             print("avg. max err | avg. rel err:")
-            print("%.3f | %.3f" %(np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean()))
-
+            print(
+                "%.3f | %.3f"
+                % (np.abs(self.max_errs).mean(), np.abs(self.rel_errs).mean())
+            )
 
     def __write(self):
-        """Writes a HDF5 output if a writer class is provided in the initialisation of the class instance
-        """
+        """Writes a HDF5 output if a writer class is provided in the initialisation of the class instance"""
         assert self.writer is not None
 
-        self.writer.populate('decomposition', 'pmf_refs', self.pmf_refs)
-        self.writer.populate('decomposition', 'pmf_fas', self.pmf_fas)
-        self.writer.populate('decomposition', 'pmf_sums', self.pmf_sums)
-        self.writer.populate('decomposition', 'pmf_ssums', self.pmf_ssums)
+        self.writer.populate("decomposition", "pmf_refs", self.pmf_refs)
+        self.writer.populate("decomposition", "pmf_fas", self.pmf_fas)
+        self.writer.populate("decomposition", "pmf_sums", self.pmf_sums)
+        self.writer.populate("decomposition", "pmf_ssums", self.pmf_ssums)
 
-        self.writer.populate('decomposition', 'max_errs', self.max_errs)
-        self.writer.populate('decomposition', 'ref_errs', self.rel_errs)
+        self.writer.populate("decomposition", "max_errs", self.max_errs)
+        self.writer.populate("decomposition", "ref_errs", self.rel_errs)
 
     def __gen_percentage_errs(self):
-        """Computes the relative and maximum errors in percentage
-        """
+        """Computes the relative and maximum errors in percentage"""
         max_idx = np.argmax(np.abs(self.pmf_refs))
-        self.max_errs = self.__get_max_diff(self.pmf_sums, self.pmf_refs, np.array(self.pmf_refs[max_idx]))
+        self.max_errs = self.__get_max_diff(
+            self.pmf_sums, self.pmf_refs, np.array(self.pmf_refs[max_idx])
+        )
         self.rel_errs = self.__get_rel_diff(self.pmf_sums, self.pmf_refs)
 
         self.max_errs = np.array(self.max_errs) * 100
         self.rel_errs = np.array(self.rel_errs) * 100
 
     def __gen_regional_errs(self):
-        """Computes the relative and maximum errors distributed over the Delaunay triangulation region
-        """
-        assert hasattr(self, 'max_errs')
-        assert hasattr(self, 'rel_errs')
+        """Computes the relative and maximum errors distributed over the Delaunay triangulation region"""
+        assert hasattr(self, "max_errs")
+        assert hasattr(self, "rel_errs")
 
         self.reg_max_errs = self.__get_regional_errs(self.tri, self.max_errs)
         self.reg_rel_errs = self.__get_regional_errs(self.tri, self.rel_errs)
 
     def __get_regional_errs(self, tri, err):
-        """Assigns the (relative or maximum) errors to the corresponding grid cells
-        """
+        """Assigns the (relative or maximum) errors to the corresponding grid cells"""
         errors = np.zeros((len(tri.simplices)))
         errors[:] = np.nan
         errors[self.params.rect_set] = err
-        errors[np.array(self.params.rect_set)+1] = err
+        errors[np.array(self.params.rect_set) + 1] = err
 
         return errors
 
@@ -216,11 +207,11 @@ class delaunay_metrics(object):
         ref = np.array(ref)
 
         return (arr - ref) / max
-    
+
 
 class diag_plotter(object):
-    """Helper class to plot CSAM-computed data 
-    """
+    """Helper class to plot CSAM-computed data"""
+
     def __init__(self, params, nhi, nhj):
         """
 
@@ -239,7 +230,19 @@ class diag_plotter(object):
 
         self.output_dir = "../manuscript/"
 
-    def show(self, rect_idx, sols, kls=None, v_extent=None, dfft_plot=False, output_fig=True, fs = (14.0,4.0), ir_args=None, fn=None, phys_lbls=None):
+    def show(
+        self,
+        rect_idx,
+        sols,
+        kls=None,
+        v_extent=None,
+        dfft_plot=False,
+        output_fig=True,
+        fs=(14.0, 4.0),
+        ir_args=None,
+        fn=None,
+        phys_lbls=None,
+    ):
         """Plots the data
 
         Parameters
@@ -247,10 +250,10 @@ class diag_plotter(object):
         rect_idx : int
             index of the quadrilateral grid cell
         sols : tuple
-            contains the data for plotting: 
-               | (:class:`src.var.topo_cell` instance, 
-               | computed CSAM spectrum, 
-               | computed idealised pseudo-momentum fluxes, 
+            contains the data for plotting:
+               | (:class:`src.var.topo_cell` instance,
+               | computed CSAM spectrum,
+               | computed idealised pseudo-momentum fluxes,
                | the reconstructed physical data)
 
             ``sols`` is the tuple returned by :func:`wrappers.interface.first_appx.do` and :func:`wrappers.interface.second_appx.do`
@@ -265,13 +268,13 @@ class diag_plotter(object):
         fs : tuple, optional
             figure size, by default (14.0,4.0)
         ir_args : list, optional
-            additional user-defined arguments: 
+            additional user-defined arguments:
                | [title of the physical reconstruction panel,
                | title of the power spectrum panel,
                | title of the idealised pseudo-momentum flux panel,
                | vertical extent of the power spectrum,
                | vertical extent of the idealised pseudo-momentum flux spectrum]
-            
+
             By default None
         fn : str, optional
             output filename, by default None
@@ -285,53 +288,68 @@ class diag_plotter(object):
             v_extent = [dat_2D.min(), dat_2D.max()]
 
         if ir_args is None:
-            if type(rect_idx) is int: 
-                idxs_tag = "Cell %i" %rect_idx
+            if type(rect_idx) is int:
+                idxs_tag = "Cell %i" % rect_idx
                 tag = "CSAM"
-                fn = "plots_CSAM_%i" %rect_idx
+                fn = "plots_CSAM_%i" % rect_idx
             elif len(rect_idx) == 2:
-                idxs_tag = "(%i,%i)" %(rect_idx[0],rect_idx[1])
+                idxs_tag = "(%i,%i)" % (rect_idx[0], rect_idx[1])
                 tag = "FFT" if dfft_plot else "FA LSFF"
-                fn = "plots_%s_%i_%i" %(tag.replace(" ","_"), rect_idx[0], rect_idx[1])
+                fn = "plots_%s_%i_%i" % (
+                    tag.replace(" ", "_"),
+                    rect_idx[0],
+                    rect_idx[1],
+                )
             else:
                 idxs_tag = ""
                 tag = ""
-                fn = "plots_%s" %str(rect_idx)
+                fn = "plots_%s" % str(rect_idx)
 
-            t1 = '%s: %s reconstruction' %(idxs_tag,tag)
+            t1 = "%s: %s reconstruction" % (idxs_tag, tag)
             if dfft_plot:
                 t2 = "ref. power spectrum"
                 t3 = "ref. PMF spectrum"
             else:
                 t2 = "approx. power spectrum"
                 t3 = "approx. PMF spectrum"
-            
+
             freq_vext, pmf_vext = None, None
         else:
             t1, t2, t3, freq_vext, pmf_vext = ir_args
-            fn = "%s_%i_%i" %(fn, rect_idx[0], rect_idx[1])
-
+            fn = "%s_%i_%i" % (fn, rect_idx[0], rect_idx[1])
 
         if phys_lbls is None:
-            phys_xlbl = 'longitude [km]'
-            phys_ylbl = 'latitude [km]'
+            phys_xlbl = "longitude [km]"
+            phys_ylbl = "latitude [km]"
         else:
             phys_xlbl, phys_ylbl = phys_lbls[0], phys_lbls[1]
 
         if self.params.plot:
-            fig, axs = plt.subplots(1,3, figsize=fs, subplot_kw=dict(box_aspect=1))
+            fig, axs = plt.subplots(1, 3, figsize=fs, subplot_kw=dict(box_aspect=1))
             fig_obj = plotter.fig_obj(fig, self.nhi, self.nhj)
-            axs[0] = fig_obj.phys_panel(axs[0], dat_2D, title=t1, xlabel=phys_xlbl, ylabel=phys_ylbl, extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()], v_extent=v_extent)
+            axs[0] = fig_obj.phys_panel(
+                axs[0],
+                dat_2D,
+                title=t1,
+                xlabel=phys_xlbl,
+                ylabel=phys_ylbl,
+                extent=[cell.lon.min(), cell.lon.max(), cell.lat.min(), cell.lat.max()],
+                v_extent=v_extent,
+            )
 
             if dfft_plot:
-                axs[1] = fig_obj.fft_freq_panel(axs[1], ampls, kls[0], kls[1], typ='real', title=t2)
-                axs[2] = fig_obj.fft_freq_panel(axs[2], uw, kls[0], kls[1], title=t3, typ='real')
+                axs[1] = fig_obj.fft_freq_panel(
+                    axs[1], ampls, kls[0], kls[1], typ="real", title=t2
+                )
+                axs[2] = fig_obj.fft_freq_panel(
+                    axs[2], uw, kls[0], kls[1], title=t3, typ="real"
+                )
             else:
                 axs[1] = fig_obj.freq_panel(axs[1], ampls, title=t2, v_extent=freq_vext)
                 axs[2] = fig_obj.freq_panel(axs[2], uw, title=t3, v_extent=pmf_vext)
 
             plt.tight_layout()
             if output_fig:
-                plt.savefig(self.output_dir + fn + '.pdf', dpi=200, bbox_inches="tight")
+                plt.savefig(self.output_dir + fn + ".pdf", dpi=200, bbox_inches="tight")
 
             plt.show()

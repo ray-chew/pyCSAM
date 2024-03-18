@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class ideal_pmf(object):
     """
     Helper class to compute the idealised pseudo-momentum fluxes under one setting.
@@ -11,14 +12,14 @@ class ideal_pmf(object):
 
         Parameters
         ----------
-        \*\*kwargs : any  
+        \*\*kwargs : any
             user-defined values to replace default background wind (``U``, ``V``), Earth's radius (``AE``), and Brunt-Väisälä frequency (``N``)
 
         """
-        self.N = 0.02       # reference brunt-väisälä frequnecy [s^{-1}]
-        self.U = -10.0      # reference horizontal wind [m s^{-1}]
-        self.V = 2.0        # reference vertical wind [m s^{-1}]
-        self.AE = 6371.0008 * 1E3 # Earth's radius in [m]
+        self.N = 0.02  # reference brunt-väisälä frequnecy [s^{-1}]
+        self.U = -10.0  # reference horizontal wind [m s^{-1}]
+        self.V = 2.0  # reference vertical wind [m s^{-1}]
+        self.AE = 6371.0008 * 1e3  # Earth's radius in [m]
 
         # If keyword arguments are specified, we use those values...
         for key, value in kwarg.items():
@@ -57,8 +58,8 @@ class ideal_pmf(object):
         #     ampls = analysis.ampls
         ampls = np.copy(analysis.ampls)
 
-        wla = wlat #* self.AE
-        wlo = wlon #* self.AE
+        wla = wlat  # * self.AE
+        wlo = wlon  # * self.AE
 
         kks = kks / wlo
         lls = lls / wla
@@ -72,21 +73,23 @@ class ideal_pmf(object):
         mms = np.sqrt(mms)
 
         # wave-action density
-        Ag = - 0.5 * ((ampls)**2 * N**2 / om )
+        Ag = -0.5 * ((ampls) ** 2 * N**2 / om)
         Ag[np.isinf(Ag)] = 0.0
         Ag[np.isnan(Ag)] = 0.0
 
         # group velocity in z-direction
-        cgz = self.N * (kks**2 + lls**2)**0.5 * mms / (kks**2 + lls**2 + mms**2)**(3/2)
+        cgz = (
+            self.N
+            * (kks**2 + lls**2) ** 0.5
+            * mms
+            / (kks**2 + lls**2 + mms**2) ** (3 / 2)
+        )
 
         cgz[np.isnan(cgz)] = 0.0
 
-        uw_pmf = (Ag * kks * cgz)
+        uw_pmf = Ag * kks * cgz
 
         if summed:
             return uw_pmf.sum()
         else:
             return uw_pmf
-        
-
-        

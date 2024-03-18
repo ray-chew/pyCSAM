@@ -67,23 +67,22 @@ elif run_case == "R2B4_NW":
 else:
     assert False
 
-    
 
 if len(run_case) > 0:
-    suffix_tag = '_' + run_case
+    suffix_tag = "_" + run_case
 
 dfft_fa = False
-dfft_tag = 'dfft' if dfft_fa else 'lsff'
+dfft_tag = "dfft" if dfft_fa else "lsff"
 params.run_case = run_case
-params.fn_tag = 'lam_alaska%s_%s_fa' %(suffix_tag, dfft_tag)
+params.fn_tag = "lam_alaska%s_%s_fa" % (suffix_tag, dfft_tag)
 
 if dfft_fa:
     params.dfft_first_guess = True
 else:
     params.dfft_first_guess = False
 
-params.lat_extent = [48.,64.,64.]
-params.lon_extent = [-148.,-148.,-112.]
+params.lat_extent = [48.0, 64.0, 64.0]
+params.lon_extent = [-148.0, -148.0, -112.0]
 
 params.get_delaunay_triangulation = True
 
@@ -107,10 +106,10 @@ else:
     params.nhj = 32
     params.n_modes = 50
 
-params.rect_set = np.sort([0,1,2,3])
+params.rect_set = np.sort([0, 1, 2, 3])
 
-params.lmbda_fa = 1e-1 # first guess
-params.lmbda_sa = 1e-1 # second step
+params.lmbda_fa = 1e-1  # first guess
+params.lmbda_sa = 1e-1  # second step
 
 params.run_full_land_model = True
 

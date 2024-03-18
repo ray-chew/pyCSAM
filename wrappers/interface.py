@@ -8,11 +8,13 @@ from src import utils, var
 from copy import deepcopy
 import numpy as np
 
+
 class get_pmf(object):
     """A wrapper class for the constrained spectral approximation method
 
     This class is used in the idealised experiments
     """
+
     def __init__(self, nhi, nhj, U, V, debug=False):
         """
 
@@ -36,10 +38,7 @@ class get_pmf(object):
 
         self.debug = debug
 
-    def sappx(self, cell, 
-              lmbda = 0.1, 
-              scale = 1.0,
-              **kwargs):
+    def sappx(self, cell, lmbda=0.1, scale=1.0, **kwargs):
         """Method to perform the constraint spectral approximation method
 
         Parameters
@@ -51,41 +50,53 @@ class get_pmf(object):
         scale : float, optional
             scales the amplitudes for debugging purposes, by default 1.0
         """
-            #   summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
+        #   summed=False, updt_analysis=False, scale=1.0, refine=False, iter_solve=False):
         self.fobj.do_full(cell)
 
-        am, data_recons = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True), kwargs.get('save_coeffs', False))
+        am, data_recons = lin_reg.do(
+            self.fobj,
+            cell,
+            lmbda,
+            kwargs.get("iter_solve", True),
+            kwargs.get("save_coeffs", False),
+        )
 
-        if kwargs.get('save_am', False): self.fobj.a_m = am
-
+        if kwargs.get("save_am", False):
+            self.fobj.a_m = am
 
         self.fobj.get_freq_grid(am)
         freqs = scale * np.abs(self.fobj.ampls)
 
-        if kwargs.get('refine', False):
+        if kwargs.get("refine", False):
             cell.topo_m -= data_recons
-            am, data_recons = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True))
+            am, data_recons = lin_reg.do(
+                self.fobj, cell, lmbda, kwargs.get("iter_solve", True)
+            )
 
             self.fobj.get_freq_grid(am)
             freqs += scale * np.abs(self.fobj.ampls)
 
-        if self.debug: print("data_recons: ", data_recons.min(), data_recons.max())
+        if self.debug:
+            print("data_recons: ", data_recons.min(), data_recons.max())
 
         dat_2D = reconstruction.recon_2D(data_recons, cell)
 
-        if self.debug: print("dat_2D: ", dat_2D.min(), dat_2D.max())
-        
+        if self.debug:
+            print("dat_2D: ", dat_2D.min(), dat_2D.max())
+
         analysis = var.analysis()
         analysis.get_attrs(self.fobj, freqs)
         analysis.recon = dat_2D
 
-        if kwargs.get('updt_analysis'): cell.analysis = analysis
+        if kwargs.get("updt_analysis"):
+            cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
-        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=kwargs.get('summed', False))
+        uw_pmf_freqs = ideal.compute_uw_pmf(
+            analysis, summed=kwargs.get("summed", False)
+        )
 
         return freqs, uw_pmf_freqs, dat_2D
-
 
     def dfft(self, cell, summed=False, updt_analysis=False):
         r"""Wrapper that performs discrete fast-Fourier transform on a quadrilateral grid cell
@@ -103,8 +114,8 @@ class get_pmf(object):
         -------
         tuple
             returns tuple containing:
-                | (FFT-computed spectrum, 
-                | computed idealised pseudo-momentum fluxes, 
+                | (FFT-computed spectrum,
+                | computed idealised pseudo-momentum fluxes,
                 | the reconstructed physical data,
                 | list containing the range of horizontal wavenumbers :math:`[\vec{n},\vec{m}]`)
         """
@@ -122,11 +133,22 @@ class get_pmf(object):
 
         kkg, llg = np.meshgrid(kks, lls)
 
-        dat_2D = np.fft.irfft2(np.fft.ifftshift(ampls, axes=0) * ampls.size, s=cell.topo.shape).real
+        dat_2D = np.fft.irfft2(
+            np.fft.ifftshift(ampls, axes=0) * ampls.size, s=cell.topo.shape
+        ).real
 
         ampls = np.abs(ampls)
 
-        if self.debug: print(np.sort(ampls.reshape(-1,))[::-1][:25])
+        if self.debug:
+            print(
+                np.sort(
+                    ampls.reshape(
+                        -1,
+                    )
+                )[
+                    ::-1
+                ][:25]
+            )
 
         analysis = var.analysis()
         analysis.wlat = wlat
@@ -136,15 +158,17 @@ class get_pmf(object):
         analysis.lls = llg
         analysis.recon = dat_2D
 
-        if updt_analysis: cell.analysis = analysis            
+        if updt_analysis:
+            cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
 
         return ampls, uw_pmf_freqs, dat_2D, [kks, lls]
 
-
-    def cg_spsp(self, cell, freqs, kklls, dat_2D, summed=False, updt_analysis=False, scale=1.0):
+    def cg_spsp(
+        self, cell, freqs, kklls, dat_2D, summed=False, updt_analysis=False, scale=1.0
+    ):
         """Method to perform a coarse-graining of spectral space
 
         .. deprecated:: 0.90.0
@@ -155,20 +179,20 @@ class get_pmf(object):
         self.fobj.m_j = kklls[1]
 
         freqs = scale * np.abs(freqs)
-        
+
         analysis = var.analysis()
         analysis.get_attrs(self.fobj, freqs)
         analysis.recon = dat_2D
 
-        if updt_analysis: cell.analysis = analysis
+        if updt_analysis:
+            cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
         uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=summed)
 
         return freqs, uw_pmf_freqs, dat_2D
 
-
-    def recompute_rhs(self, cell, fobj, lmbda = 0.1, **kwargs):
+    def recompute_rhs(self, cell, fobj, lmbda=0.1, **kwargs):
         """Method to recompute the reconstructed physical data given a set of spectral amplitudes
 
         Parameters
@@ -184,13 +208,19 @@ class get_pmf(object):
         -------
         tuple
             returns tuple containing:
-                | (FFT-computed spectrum, 
-                | computed idealised pseudo-momentum fluxes, 
+                | (FFT-computed spectrum,
+                | computed idealised pseudo-momentum fluxes,
                 | the reconstructed physical data)
         """
         self.fobj.do_full(cell)
 
-        _, _ = lin_reg.do(self.fobj, cell, lmbda, kwargs.get('iter_solve', True), kwargs.get('save_coeffs', False))
+        _, _ = lin_reg.do(
+            self.fobj,
+            cell,
+            lmbda,
+            kwargs.get("iter_solve", True),
+            kwargs.get("save_coeffs", False),
+        )
 
         am = fobj.a_m
         self.fobj.get_freq_grid(am)
@@ -198,18 +228,20 @@ class get_pmf(object):
 
         data_recons = self.fobj.coeff.dot(am)
         dat_2D = reconstruction.recon_2D(data_recons, cell)
-        
+
         analysis = var.analysis()
         analysis.get_attrs(fobj, freqs)
         analysis.recon = dat_2D
 
-        if kwargs.get('updt_analysis', True): cell.analysis = analysis
+        if kwargs.get("updt_analysis", True):
+            cell.analysis = analysis
 
         ideal = physics.ideal_pmf(U=self.U, V=self.V)
-        uw_pmf_freqs = ideal.compute_uw_pmf(analysis, summed=kwargs.get('summed', False))
+        uw_pmf_freqs = ideal.compute_uw_pmf(
+            analysis, summed=kwargs.get("summed", False)
+        )
 
         return freqs, uw_pmf_freqs, dat_2D
-    
 
 
 def taper_quad(params, simplex_lat, simplex_lon, cell, topo):
@@ -220,7 +252,7 @@ def taper_quad(params, simplex_lat, simplex_lon, cell, topo):
     params : :class:`src.var.params`
         instance of the user-defined parameters class
     simplex_lat : list
-        list of latitudinal coordinates of the vertices 
+        list of latitudinal coordinates of the vertices
     simplex_lon : list
         list of longitudinal coordinates of the vertices
     cell : :class:`src.var.topo_cell`
@@ -236,7 +268,16 @@ def taper_quad(params, simplex_lat, simplex_lon, cell, topo):
     taper.do_tapering()
 
     # get tapered topography in quadrilateral with padding
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding, topo_mask=taper.p)
+    utils.get_lat_lon_segments(
+        simplex_lat,
+        simplex_lon,
+        cell,
+        topo,
+        rect=True,
+        padding=params.padding,
+        topo_mask=taper.p,
+    )
+
 
 def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
     """Applies tapering to a non-quadrilateral grid cell
@@ -246,7 +287,7 @@ def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
     params : :class:`src.var.params`
         instance of the user-defined parameters class
     simplex_lat : list
-        list of latitudinal coordinates of the vertices 
+        list of latitudinal coordinates of the vertices
     simplex_lon : list
         list of longitudinal coordinates of the vertices
     cell : :class:`src.var.topo_cell`
@@ -261,21 +302,41 @@ def taper_nonquad(params, simplex_lat, simplex_lon, cell, topo, res_topo=None):
     taper.do_tapering()
 
     # get padded topography
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding)
-    
+    utils.get_lat_lon_segments(
+        simplex_lat, simplex_lon, cell, topo, rect=True, padding=params.padding
+    )
+
     if res_topo is not None:
         cell.topo = res_topo
 
     # get padded topography in non-quad
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, filtered=False)
+    utils.get_lat_lon_segments(
+        simplex_lat,
+        simplex_lon,
+        cell,
+        topo,
+        rect=False,
+        padding=params.padding,
+        filtered=False,
+    )
     # mask_taper = np.copy(cell.mask)
 
     # apply tapering mask to padded non-quad domain
-    utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, rect=False, padding=params.padding, topo_mask=taper.p, filtered=False, mask=(taper.p > 1e-2).astype(bool))
+    utils.get_lat_lon_segments(
+        simplex_lat,
+        simplex_lon,
+        cell,
+        topo,
+        rect=False,
+        padding=params.padding,
+        topo_mask=taper.p,
+        filtered=False,
+        mask=(taper.p > 1e-2).astype(bool),
+    )
 
     # mask=(taper.p > 1e-2).astype(bool)
     # cell.topo = taper.p * cell.topo * mask
-    # cell.mask = mask 
+    # cell.mask = mask
 
 
 class first_appx(object):
@@ -307,7 +368,7 @@ class first_appx(object):
         Parameters
         ----------
         simplex_lat : list
-            list of latitudinal coordinates of the vertices 
+            list of latitudinal coordinates of the vertices
         simplex_lon : list
             list of longitudinal coordinates of the vertices
             _description_
@@ -317,11 +378,11 @@ class first_appx(object):
         Returns
         -------
         tuple
-            contains the data for plotting: 
+            contains the data for plotting:
 
-               | (:class:`src.var.topo_cell` instance, 
-               | computed CSAM spectrum, 
-               | computed idealised pseudo-momentum fluxes, 
+               | (:class:`src.var.topo_cell` instance,
+               | computed CSAM spectrum,
+               | computed idealised pseudo-momentum fluxes,
                | the reconstructed physical data)
 
             corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`
@@ -332,16 +393,27 @@ class first_appx(object):
             if self.params.taper_fa:
                 taper_quad(self.params, simplex_lat, simplex_lon, cell_fa, self.topo)
             else:
-                utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell_fa, self.topo, rect=self.params.rect)    
+                utils.get_lat_lon_segments(
+                    simplex_lat, simplex_lon, cell_fa, self.topo, rect=self.params.rect
+                )
         else:
             cell_fa.topo = res_topo
-            utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell_fa, self.topo, padding=self.params.padding, rect=False, mask=np.ones_like(res_topo).astype(bool))    
+            utils.get_lat_lon_segments(
+                simplex_lat,
+                simplex_lon,
+                cell_fa,
+                self.topo,
+                padding=self.params.padding,
+                rect=False,
+                mask=np.ones_like(res_topo).astype(bool),
+            )
 
-        first_guess = get_pmf(self.nhi,self.nhj,self.params.U,self.params.V)
+        first_guess = get_pmf(self.nhi, self.nhj, self.params.U, self.params.V)
 
-        ampls_fa, uw_fa, dat_2D_fa = first_guess.sappx(cell_fa, lmbda=self.params.lmbda_fa, iter_solve=self.params.fa_iter_solve)
+        ampls_fa, uw_fa, dat_2D_fa = first_guess.sappx(
+            cell_fa, lmbda=self.params.lmbda_fa, iter_solve=self.params.fa_iter_solve
+        )
         return cell_fa, ampls_fa, uw_fa, dat_2D_fa
-
 
 
 class second_appx(object):
@@ -349,7 +421,8 @@ class second_appx(object):
 
     Use this routine to apply tapering and to separate the first and second approximation steps
     """
-    def __init__(self, nhi,nhj, params, topo, tri):
+
+    def __init__(self, nhi, nhj, params, topo, tri):
         """
         Parameters
         ----------
@@ -385,20 +458,22 @@ class second_appx(object):
         Returns
         -------
         tuple
-            contains the data for plotting: 
+            contains the data for plotting:
 
-               | (:class:`src.var.topo_cell` instance, 
-               | computed CSAM spectrum, 
-               | computed idealised pseudo-momentum fluxes, 
+               | (:class:`src.var.topo_cell` instance,
+               | computed CSAM spectrum,
+               | computed idealised pseudo-momentum fluxes,
                | the reconstructed physical data)
-               
+
             corresponding to ``sols`` in :func:`wrappers.diagnostics.diag_plotter.show`.
 
             If ``params.recompute_rhs = True``, the tuple contains two lists. The first list is the contains the data above, and the second list contains the data from the recomputation over the quadrilateral domain.
         """
         # make a copy of the spectrum obtained from the FA.
         fq_cpy = np.copy(ampls_fa)
-        fq_cpy[np.isnan(fq_cpy)] = 0.0 # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
+        fq_cpy[
+            np.isnan(fq_cpy)
+        ] = 0.0  # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
 
         cell = var.topo_cell()
 
@@ -413,12 +488,21 @@ class second_appx(object):
         if (res_topo is not None) and (not self.params.taper_sa):
             cell.topo = res_topo * cell.mask
 
-        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, self.topo, rect=False, filtered=False)
+        utils.get_lat_lon_segments(
+            simplex_lat, simplex_lon, cell, self.topo, rect=False, filtered=False
+        )
 
         if self.params.taper_sa:
-            taper_nonquad(self.params, simplex_lat, simplex_lon, cell, self.topo, res_topo=res_topo)
+            taper_nonquad(
+                self.params,
+                simplex_lat,
+                simplex_lon,
+                cell,
+                self.topo,
+                res_topo=res_topo,
+            )
 
-        second_guess = get_pmf(self.nhi,self.nhj,self.params.U,self.params.V)
+        second_guess = get_pmf(self.nhi, self.nhj, self.params.U, self.params.V)
 
         indices = []
         modes_cnt = 0
@@ -438,19 +522,33 @@ class second_appx(object):
             l_idxs = [pair[0] for pair in indices]
 
         if self.params.dfft_first_guess:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = True, components='real')
+            second_guess.fobj.set_kls(
+                k_idxs, l_idxs, recompute_nhij=True, components="real"
+            )
         else:
-            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij = False)
+            second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij=False)
 
-        ampls_sa, uw_sa, dat_2D_sa = second_guess.sappx(cell, lmbda=self.params.lmbda_sa, updt_analysis=True, scale=1.0, iter_solve=self.params.sa_iter_solve, save_am=save_am)
+        ampls_sa, uw_sa, dat_2D_sa = second_guess.sappx(
+            cell,
+            lmbda=self.params.lmbda_sa,
+            updt_analysis=True,
+            scale=1.0,
+            iter_solve=self.params.sa_iter_solve,
+            save_am=save_am,
+        )
 
         if self.params.recompute_rhs:
             cell_quad = deepcopy(cell)
-            cell_quad.get_masked(mask=np.ones_like(cell.topo).astype('bool'))
-            ampls_02_rc, uw_02_rc, dat_2D_02_rc = second_guess.recompute_rhs(cell_quad, second_guess.fobj, save_coeffs = True)
+            cell_quad.get_masked(mask=np.ones_like(cell.topo).astype("bool"))
+            ampls_02_rc, uw_02_rc, dat_2D_02_rc = second_guess.recompute_rhs(
+                cell_quad, second_guess.fobj, save_coeffs=True
+            )
 
-            return [cell_quad, ampls_sa, uw_sa, dat_2D_sa], [cell, ampls_02_rc, uw_02_rc, dat_2D_02_rc]
+            return [cell_quad, ampls_sa, uw_sa, dat_2D_sa], [
+                cell,
+                ampls_02_rc,
+                uw_02_rc,
+                dat_2D_02_rc,
+            ]
         else:
-
             return cell, ampls_sa, uw_sa, dat_2D_sa
-        

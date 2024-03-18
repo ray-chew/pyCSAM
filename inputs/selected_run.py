@@ -23,7 +23,7 @@ run_case = "ITER_REF"
 run_case = "FLUX_SDY"
 
 if run_case == "POT_BIAS":
-    params.rect_set = np.sort([24,200])
+    params.rect_set = np.sort([24, 200])
     params.no_corrections = True
     params.plot = True
 
@@ -41,13 +41,13 @@ elif run_case == "ITER_REF":
     params.nhj = 32
 
     # iterative refinement: worst offenders
-    params.rect_set = np.sort([92,24, 152,160,42,200,202,238,180])
+    params.rect_set = np.sort([92, 24, 152, 160, 42, 200, 202, 238, 180])
     # iterative refinement: focus
     # params.rect_set = np.sort([42])
 
 elif run_case == "DFFT_FA":
     # FA dfft vs lsff comparison
-    params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
+    params.rect_set = np.sort([20, 148, 160, 212, 38, 242, 188, 176, 208, 248])
     params.dfft_first_guess = True
     params.nhi = 32
     params.nhj = 64
@@ -55,7 +55,7 @@ elif run_case == "DFFT_FA":
 
 elif run_case == "LSFF_FA":
     # FA dfft vs lsff comparison
-    params.rect_set = np.sort([20,148,160,212,38,242,188,176,208,248])
+    params.rect_set = np.sort([20, 148, 160, 212, 38, 242, 188, 176, 208, 248])
     params.dfft_first_guess = False
     params.nhi = 32
     params.nhj = 64
@@ -76,14 +76,14 @@ else:
 
 
 if len(run_case) > 0:
-    suffix_tag = '_' + run_case
+    suffix_tag = "_" + run_case
 
-dfft_tag = 'dfft' if params.dfft_first_guess else 'lsff'
+dfft_tag = "dfft" if params.dfft_first_guess else "lsff"
 params.run_case = run_case
-params.fn_tag = 'selected_alaska%s_%s_fa' %(suffix_tag, dfft_tag)
+params.fn_tag = "selected_alaska%s_%s_fa" % (suffix_tag, dfft_tag)
 
-params.lat_extent = [48.,64.,64.]
-params.lon_extent = [-148.,-148.,-112.]
+params.lat_extent = [48.0, 64.0, 64.0]
+params.lon_extent = [-148.0, -148.0, -112.0]
 
 # corresponds to approx (160x160)km
 params.delaunay_xnp = 14
@@ -91,8 +91,8 @@ params.delaunay_ynp = 11
 
 params.n_modes = 100
 
-params.lmbda_fa = 1e-1 # first guess
-params.lmbda_sa = 1e-1 # second step
+params.lmbda_fa = 1e-1  # first guess
+params.lmbda_sa = 1e-1  # second step
 
 params.lxkm, params.lykm = 160, 160
 

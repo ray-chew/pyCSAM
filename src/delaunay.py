@@ -2,7 +2,8 @@ import numpy as np
 from scipy.spatial import Delaunay
 from src import utils, var
 
-def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
+
+def get_decomposition(topo, xnp=11, ynp=6, padding=0):
     """
     Partitions a lat-lon domain into a number of coarser but regularly spaced points that comprises the vertices of the Delaunay triangles.
 
@@ -25,22 +26,24 @@ def get_decomposition(topo, xnp=11, ynp=6, padding = 0):
 
     xlen = len(topo.lon) - padding
     ylen = len(topo.lat) - padding
-    xPoints = np.linspace(padding,xlen-1,xnp)
-    yPoints = np.linspace(padding,ylen-1,ynp)
+    xPoints = np.linspace(padding, xlen - 1, xnp)
+    yPoints = np.linspace(padding, ylen - 1, ynp)
 
-    YY,XX = np.meshgrid(yPoints,xPoints)
+    YY, XX = np.meshgrid(yPoints, xPoints)
 
     # Now we get the points by index.
-    points = np.array([list(item) for item in zip(XX.ravel(), YY.ravel())]).astype('int')
+    points = np.array([list(item) for item in zip(XX.ravel(), YY.ravel())]).astype(
+        "int"
+    )
 
-    lat_verts = topo.lat_grid[points[:,1], points[:,0]]
-    lon_verts = topo.lon_grid[points[:,1], points[:,0]]
+    lat_verts = topo.lat_grid[points[:, 1], points[:, 0]]
+    lon_verts = topo.lon_grid[points[:, 1], points[:, 0]]
 
     # Using these indices, we get the list of points in (lon,lat).
     points = np.array([list(item) for item in zip(lon_verts, lat_verts)])
 
-    lats = points[:,1]
-    lons = points[:,0]
+    lats = points[:, 1]
+    lons = points[:, 0]
 
     # Using scipy spatial, we setup the Delaunay decomposition
     tri = Delaunay(points)
@@ -90,7 +93,9 @@ def get_land_cells(tri, topo, height_tol=0.5, percent_tol=0.95):
         simplex_lat = tri.tri_lat_verts[tri_idx]
         simplex_lon = tri.tri_lon_verts[tri_idx]
 
-        utils.get_lat_lon_segments(simplex_lat, simplex_lon, cell, topo, load_topo=True, filtered=False)
+        utils.get_lat_lon_segments(
+            simplex_lat, simplex_lon, cell, topo, load_topo=True, filtered=False
+        )
 
         if not (((cell.topo <= height_tol).sum() / cell.topo.size) > percent_tol):
             rect_set.append(tri_idx)

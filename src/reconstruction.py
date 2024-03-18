@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def recon_2D(recons_z, cell):
     """
     Reassembles the vector-like ``recons_z`` into a 2D representation given by the properties of :class:`cell <src.var.topo_cell>`.
@@ -22,9 +23,8 @@ def recon_2D(recons_z, cell):
     c = 0
     for i in range(len(lat)):
         for j in range(len(lon)):
+            if cell.mask[i, j] == 1:
+                recons_z_2D[i, j] = recons_z[c]
+                c = c + 1
 
-            if (cell.mask[i,j] == 1):
-                recons_z_2D[i,j] = recons_z[c]
-                c = c+1
-                
     return recons_z_2D
