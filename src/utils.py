@@ -9,7 +9,12 @@ import scipy.interpolate as interpolate
 import sys
 
 
-def pick_cell(lat_ref, lon_ref, grid, radius=1.0):
+def pick_cell(
+    lat_ref,
+    lon_ref,
+    grid,
+    radius=1.0,
+):
     """
     .. deprecated:: 0.90.0
 
@@ -45,7 +50,14 @@ def rad2deg(val):
     return np.rad2deg(val)
 
 
-def isosceles(grid, cell, xmax=2.0 * np.pi, ymax=2.0 * np.pi, res=480, tri="mid"):
+def isosceles(
+    grid,
+    cell,
+    xmax=2.0 * np.pi,
+    ymax=2.0 * np.pi,
+    res=480,
+    tri="mid",
+):
     """
     Populates a :class:`cell <src.var.topo_cell>` instance with an idealised triangle
 
@@ -125,7 +137,13 @@ def isosceles(grid, cell, xmax=2.0 * np.pi, ymax=2.0 * np.pi, res=480, tri="mid"
 
 
 def delaunay(
-    grid, cell, res_x=480, res_y=480, xmax=2.0 * np.pi, ymax=2.0 * np.pi, tri="lower"
+    grid,
+    cell,
+    res_x=480,
+    res_y=480,
+    xmax=2.0 * np.pi,
+    ymax=2.0 * np.pi,
+    tri="lower",
 ):
     """Generates an idealised Delaunay triangle
 
@@ -180,7 +198,11 @@ def delaunay(
     return 0
 
 
-def gen_art_terrain(shp, seed=555, iters=1000):
+def gen_art_terrain(
+    shp,
+    seed=555,
+    iters=1000,
+):
     """
     Generates an artificial terrain
 
