@@ -9,10 +9,11 @@ CSAM's Readme
 
     Constrained Spectral Approximation Method
 
-.. code:: markdown
-
-    [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-    [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+.. image:: https://img.shields.io/badge/License-AGPL_v3-blue.svg
+    :target: https://www.gnu.org/licenses/agpl-3.0
+    
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
 
 
 The Constrained Spectral Approximation Method (CSAM) is a physically sound and robust method for approximating the spectrum of subgrid-scale orography. It operates under the following constraints:
