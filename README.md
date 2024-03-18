@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://ray-chew.github.io/spec_appx/index.html">
-  <alt="CSAM Logo" img src="https://ray-chew.github.io/spec_appx/_static/logo.png" />
+  <img alt="CSAM Logo" src="https://ray-chew.github.io/spec_appx/_static/logo.png">
   </a>
 </p>
 
