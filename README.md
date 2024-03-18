@@ -1,4 +1,8 @@
-[![CSAM Logo](https://ray-chew.github.io/spec_appx/_static/logo.png)](https://ray-chew.github.io/spec_appx/index.html)
+<p align="center">
+  <a href="https://ray-chew.github.io/spec_appx/index.html">
+  <alt="CSAM Logo" img src="https://ray-chew.github.io/spec_appx/_static/logo.png" />
+  </a>
+</p>
 
 <h2 align="center">Constrained Spectral Approximation Method</h2>
 
