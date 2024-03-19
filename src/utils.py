@@ -448,8 +448,8 @@ def get_lat_lon_segments(
         number of data points in the padded region, by default 0
     topo_mask : array-like, optional
         tapering mask, by default None
-    mask : _type_, optional
-        mask to select for data points inside the non-quadrilateral grid cell, by default None
+    mask : array-like, optional
+        2D Boolean mask to select for data points inside the non-quadrilateral grid cell, by default None
     load_topo : bool, optional
         explicitly replaces the topography attribute in the cell ``cell.topo`` with the data given in ``topo``, by default False
     """

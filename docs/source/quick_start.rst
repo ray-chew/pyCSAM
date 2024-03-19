@@ -1,6 +1,6 @@
 Quickstart
 ==========
-A quick and dirty guide to using the CSAM codebase.
+A quick and dirty guide to using the CSAM codebase
 
 Requirements
 ^^^^^^^^^^^^
@@ -15,7 +15,7 @@ Overview
 ^^^^^^^^
 The CSAM codebase is structured modularly, see :numref:`structure` for a graphical overview.
 
-The package :mod:`wrappers` provides interfaces to the core code components in :mod:`src` and :mod:`vis`. For example, it defines the First and Second Approximation steps in the CSAM algorithm and applies the tapering of the physical data. Refer to the APIs for more details.
+The package :mod:`wrappers` provides interfaces to the core code components in :mod:`src` and :mod:`vis`. For example, it defines the First and Second Approximation steps in the CSAM algorithm and applies the tapering of the physical data. Refer to the :doc:`APIs <api>` for more details.
 
 Helper functions and data structures are provided for the processing of user-defined topographies (:mod:`src.var.topo`), grids (:mod:`src.var.grid`), and input parameters (:mod:`src.var.params`).
 
@@ -199,7 +199,7 @@ To reproduce the coarse grid study (*Coarse Delaunay triangulation (approximatel
 
     run_case = "R2B4"
 
-2. Execute the run script :mod:`runs.delaunay_runs`. Make sure to import the correct user-defined input file:
+2. Make sure to import the correct user-defined input file. Then execute the run script :mod:`runs.delaunay_runs`:
 
 .. code-block:: console
 

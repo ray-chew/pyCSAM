@@ -11,8 +11,8 @@
 <a href="https://github.com/ray-chew/spec_appx/actions/workflows/documentation.yml">
 <img alt="GitHub Actions: docs" src=https://github.com/ray-chew/spec_appx/actions/workflows/documentation.yml/badge.svg>
 </a>
-<a href="https://www.gnu.org/licenses/agpl-3.0">
-<img alt="License: GNU GPL v3" src=https://img.shields.io/badge/License-AGPL_v3-blue.svg>
+<a href="https://www.gnu.org/licenses/gpl-3.0">
+<img alt="License: GPL v3" src=https://img.shields.io/badge/License-GPLv3-blue.svg>
 </a>
 <a href="https://github.com/psf/black">
 <img alt="Code style: black" src=https://img.shields.io/badge/code%20style-black-000000.svg>
@@ -32,7 +32,7 @@ This method is primarily used to represent terrain for weather forecasting purpo
 
 ---
 
-**[Read the documentation here.](https://ray-chew.github.io/spec_appx/index.html)**
+**[Read the documentation here](https://ray-chew.github.io/spec_appx/index.html)**
 
 ---
 
@@ -47,7 +47,7 @@ See [`requirements.txt`](https://github.com/ray-chew/spec_appx/blob/main/require
 
 ### Installation
 
-Make a fork and clone your remote forked repository.
+Fork this repository and clone your remote fork.
 
 ### Configuration
 
@@ -61,7 +61,7 @@ A simple setup can be found in [`runs.idealised_isosceles`](https://github.com/r
 python3 ./runs/idealised_isosceles.py
 ```
 
-However, the codebase is structured such that the user can easily assemble a run script to define their own experiments. Refer to the documentation for the available APIs.
+However, the codebase is structured such that the user can easily assemble a run script to define their own experiments. Refer to the documentation for the [available APIs](https://ray-chew.github.io/spec_appx/api.html).
 
 ## License
 
