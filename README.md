@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://github.com/ray-chew/spec_appx/actions/workflows/documentation.yml">
-<img alt="GitHub Actions: docs" src=https://github.com/ray-chew/spec_appx/actions/workflows/documentation.yml/badge.svg>
+<img alt="GitHub Actions: docs" src=https://img.shields.io/github/actions/workflow/status/ray-chew/spec_appx/documentation.yml?logo=github&label=docs>
 </a>
 <a href="https://www.gnu.org/licenses/gpl-3.0">
 <img alt="License: GPL v3" src=https://img.shields.io/badge/License-GPLv3-blue.svg>
