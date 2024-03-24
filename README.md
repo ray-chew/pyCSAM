@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://ray-chew.github.io/spec_appx/index.html">
-  <img alt="CSAM Logo" src="https://ray-chew.github.io/spec_appx/_static/logo.png">
+  <a href="https://ray-chew.github.io/pyCSAM/index.html">
+  <img alt="CSAM Logo" src="https://ray-chew.github.io/pyCSAM/_static/logo.png">
   </a>
 </p>
 
@@ -8,8 +8,8 @@
 
 
 <p align="center">
-<a href="https://github.com/ray-chew/spec_appx/actions/workflows/documentation.yml">
-<img alt="GitHub Actions: docs" src=https://img.shields.io/github/actions/workflow/status/ray-chew/spec_appx/documentation.yml?logo=github&label=docs>
+<a href="https://github.com/ray-chew/pyCSAM/actions/workflows/documentation.yml">
+<img alt="GitHub Actions: docs" src=https://img.shields.io/github/actions/workflow/status/ray-chew/pyCSAM/documentation.yml?logo=github&label=docs>
 </a>
 <a href="https://www.gnu.org/licenses/gpl-3.0">
 <img alt="License: GPL v3" src=https://img.shields.io/badge/License-GPLv3-blue.svg>
@@ -32,15 +32,15 @@ This method is primarily used to represent terrain for weather forecasting purpo
 
 ---
 
-**[Read the documentation here](https://ray-chew.github.io/spec_appx/index.html)**
+**[Read the documentation here](https://ray-chew.github.io/pyCSAM/index.html)**
 
 ---
 
 ## Requirements
 
-See [`requirements.txt`](https://github.com/ray-chew/spec_appx/blob/main/requirements.txt)
+See [`requirements.txt`](https://github.com/ray-chew/pyCSAM/blob/main/requirements.txt)
 
-> **NOTE:**  The Sphinx dependencies can be found in [`docs/conf.py`](https://github.com/ray-chew/spec_appx/blob/main/docs/source/conf.py).
+> **NOTE:**  The Sphinx dependencies can be found in [`docs/conf.py`](https://github.com/ray-chew/pyCSAM/blob/main/docs/source/conf.py).
 
 
 ## Usage
@@ -51,17 +51,17 @@ Fork this repository and clone your remote fork.
 
 ### Configuration
 
-The user-defined input parameters are in the [`inputs`](https://github.com/ray-chew/spec_appx/tree/main/inputs) subpackage. These parameters are imported into the run scripts in [`runs`](https://github.com/ray-chew/spec_appx/tree/main/runs). 
+The user-defined input parameters are in the [`inputs`](https://github.com/ray-chew/pyCSAM/tree/main/inputs) subpackage. These parameters are imported into the run scripts in [`runs`](https://github.com/ray-chew/pyCSAM/tree/main/runs). 
 
 ### Execution
 
-A simple setup can be found in [`runs.idealised_isosceles`](https://github.com/ray-chew/spec_appx/blob/main/runs/idealised_isosceles.py). To execute this run script:
+A simple setup can be found in [`runs.idealised_isosceles`](https://github.com/ray-chew/pyCSAM/blob/main/runs/idealised_isosceles.py). To execute this run script:
 
 ```console
 python3 ./runs/idealised_isosceles.py
 ```
 
-However, the codebase is structured such that the user can easily assemble a run script to define their own experiments. Refer to the documentation for the [available APIs](https://ray-chew.github.io/spec_appx/api.html).
+However, the codebase is structured such that the user can easily assemble a run script to define their own experiments. Refer to the documentation for the [available APIs](https://ray-chew.github.io/pyCSAM/api.html).
 
 ## License
 
