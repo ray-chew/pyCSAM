@@ -274,6 +274,7 @@ plt.show()
 
 # %%
 #### plot the errors
+print("amplitudes:")
 print(sums)
 plotter.error_bar_abs_plot(
     selected_errs,
@@ -302,7 +303,10 @@ plotter.error_bar_abs_plot(
 # %%
 #### print the errors
 np.set_printoptions(suppress=True)
+print("percentage error in amplitude:")
 print(np.around(sum_errs, 5) * 100)
+print("")
+print("L2-errors:")
 print(errs)
 
 # %%

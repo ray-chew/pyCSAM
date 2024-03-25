@@ -120,8 +120,8 @@ print(ampls_ref.max())
 
 params = var.params()
 params.plot = True
-params.lmbda_fa = 0.0
 params.lmbda_sa = 0.1
+params.lmbda_sa = 1e-6
 dplot = diagnostics.diag_plotter(params, nhi, nhj)
 dplot.show((0, 1), sols, kls=kls_ref, v_extent=v_extent, dfft_plot=True)
 
@@ -391,7 +391,7 @@ if do_rhs_recomputation:
         v_extent=v_extent,
         ir_args=ir_args,
         phys_lbls=["", ""],
-        fn=fn,
+        fn="",
     )
     print(uw_01_rc.sum())
 
@@ -413,7 +413,7 @@ if do_rhs_recomputation:
         v_extent=v_extent,
         ir_args=ir_args,
         phys_lbls=["", ""],
-        fn=fn,
+        fn="",
     )
     print(uw_02_rc.sum())
 
