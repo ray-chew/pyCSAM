@@ -1,0 +1,878 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 --><title>Index - CSAM v0.95.1 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">CSAM v0.95.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">CSAM v0.95.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">CSAM’s Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules/inputs.html"><cite>inputs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of inputs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/inputs.lam_run.html">inputs.lam_run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/inputs.selected_run.html">inputs.selected_run</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules/runs.html"><cite>runs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of runs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/runs.idealised_isosceles.html">runs.idealised_isosceles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/runs.idealised_delaunay.html">runs.idealised_delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/runs.delaunay_runs.html">runs.delaunay_runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/runs.icon_usgs_test.html">runs.icon_usgs_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/runs.tapering_test.html">runs.tapering_test</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules/wrappers.html"><cite>wrappers</cite></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wrappers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/wrappers.diagnostics.html">wrappers.diagnostics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/wrappers.interface.html">wrappers.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules/src.html"><cite>src</cite></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.delaunay.html">src.delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.fourier.html">src.fourier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.io.html">src.io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.lin_reg.html">src.lin_reg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.physics.html">src.physics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.reconstruction.html">src.reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.utils.html">src.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/src.var.html">src.var</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules/vis.html"><cite>vis</cite></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of vis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/vis.cart_plot.html">vis.cart_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/vis.plotter.html">vis.plotter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Change log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refs.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ray-chew/spec_appx">GitHub repo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#_"><strong>_</strong></a> | <a href="#A"><strong>A</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="_" class="genindex-section">
+  <h2>_</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.__init__">__init__() (src.fourier.f_trans method)</a>
+
+        <ul>
+          <li><a href="modules/src.io.html#src.io.ncdata.__init__">(src.io.ncdata method)</a>
+</li>
+          <li><a href="modules/src.io.html#src.io.ncdata.read_merit_topo.__init__">(src.io.ncdata.read_merit_topo method)</a>
+</li>
+          <li><a href="modules/src.io.html#src.io.reader.__init__">(src.io.reader method)</a>
+</li>
+          <li><a href="modules/src.io.html#src.io.writer.__init__">(src.io.writer method)</a>
+</li>
+          <li><a href="modules/src.physics.html#src.physics.ideal_pmf.__init__">(src.physics.ideal_pmf method)</a>
+</li>
+          <li><a href="modules/src.utils.html#src.utils.gen_triangle.__init__">(src.utils.gen_triangle method)</a>
+</li>
+          <li><a href="modules/src.utils.html#src.utils.taper.__init__">(src.utils.taper method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.analysis.__init__">(src.var.analysis method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.grid.__init__">(src.var.grid method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.obj.__init__">(src.var.obj method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.params.__init__">(src.var.params method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.topo.__init__">(src.var.topo method)</a>
+</li>
+          <li><a href="modules/src.var.html#src.var.topo_cell.__init__">(src.var.topo_cell method)</a>
+</li>
+          <li><a href="modules/vis.plotter.html#vis.plotter.fig_obj.__init__">(vis.plotter.fig_obj method)</a>
+</li>
+          <li><a href="modules/vis.plotter.html#vis.plotter.plot_3d.__init__">(vis.plotter.plot_3d method)</a>
+</li>
+          <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics.__init__">(wrappers.diagnostics.delaunay_metrics method)</a>
+</li>
+          <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.diag_plotter.__init__">(wrappers.diagnostics.diag_plotter method)</a>
+</li>
+          <li><a href="modules/wrappers.interface.html#wrappers.interface.first_appx.__init__">(wrappers.interface.first_appx method)</a>
+</li>
+          <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf.__init__">(wrappers.interface.get_pmf method)</a>
+</li>
+          <li><a href="modules/wrappers.interface.html#wrappers.interface.second_appx.__init__">(wrappers.interface.second_appx method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.var.html#src.var.analysis">analysis (class in src.var)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.var.html#src.var.grid.apply_f">apply_f() (src.var.grid method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf.cg_spsp">cg_spsp() (wrappers.interface.get_pmf method)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.params.check_delaunay">check_delaunay() (src.var.params method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.var.html#src.var.params.check_init">check_init() (src.var.params method)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.params.checker">checker() (src.var.params static method)</a>
+</li>
+        <li><a href="modules/src.physics.html#src.physics.ideal_pmf.compute_uw_pmf">compute_uw_pmf() (src.physics.ideal_pmf method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.utils.html#src.utils.delaunay">delaunay() (in module src.utils)</a>
+</li>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics">delaunay_metrics (class in wrappers.diagnostics)</a>
+</li>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf.dfft">dfft() (wrappers.interface.get_pmf method)</a>
+</li>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.diag_plotter">diag_plotter (class in wrappers.diagnostics)</a>
+</li>
+        <li><a href="modules/src.lin_reg.html#src.lin_reg.do">do() (in module src.lin_reg)</a>
+
+        <ul>
+          <li><a href="modules/wrappers.interface.html#wrappers.interface.first_appx.do">(wrappers.interface.first_appx method)</a>
+</li>
+          <li><a href="modules/wrappers.interface.html#wrappers.interface.second_appx.do">(wrappers.interface.second_appx method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.do_axial">do_axial() (src.fourier.f_trans method)</a>
+</li>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.do_cg_spsp">do_cg_spsp() (src.fourier.f_trans method)</a>
+</li>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.do_full">do_full() (src.fourier.f_trans method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.taper.do_tapering">do_tapering() (src.utils.taper method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics.end">end() (wrappers.diagnostics.delaunay_metrics method)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.error_bar_abs_plot">error_bar_abs_plot() (in module vis.plotter)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/vis.plotter.html#vis.plotter.error_bar_plot">error_bar_plot() (in module vis.plotter)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.error_bar_split_plot">error_bar_split_plot() (in module vis.plotter)</a>
+</li>
+        <li><a href="modules/vis.cart_plot.html#vis.cart_plot.error_delaunay">error_delaunay() (in module vis.cart_plot)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans">f_trans (class in src.fourier)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.fig_obj.fft_freq_panel">fft_freq_panel() (vis.plotter.fig_obj method)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.fig_obj">fig_obj (class in vis.plotter)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.first_appx">first_appx (class in wrappers.interface)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.fn_gen">fn_gen() (in module src.io)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.fig_obj.freq_panel">freq_panel() (vis.plotter.fig_obj method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.utils.html#src.utils.gen_art_terrain">gen_art_terrain() (in module src.utils)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.topo_cell.gen_mgrids">gen_mgrids() (src.var.topo_cell method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.gen_triangle">gen_triangle (class in src.utils)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.analysis.get_attrs">get_attrs() (src.var.analysis method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.get_closest_idx">get_closest_idx() (in module src.utils)</a>
+</li>
+        <li><a href="modules/src.lin_reg.html#src.lin_reg.get_coeffs">get_coeffs() (in module src.lin_reg)</a>
+</li>
+        <li><a href="modules/src.delaunay.html#src.delaunay.get_decomposition">get_decomposition() (in module src.delaunay)</a>
+</li>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.get_freq_grid">get_freq_grid() (src.fourier.f_trans method)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.topo_cell.get_grad_topo">get_grad_topo() (src.var.topo_cell method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.delaunay.html#src.delaunay.get_land_cells">get_land_cells() (in module src.delaunay)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.get_lat_lon_segments">get_lat_lon_segments() (in module src.utils)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.topo_cell.get_masked">get_masked() (src.var.topo_cell method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.reader.get_params">get_params() (src.io.reader method)</a>
+</li>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf">get_pmf (class in wrappers.interface)</a>
+</li>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics.get_rel_err">get_rel_err() (wrappers.diagnostics.delaunay_metrics method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.get_size">get_size() (in module src.utils)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.ncdata.read_merit_topo.get_topo">get_topo() (src.io.ncdata.read_merit_topo method)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.grid">grid (class in src.var)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.analysis.grid_kk_ll">grid_kk_ll() (src.var.analysis method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.physics.html#src.physics.ideal_pmf">ideal_pmf (class in src.physics)</a>
+</li>
+        <li>
+    inputs
+
+        <ul>
+          <li><a href="modules/inputs.html#module-inputs">module</a>
+</li>
+        </ul></li>
+        <li>
+    inputs.lam_run
+
+        <ul>
+          <li><a href="modules/inputs.lam_run.html#module-inputs.lam_run">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    inputs.selected_run
+
+        <ul>
+          <li><a href="modules/inputs.selected_run.html#module-inputs.selected_run">module</a>
+</li>
+        </ul></li>
+        <li><a href="modules/src.io.html#src.io.writer.io_create_file">io_create_file() (src.io.writer method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.isosceles">isosceles() (in module src.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/vis.cart_plot.html#vis.cart_plot.lat_lon">lat_lon() (in module vis.cart_plot)</a>
+</li>
+        <li><a href="modules/vis.cart_plot.html#vis.cart_plot.lat_lon_delaunay">lat_lon_delaunay() (in module vis.cart_plot)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/vis.cart_plot.html#vis.cart_plot.lat_lon_icon">lat_lon_icon() (in module vis.cart_plot)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.latlon2m">latlon2m() (in module src.utils)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    module
+
+        <ul>
+          <li><a href="modules/inputs.html#module-inputs">inputs</a>
+</li>
+          <li><a href="modules/inputs.lam_run.html#module-inputs.lam_run">inputs.lam_run</a>
+</li>
+          <li><a href="modules/inputs.selected_run.html#module-inputs.selected_run">inputs.selected_run</a>
+</li>
+          <li><a href="modules/runs.html#module-runs">runs</a>
+</li>
+          <li><a href="modules/runs.delaunay_runs.html#module-runs.delaunay_runs">runs.delaunay_runs</a>
+</li>
+          <li><a href="modules/src.html#module-src">src</a>
+</li>
+          <li><a href="modules/src.delaunay.html#module-src.delaunay">src.delaunay</a>
+</li>
+          <li><a href="modules/src.fourier.html#module-src.fourier">src.fourier</a>
+</li>
+          <li><a href="modules/src.io.html#module-src.io">src.io</a>
+</li>
+          <li><a href="modules/src.lin_reg.html#module-src.lin_reg">src.lin_reg</a>
+</li>
+          <li><a href="modules/src.physics.html#module-src.physics">src.physics</a>
+</li>
+          <li><a href="modules/src.reconstruction.html#module-src.reconstruction">src.reconstruction</a>
+</li>
+          <li><a href="modules/src.utils.html#module-src.utils">src.utils</a>
+</li>
+          <li><a href="modules/src.var.html#module-src.var">src.var</a>
+</li>
+          <li><a href="modules/vis.html#module-vis">vis</a>
+</li>
+          <li><a href="modules/vis.cart_plot.html#module-vis.cart_plot">vis.cart_plot</a>
+</li>
+          <li><a href="modules/vis.plotter.html#module-vis.plotter">vis.plotter</a>
+</li>
+          <li><a href="modules/wrappers.html#module-wrappers">wrappers</a>
+</li>
+          <li><a href="modules/wrappers.diagnostics.html#module-wrappers.diagnostics">wrappers.diagnostics</a>
+</li>
+          <li><a href="modules/wrappers.interface.html#module-wrappers.interface">wrappers.interface</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.io.html#src.io.ncdata">ncdata (class in src.io)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.io.html#src.io.ncdata.read_merit_topo">ncdata.read_merit_topo (class in src.io)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.var.html#src.var.obj">obj (class in src.var)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.var.html#src.var.params">params (class in src.var)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.fig_obj.phys_panel">phys_panel() (vis.plotter.fig_obj method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.pick_cell">pick_cell() (in module src.utils)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/vis.plotter.html#vis.plotter.plot_3d.plot">plot() (vis.plotter.plot_3d method)</a>
+</li>
+        <li><a href="modules/vis.plotter.html#vis.plotter.plot_3d">plot_3d (class in vis.plotter)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.writer.populate">populate() (src.io.writer method)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.obj.print">print() (src.var.obj method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.utils.html#src.utils.rad2deg">rad2deg() (in module src.utils)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.reader.read_all">read_all() (src.io.reader method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.ncdata.read_dat">read_dat() (src.io.ncdata method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.reader.read_data">read_data() (src.io.reader method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.ncdata.read_topo">read_topo() (src.io.ncdata method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.reader">reader (class in src.io)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf.recompute_rhs">recompute_rhs() (wrappers.interface.get_pmf method)</a>
+</li>
+        <li><a href="modules/src.reconstruction.html#src.reconstruction.recon_2D">recon_2D() (in module src.reconstruction)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.rescale">rescale() (in module src.utils)</a>
+</li>
+        <li>
+    runs
+
+        <ul>
+          <li><a href="modules/runs.html#module-runs">module</a>
+</li>
+        </ul></li>
+        <li>
+    runs.delaunay_runs
+
+        <ul>
+          <li><a href="modules/runs.delaunay_runs.html#module-runs.delaunay_runs">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.get_pmf.sappx">sappx() (wrappers.interface.get_pmf method)</a>
+</li>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.second_appx">second_appx (class in wrappers.interface)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.params.self_test">self_test() (src.var.params method)</a>
+</li>
+        <li><a href="modules/src.fourier.html#src.fourier.f_trans.set_kls">set_kls() (src.fourier.f_trans method)</a>
+</li>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.diag_plotter.show">show() (wrappers.diagnostics.diag_plotter method)</a>
+</li>
+        <li><a href="modules/src.utils.html#src.utils.sliding_window_view">sliding_window_view() (in module src.utils)</a>
+</li>
+        <li>
+    src
+
+        <ul>
+          <li><a href="modules/src.html#module-src">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.delaunay
+
+        <ul>
+          <li><a href="modules/src.delaunay.html#module-src.delaunay">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.fourier
+
+        <ul>
+          <li><a href="modules/src.fourier.html#module-src.fourier">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    src.io
+
+        <ul>
+          <li><a href="modules/src.io.html#module-src.io">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.lin_reg
+
+        <ul>
+          <li><a href="modules/src.lin_reg.html#module-src.lin_reg">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.physics
+
+        <ul>
+          <li><a href="modules/src.physics.html#module-src.physics">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.reconstruction
+
+        <ul>
+          <li><a href="modules/src.reconstruction.html#module-src.reconstruction">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.utils
+
+        <ul>
+          <li><a href="modules/src.utils.html#module-src.utils">module</a>
+</li>
+        </ul></li>
+        <li>
+    src.var
+
+        <ul>
+          <li><a href="modules/src.var.html#module-src.var">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.utils.html#src.utils.taper">taper (class in src.utils)</a>
+</li>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.taper_nonquad">taper_nonquad() (in module wrappers.interface)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.interface.html#wrappers.interface.taper_quad">taper_quad() (in module wrappers.interface)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.topo">topo (class in src.var)</a>
+</li>
+        <li><a href="modules/src.var.html#src.var.topo_cell">topo_cell (class in src.var)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics.update_pair">update_pair() (wrappers.diagnostics.delaunay_metrics method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/wrappers.diagnostics.html#wrappers.diagnostics.delaunay_metrics.update_quad">update_quad() (wrappers.diagnostics.delaunay_metrics method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    vis
+
+        <ul>
+          <li><a href="modules/vis.html#module-vis">module</a>
+</li>
+        </ul></li>
+        <li>
+    vis.cart_plot
+
+        <ul>
+          <li><a href="modules/vis.cart_plot.html#module-vis.cart_plot">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    vis.plotter
+
+        <ul>
+          <li><a href="modules/vis.plotter.html#module-vis.plotter">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    wrappers
+
+        <ul>
+          <li><a href="modules/wrappers.html#module-wrappers">module</a>
+</li>
+        </ul></li>
+        <li>
+    wrappers.diagnostics
+
+        <ul>
+          <li><a href="modules/wrappers.diagnostics.html#module-wrappers.diagnostics">module</a>
+</li>
+        </ul></li>
+        <li>
+    wrappers.interface
+
+        <ul>
+          <li><a href="modules/wrappers.interface.html#module-wrappers.interface">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="modules/src.io.html#src.io.writer.write_all">write_all() (src.io.writer method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.writer.write_all_attrs">write_all_attrs() (src.io.writer method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.writer.write_attr">write_attr() (src.io.writer method)</a>
+</li>
+        <li><a href="modules/src.io.html#src.io.writer">writer (class in src.io)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achatz
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=76f4ad40"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

@@ -1,0 +1,566 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Change log" href="../changelog.html" /><link rel="prev" title="vis.cart_plot" href="vis.cart_plot.html" />
+
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>vis.plotter - CSAM v0.95.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">CSAM v0.95.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">CSAM v0.95.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CSAM’s Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="inputs.html"><cite>inputs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of inputs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="inputs.lam_run.html">inputs.lam_run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inputs.selected_run.html">inputs.selected_run</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="runs.html"><cite>runs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of runs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="runs.idealised_isosceles.html">runs.idealised_isosceles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.idealised_delaunay.html">runs.idealised_delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.delaunay_runs.html">runs.delaunay_runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.icon_usgs_test.html">runs.icon_usgs_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.tapering_test.html">runs.tapering_test</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wrappers.html"><cite>wrappers</cite></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wrappers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wrappers.diagnostics.html">wrappers.diagnostics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wrappers.interface.html">wrappers.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="src.html"><cite>src</cite></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.delaunay.html">src.delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.fourier.html">src.fourier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.io.html">src.io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.lin_reg.html">src.lin_reg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.physics.html">src.physics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.reconstruction.html">src.reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.var.html">src.var</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="vis.html"><cite>vis</cite></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of vis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="vis.cart_plot.html">vis.cart_plot</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">vis.plotter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refs.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ray-chew/spec_appx">GitHub repo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-vis.plotter">
+<span id="vis-plotter"></span><h1>vis.plotter<a class="headerlink" href="#module-vis.plotter" title="Link to this heading">#</a></h1>
+<p>Contains the classes and functions for single-cell plots.</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vis.plotter.error_bar_plot" title="vis.plotter.error_bar_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error_bar_plot</span></code></a>(idx_name, pmf_diff, params[, ...])</p></td>
+<td><p>Bar plot of errors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#vis.plotter.error_bar_split_plot" title="vis.plotter.error_bar_split_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error_bar_split_plot</span></code></a>(errs, lbls, bs, ts, ...)</p></td>
+<td><p>Function to generate error bar plots with a split in the middle, e.g., when space in limited on a presentation slide or poster.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vis.plotter.error_bar_abs_plot" title="vis.plotter.error_bar_abs_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error_bar_abs_plot</span></code></a>(errs, lbls[, fs, title, ...])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#vis.plotter.fig_obj" title="vis.plotter.fig_obj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fig_obj</span></code></a>(fig, nhi, nhj[, cbar, set_label])</p></td>
+<td><p>A figure object class to plot physical and spectral panels.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="vis.plotter.fig_obj">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vis.plotter.</span></span><span class="sig-name descname"><span class="pre">fig_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.fig_obj" title="Link to this definition">#</a></dt>
+<dd><p>A figure object class to plot physical and spectral panels.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.fig_obj.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.fig_obj.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialises the figure object and the methods fill the axes.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl>
+<dt>fig<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.figure.Figure</span></code> instance</span></dt><dd><p>matplotlib figure</p>
+</dd>
+<dt>nhi<span class="classifier">int</span></dt><dd><p>number of harmonics in the first horizontal direction</p>
+</dd>
+<dt>nhj<span class="classifier">int</span></dt><dd><p>number of harmonics in the second horizontal direction</p>
+</dd>
+<dt>cbar<span class="classifier">bool, optional</span></dt><dd><p>user-defined colorbar, by default True</p>
+</dd>
+<dt>set_label<span class="classifier">bool, optional</span></dt><dd><p>toggle axis labels, by default True</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.fig_obj.phys_panel">
+<span class="sig-name descname"><span class="pre">phys_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.fig_obj.phys_panel" title="Link to this definition">#</a></dt>
+<dd><p>Plots a physical depiction of the input data.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<dl>
+<dt>axs<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></span></dt><dd><p>matplotlib figure axis</p>
+</dd>
+<dt>data<span class="classifier">array-like</span></dt><dd><p>2D image data</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>panel title, by default “”</p>
+</dd>
+<dt>extent<span class="classifier">list, optional</span></dt><dd><p>[x0,x1,y0,y1], by default “”</p>
+</dd>
+<dt>xlabel<span class="classifier">str, optional</span></dt><dd><p>x-axis label, by default “”</p>
+</dd>
+<dt>ylabel<span class="classifier">str, optional</span></dt><dd><p>y-axis label, by default “”</p>
+</dd>
+<dt>v_extent<span class="classifier">list, optional</span></dt><dd><p>[h0,h1]; vertical extent of the data, by default None</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></dt><dd><p>matplotlib figure axis</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.fig_obj.freq_panel">
+<span class="sig-name descname"><span class="pre">freq_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ampls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nhj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Power</span> <span class="pre">spectrum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_extent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.fig_obj.freq_panel" title="Link to this definition">#</a></dt>
+<dd><p>Plots the spectrum in a dense truncated spectral space.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<dl>
+<dt>axs<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></span></dt><dd><p>matplotlib figure axis</p>
+</dd>
+<dt>ampls<span class="classifier">array-like</span></dt><dd><p>2D (abs.) spectral data</p>
+</dd>
+<dt>nhi<span class="classifier">int, optional</span></dt><dd><p>number of harmonics in the first horizontal direction, by default None</p>
+</dd>
+<dt>nhj<span class="classifier">_type_, optional</span></dt><dd><p>number of harmonics in the second horizontal direction, by default None</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>user-defined panel title, by default “Power spectrum”</p>
+</dd>
+<dt>v_extent<span class="classifier">_type_, optional</span></dt><dd><p>[h0,h1]; vertical extent of the data, by default None</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></dt><dd><p>matplotlib figure axis</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.fig_obj.fft_freq_panel">
+<span class="sig-name descname"><span class="pre">fft_freq_panel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ampls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FFT</span> <span class="pre">power</span> <span class="pre">spectrum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">typ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'imag'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.fig_obj.fft_freq_panel" title="Link to this definition">#</a></dt>
+<dd><p>Plots the spectrum in the full spectral space.</p>
+<section id="id4">
+<h2>Parameters<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<dl>
+<dt>axs<span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></span></dt><dd><p>matplotlib figure axis</p>
+</dd>
+<dt>ampls<span class="classifier">array-like</span></dt><dd><p>2D (abs.) spectral data</p>
+</dd>
+<dt>kks<span class="classifier">list</span></dt><dd><p>list of first horizontal wavenumbers</p>
+</dd>
+<dt>lls<span class="classifier">list</span></dt><dd><p>list of second horizontal wavenumbers</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Returns<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">plt.Axes</span></code></dt><dd><p>matplotlib figure axis</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vis.plotter.error_bar_plot">
+<span class="sig-prename descclassname"><span class="pre">vis.plotter.</span></span><span class="sig-name descname"><span class="pre">error_bar_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmf_diff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'../output/error_plot.pdf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[-100,</span> <span class="pre">100]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10.0,</span> <span class="pre">6.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.error_bar_plot" title="Link to this definition">#</a></dt>
+<dd><p>Bar plot of errors.</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<dl>
+<dt>idx_name<span class="classifier">list</span></dt><dd><p>labels of the error plots, e.g., cell index</p>
+</dd>
+<dt>pmf_diff<span class="classifier">list</span></dt><dd><p>list containing the errors. Same size as <cite>idx_name</cite>.</p>
+</dd>
+<dt>params<span class="classifier"><a class="reference internal" href="src.var.html#src.var.params" title="src.var.params"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.params</span></code></a></span></dt><dd><p>user parameter class</p>
+</dd>
+<dt>comparison<span class="classifier">list, optional</span></dt><dd><p>a second error list to be compared to <cite>pmf_diff</cite>. Same size as <cite>pmf_diff</cite>, by default None</p>
+</dd>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>user-defined panel title, by default “”</p>
+</dd>
+<dt>gen_title<span class="classifier">bool, optional</span></dt><dd><p>automatically generate panel title from <cite>params</cite>, by default False</p>
+</dd>
+<dt>output_fig<span class="classifier">bool, optional</span></dt><dd><p>toggle writing figure output, by default False</p>
+</dd>
+<dt>fn<span class="classifier">str, optional</span></dt><dd><p>path to write output figure, by default “../output/error_plot.pdf”</p>
+</dd>
+<dt>ylim<span class="classifier">list, optional</span></dt><dd><p>extent of the error bar plot, by default [-100,100]</p>
+</dd>
+<dt>fs<span class="classifier">tuple, optional</span></dt><dd><p>figure size, by default (10.0,6.0)</p>
+</dd>
+<dt>ylabel<span class="classifier">str, optional</span></dt><dd><p>y-axis label, by default “”</p>
+</dd>
+<dt>fontsize<span class="classifier">int, optional</span></dt><dd><p>by default 8</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vis.plotter.error_bar_split_plot">
+<span class="sig-prename descclassname"><span class="pre">vis.plotter.</span></span><span class="sig-name descname"><span class="pre">error_bar_split_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts_ticks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3.5,</span> <span class="pre">3.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output/errors.pdf'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.error_bar_split_plot" title="Link to this definition">#</a></dt>
+<dd><p>Function to generate error bar plots with a split in the middle, e.g., when space in limited on a presentation slide or poster.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="vis.plotter.error_bar_abs_plot">
+<span class="sig-prename descclassname"><span class="pre">vis.plotter.</span></span><span class="sig-name descname"><span class="pre">error_bar_abs_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3.5,</span> <span class="pre">3.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output/errors.pdf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.error_bar_abs_plot" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="vis.plotter.plot_3d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">vis.plotter.</span></span><span class="sig-name descname"><span class="pre">plot_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">230</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.plot_3d" title="Link to this definition">#</a></dt>
+<dd><p>Helper class for 3D plots</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.plot_3d.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ele</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">230</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.plot_3d.__init__" title="Link to this definition">#</a></dt>
+<dd><section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<dl>
+<dt>cell<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo_cell</span></code></a></span></dt><dd><p>instance of a cell object</p>
+</dd>
+<dt>ele<span class="classifier">int, optional</span></dt><dd><p>elevation angle, by default 5</p>
+</dd>
+<dt>azi<span class="classifier">int, optional</span></dt><dd><p>azimuthal angle, by default 230</p>
+</dd>
+<dt>cpad<span class="classifier">float, optional</span></dt><dd><p>colour bar padding, by default 0.01</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="vis.plotter.plot_3d.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plot_3D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lbls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vis.plotter.plot_3d.plot" title="Link to this definition">#</a></dt>
+<dd><p>Does the plotting</p>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>Z<span class="classifier">array-like</span></dt><dd><p>2D elevation array</p>
+</dd>
+<dt>output_fig<span class="classifier">bool, optional</span></dt><dd><p>toggles output of figure, by default True</p>
+</dd>
+<dt>output_fn<span class="classifier">str, optional</span></dt><dd><p>output filnemae, by default “plot_3D”</p>
+</dd>
+<dt>lbls<span class="classifier">list, optional</span></dt><dd><p>list of axis labels containing <code class="docutils literal notranslate"><span class="pre">[x_label,</span> <span class="pre">y_label,</span> <span class="pre">z_label]</span></code>, by default None</p>
+</dd>
+<dt>fs<span class="classifier">tuple, optional</span></dt><dd><p>figure size, by default (10,10)</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../changelog.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Change log</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="vis.cart_plot.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">vis.cart_plot</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achatz
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">vis.plotter</a><ul>
+<li><a class="reference internal" href="#vis.plotter.fig_obj"><code class="docutils literal notranslate"><span class="pre">fig_obj</span></code></a><ul>
+<li><a class="reference internal" href="#vis.plotter.fig_obj.__init__"><code class="docutils literal notranslate"><span class="pre">fig_obj.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.fig_obj.phys_panel"><code class="docutils literal notranslate"><span class="pre">fig_obj.phys_panel()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.fig_obj.freq_panel"><code class="docutils literal notranslate"><span class="pre">fig_obj.freq_panel()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.fig_obj.fft_freq_panel"><code class="docutils literal notranslate"><span class="pre">fig_obj.fft_freq_panel()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vis.plotter.error_bar_plot"><code class="docutils literal notranslate"><span class="pre">error_bar_plot()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.error_bar_split_plot"><code class="docutils literal notranslate"><span class="pre">error_bar_split_plot()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.error_bar_abs_plot"><code class="docutils literal notranslate"><span class="pre">error_bar_abs_plot()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.plot_3d"><code class="docutils literal notranslate"><span class="pre">plot_3d</span></code></a><ul>
+<li><a class="reference internal" href="#vis.plotter.plot_3d.__init__"><code class="docutils literal notranslate"><span class="pre">plot_3d.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#vis.plotter.plot_3d.plot"><code class="docutils literal notranslate"><span class="pre">plot_3d.plot()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=76f4ad40"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

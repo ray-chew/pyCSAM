@@ -1,0 +1,730 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="src.var" href="src.var.html" /><link rel="prev" title="src.reconstruction" href="src.reconstruction.html" />
+
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>src.utils - CSAM v0.95.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">CSAM v0.95.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">CSAM v0.95.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">CSAM’s Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="inputs.html"><cite>inputs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of inputs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="inputs.lam_run.html">inputs.lam_run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inputs.selected_run.html">inputs.selected_run</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="runs.html"><cite>runs</cite></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of runs</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="runs.idealised_isosceles.html">runs.idealised_isosceles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.idealised_delaunay.html">runs.idealised_delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.delaunay_runs.html">runs.delaunay_runs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.icon_usgs_test.html">runs.icon_usgs_test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="runs.tapering_test.html">runs.tapering_test</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="wrappers.html"><cite>wrappers</cite></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of wrappers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="wrappers.diagnostics.html">wrappers.diagnostics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="wrappers.interface.html">wrappers.interface</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="src.html"><cite>src</cite></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.delaunay.html">src.delaunay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.fourier.html">src.fourier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.io.html">src.io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.lin_reg.html">src.lin_reg</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.physics.html">src.physics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.reconstruction.html">src.reconstruction</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">src.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.var.html">src.var</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="vis.html"><cite>vis</cite></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of vis</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="vis.cart_plot.html">vis.cart_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vis.plotter.html">vis.plotter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Change log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../refs.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ray-chew/spec_appx">GitHub repo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-src.utils">
+<span id="src-utils"></span><h1>src.utils<a class="headerlink" href="#module-src.utils" title="Link to this heading">#</a></h1>
+<p>This module contains miscellaneous helper functions and classes</p>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.delaunay" title="src.utils.delaunay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delaunay</span></code></a>(grid, cell[, res_x, res_y, xmax, ...])</p></td>
+<td><p>Generates an idealised Delaunay triangle</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.gen_art_terrain" title="src.utils.gen_art_terrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_art_terrain</span></code></a>(shp[, seed, iters])</p></td>
+<td><p>Generates an artificial terrain</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.get_closest_idx" title="src.utils.get_closest_idx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_closest_idx</span></code></a>(val, arr)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.get_lat_lon_segments" title="src.utils.get_lat_lon_segments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lat_lon_segments</span></code></a>(lat_verts, lon_verts, ...)</p></td>
+<td><p>Populates an empty <a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">cell</span></code></a> object given the vertices and underlying topography.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.get_size" title="src.utils.get_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_size</span></code></a>(obj[, seen])</p></td>
+<td><p>Recursively finds size of objects</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.isosceles" title="src.utils.isosceles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isosceles</span></code></a>(grid, cell[, xmax, ymax, res, tri])</p></td>
+<td><p>Populates a <a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">cell</span></code></a> instance with an idealised triangle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.latlon2m" title="src.utils.latlon2m"><code class="xref py py-obj docutils literal notranslate"><span class="pre">latlon2m</span></code></a>(arr, fix_pt, latlon)</p></td>
+<td><p>Wrapper function to compute the distance of a list of values from a given fixed point (in meters).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.pick_cell" title="src.utils.pick_cell"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pick_cell</span></code></a>(lat_ref, lon_ref, grid[, radius])</p></td>
+<td><p><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.90.0.</span></p>
+</div>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.rad2deg" title="src.utils.rad2deg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rad2deg</span></code></a>(val)</p></td>
+<td><p>Radians to degrees converter</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.rescale" title="src.utils.rescale"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rescale</span></code></a>(arr[, rng])</p></td>
+<td><p>Rescales a list to the interval of [0,1]</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.sliding_window_view" title="src.utils.sliding_window_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sliding_window_view</span></code></a>(arr, window_shape, steps)</p></td>
+<td><p>Produce a view from a sliding, striding window over <cite>arr</cite>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.utils.gen_triangle" title="src.utils.gen_triangle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_triangle</span></code></a>(vx, vy[, x_rng, y_rng])</p></td>
+<td><p>Defines a triangle generator given the coordinates of its vertices</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#src.utils.taper" title="src.utils.taper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">taper</span></code></a>(cell, padding[, stencil_typ, ...])</p></td>
+<td><p>Helper class to apply tapering via artificial diffusion</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.pick_cell">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">pick_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.pick_cell" title="Link to this definition">#</a></dt>
+<dd><div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.90.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.rad2deg">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">rad2deg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.rad2deg" title="Link to this definition">#</a></dt>
+<dd><p>Radians to degrees converter</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>val<span class="classifier">float</span></dt><dd><p>argument in units of radians</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>argument in units of degrees</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.isosceles">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">isosceles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">480</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mid'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.isosceles" title="Link to this definition">#</a></dt>
+<dd><p>Populates a <a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">cell</span></code></a> instance with an idealised triangle</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<dl>
+<dt>grid<span class="classifier"><a class="reference internal" href="src.var.html#src.var.grid" title="src.var.grid"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.grid</span></code></a></span></dt><dd><p>instance of the grid class</p>
+</dd>
+<dt>cell<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo_cell</span></code></a></span></dt><dd><p>instance of the cell class</p>
+</dd>
+<dt>xmax<span class="classifier">float, optional</span></dt><dd><p>first horizontal extent, by default 2.0*np.pi</p>
+</dd>
+<dt>ymax<span class="classifier">float, optional</span></dt><dd><p>second horizontal extent, by default 2.0*np.pi</p>
+</dd>
+<dt>res<span class="classifier">int, optional</span></dt><dd><p>resolution of the triangle, by default 480</p>
+</dd>
+<dt>tri<span class="classifier">str, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">mid</span></code> generates an isosceles triangle, <code class="docutils literal notranslate"><span class="pre">left</span></code> generates a lower and <code class="docutils literal notranslate"><span class="pre">right</span></code> an upper triangle. By default ‘mid’</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>always returns 0, as this function generates only one triangle at index 0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.delaunay">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">delaunay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">480</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">480</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.283185307179586</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lower'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.delaunay" title="Link to this definition">#</a></dt>
+<dd><p>Generates an idealised Delaunay triangle</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<dl>
+<dt>grid<span class="classifier"><a class="reference internal" href="src.var.html#src.var.grid" title="src.var.grid"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.grid</span></code></a></span></dt><dd><p>instance of the grid class</p>
+</dd>
+<dt>cell<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo_cell</span></code></a></span></dt><dd><p>instance of the cell class</p>
+</dd>
+<dt>res_x<span class="classifier">int, optional</span></dt><dd><p>resolution of the first horizontal extent, by default 480</p>
+</dd>
+<dt>res_y<span class="classifier">int, optional</span></dt><dd><p>resolution of the second horizontal extent, by default 480</p>
+</dd>
+<dt>xmax<span class="classifier">float, optional</span></dt><dd><p>first horizontal extent, by default 2.0*np.pi</p>
+</dd>
+<dt>ymax<span class="classifier">float, optional</span></dt><dd><p>second horizontal extent, by default 2.0*np.pi</p>
+</dd>
+<dt>tri<span class="classifier">str, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">lower</span></code> generates a lower triangle, and <code class="docutils literal notranslate"><span class="pre">upper</span></code> an upper triangle. By default ‘lower’</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>int</dt><dd><p>always returns 0, as this function generates only one triangle at index 0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.gen_art_terrain">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">gen_art_terrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">555</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.gen_art_terrain" title="Link to this definition">#</a></dt>
+<dd><p>Generates an artificial terrain</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.90.0.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>superceded by <code class="xref py py-mod docutils literal notranslate"><span class="pre">src.runs.idealised_test</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">src.runs.idealised_test_2</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.gen_triangle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">gen_triangle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.gen_triangle" title="Link to this definition">#</a></dt>
+<dd><p>Defines a triangle generator given the coordinates of its vertices</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.gen_triangle.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.gen_triangle.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Defines the triangle’s properties</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>vx<span class="classifier">list</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">[x1,</span> <span class="pre">x2,</span> <span class="pre">x3]</span></code>, list of the first coordinate of the vertices</p>
+</dd>
+<dt>vy<span class="classifier">list</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">[y1,</span> <span class="pre">y2,</span> <span class="pre">y3]</span></code>, list of the second coordinate of the vertices</p>
+</dd>
+<dt>x_rng<span class="classifier">list, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">[x_min,</span> <span class="pre">x_max]</span></code>: the full first horizontal extent of the domain encompassing the triangle, by default None</p>
+</dd>
+<dt>y_rng<span class="classifier">list, optional</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">[y_min,</span> <span class="pre">y_max]</span></code>: the full second horizontal extent of the domain encompassing the triangle, by default None</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">x_rng</span></code> and <code class="docutils literal notranslate"><span class="pre">y_rng</span></code> are required if the triangle does not span the full extent of the grid cell.</p>
+</div>
+</section>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.rescale">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">rescale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.rescale" title="Link to this definition">#</a></dt>
+<dd><p>Rescales a list to the interval of [0,1]</p>
+<section id="id6">
+<h2>Parameters<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>arr<span class="classifier">list</span></dt><dd><p>data points to be rescaled</p>
+</dd>
+<dt>rng<span class="classifier">list, optional</span></dt><dd><p>extent to be rescaled, by default None</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Returns<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>list</dt><dd><p><code class="docutils literal notranslate"><span class="pre">arr</span></code> values rescaled to [0,1]</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This rescaling is required to work with the fast <code class="xref py py-func docutils literal notranslate"><span class="pre">triangle</span> <span class="pre">generator</span> <span class="pre">function</span></code>.</p>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.get_size">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">get_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.get_size" title="Link to this definition">#</a></dt>
+<dd><p>Recursively finds size of objects</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Function taken from <a class="reference external" href="https://github.com/bosswissam/pysize">https://github.com/bosswissam/pysize</a>. Useful in checking how much memory is required by the data objects generated by <a class="reference internal" href="src.var.html#module-src.var" title="src.var"><code class="xref py py-mod docutils literal notranslate"><span class="pre">src.var</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.get_lat_lon_segments">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">get_lat_lon_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_verts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_verts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filtered</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topo_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_topo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.get_lat_lon_segments" title="Link to this definition">#</a></dt>
+<dd><p>Populates an empty <a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">cell</span></code></a> object given the vertices and underlying topography.</p>
+<section id="id8">
+<h2>Parameters<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<dl>
+<dt>lat_verts<span class="classifier">list</span></dt><dd><p>vertices of the cell in the first horizontal direction</p>
+</dd>
+<dt>lon_verts<span class="classifier">list</span></dt><dd><p>vertices of the cell in the second horizontal direction</p>
+</dd>
+<dt>cell<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo_cell</span></code></a></span></dt><dd><p>instance of the cell object class</p>
+</dd>
+<dt>topo<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo" title="src.var.topo"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo</span></code></a></span></dt><dd><p>instance of the topography object class</p>
+</dd>
+<dt>rect<span class="classifier">bool, optional</span></dt><dd><p>do the vertices describe a quadrilateral grid cell? By default False</p>
+</dd>
+<dt>filtered<span class="classifier">bool, optional</span></dt><dd><p>removes topographic features smaller than 5km in scale, by default True</p>
+</dd>
+<dt>padding<span class="classifier">int, optional</span></dt><dd><p>number of data points in the padded region, by default 0</p>
+</dd>
+<dt>topo_mask<span class="classifier">array-like, optional</span></dt><dd><p>tapering mask, by default None</p>
+</dd>
+<dt>mask<span class="classifier">array-like, optional</span></dt><dd><p>2D Boolean mask to select for data points inside the non-quadrilateral grid cell, by default None</p>
+</dd>
+<dt>load_topo<span class="classifier">bool, optional</span></dt><dd><p>explicitly replaces the topography attribute in the cell <code class="docutils literal notranslate"><span class="pre">cell.topo</span></code> with the data given in <code class="docutils literal notranslate"><span class="pre">topo</span></code>, by default False</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.get_closest_idx">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">get_closest_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.get_closest_idx" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.latlon2m">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">latlon2m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_pt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latlon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.latlon2m" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper function to compute the distance of a list of values from a given fixed point (in meters).</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>arr<span class="classifier">list</span></dt><dd><p>list of values in degrees</p>
+</dd>
+<dt>fix_pt<span class="classifier">float</span></dt><dd><p>given fixed point, e.g. the origin, in degrees</p>
+</dd>
+<dt>latlon<span class="classifier">str</span></dt><dd><p><code class="docutils literal notranslate"><span class="pre">lat</span></code> if the distance are to be computed in the latitudinal direction, <code class="docutils literal notranslate"><span class="pre">lon</span></code> otherwise.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>distance in meters</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.utils.sliding_window_view">
+<span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">sliding_window_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.sliding_window_view" title="Link to this definition">#</a></dt>
+<dd><p>Produce a view from a sliding, striding window over <cite>arr</cite>.
+The window is only placed in ‘valid’ positions - no overlapping
+over the boundary.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>arr<span class="classifier">numpy.ndarray, shape=(…,[x, (…), z])</span></dt><dd><p>The array to slide the window over.</p>
+</dd>
+<dt>window_shape<span class="classifier">Sequence[int]</span></dt><dd><p>The shape of the window to raster: [Wx, (…), Wz],
+determines the length of [x, (…), z]</p>
+</dd>
+<dt>steps<span class="classifier">Sequence[int]</span></dt><dd><p>The step size used when applying the window
+along the [x, (…), z] directions: [Sx, (…), Sz]</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<p>view of <cite>arr</cite>, shape=([X, (…), Z], …, [Wx, (…), Wz]), where X = (x - Wx) // Sx + 1</p>
+</section>
+<section id="note">
+<h2>Note<a class="headerlink" href="#note" title="Link to this heading">#</a></h2>
+<p>This function is taken from:
+<a class="reference external" href="https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a">https://gist.github.com/meowklaski/4bda7c86c6168f3557657d5fb0b5395a</a></p>
+<p>In general, given:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">sliding_window_view</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span>
+                            <span class="n">window_shape</span><span class="o">=</span><span class="p">[</span><span class="n">Wx</span><span class="p">,</span> <span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">Wz</span><span class="p">],</span>
+                            <span class="n">steps</span><span class="o">=</span><span class="p">[</span><span class="n">Sx</span><span class="p">,</span> <span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">Sz</span><span class="p">])</span>
+<span class="n">out</span><span class="p">[</span><span class="n">ix</span><span class="p">,</span> <span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">iz</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ix</span><span class="o">*</span><span class="n">Sx</span><span class="p">:</span><span class="n">ix</span><span class="o">*</span><span class="n">Sx</span><span class="o">+</span><span class="n">Wx</span><span class="p">,</span>  <span class="p">(</span><span class="o">...</span><span class="p">),</span> <span class="n">iz</span><span class="o">*</span><span class="n">Sz</span><span class="p">:</span><span class="n">iz</span><span class="o">*</span><span class="n">Sz</span><span class="o">+</span><span class="n">Wz</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h2>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
+<span class="go">array([[0, 1, 2],</span>
+<span class="go">    [3, 4, 5],</span>
+<span class="go">    [6, 7, 8]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">sliding_window_view</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">steps</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span>
+<span class="go">array([[[[0, 1],</span>
+<span class="go">        [3, 4]],</span>
+<span class="go">        [[1, 2],</span>
+<span class="go">        [4, 5]]],</span>
+<span class="go">    [[[3, 4],</span>
+<span class="go">        [6, 7]],</span>
+<span class="go">        [[4, 5],</span>
+<span class="go">        [7, 8]]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">shares_memory</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">    True</span>
+<span class="go"># Performing a neural net style 2D conv (correlation)</span>
+<span class="go"># placing a 4x4 filter with stride-1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>  <span class="c1"># (N, C, H, W)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># (F, C, Hf, Wf)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">windowed_data</span> <span class="o">=</span> <span class="n">sliding_window_view</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+<span class="gp">... </span>                                    <span class="n">window_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+<span class="gp">... </span>                                    <span class="n">steps</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conv_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">filters</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">windowed_data</span><span class="p">,</span>
+<span class="gp">... </span>                        <span class="n">axes</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]])</span>
+<span class="go"># (F, H&#39;, W&#39;, N) -&gt; (N, F, H&#39;, W&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conv_out</span> <span class="o">=</span> <span class="n">conv_out</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.utils.taper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.utils.</span></span><span class="sig-name descname"><span class="pre">taper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_typ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">art_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">art_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">800</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.taper" title="Link to this definition">#</a></dt>
+<dd><p>Helper class to apply tapering via artificial diffusion</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.taper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stencil_typ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'OP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_fac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">art_dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">art_it</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">800</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.taper.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialises an artificial diffusion scenario</p>
+<section id="id13">
+<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<dl>
+<dt>cell<span class="classifier"><a class="reference internal" href="src.var.html#src.var.topo_cell" title="src.var.topo_cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">src.var.topo_cell</span></code></a></span></dt><dd><p>instance of the cell object class</p>
+</dd>
+<dt>padding<span class="classifier">int</span></dt><dd><p>number of data points in the padded region</p>
+</dd>
+<dt>stencil_typ<span class="classifier">str, optional</span></dt><dd><p>Laplacian stencil choice, by default ‘OP’ which is also the most stable</p>
+</dd>
+<dt>scale_fac<span class="classifier">float, optional</span></dt><dd><p>scaling factor for the stencil, by default 1.0</p>
+</dd>
+<dt>art_dt<span class="classifier">float, optional</span></dt><dd><p>artificial diffusion time-step size, by default 0.5</p>
+</dd>
+<dt>art_it<span class="classifier">int, optional</span></dt><dd><p>number of iterations for the artificial discussion, by default 800</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.utils.taper.do_tapering">
+<span class="sig-name descname"><span class="pre">do_tapering</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.utils.taper.do_tapering" title="Link to this definition">#</a></dt>
+<dd><p>Get tapered mask via artificial diffusion</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="src.var.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">src.var</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="src.reconstruction.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">src.reconstruction</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Ray Chew, Stamen Dolaptchiev, Maja-Sophie Wedel, Ulrich Achatz
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">src.utils</a><ul>
+<li><a class="reference internal" href="#src.utils.pick_cell"><code class="docutils literal notranslate"><span class="pre">pick_cell()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.rad2deg"><code class="docutils literal notranslate"><span class="pre">rad2deg()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.isosceles"><code class="docutils literal notranslate"><span class="pre">isosceles()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.delaunay"><code class="docutils literal notranslate"><span class="pre">delaunay()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.gen_art_terrain"><code class="docutils literal notranslate"><span class="pre">gen_art_terrain()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.gen_triangle"><code class="docutils literal notranslate"><span class="pre">gen_triangle</span></code></a><ul>
+<li><a class="reference internal" href="#src.utils.gen_triangle.__init__"><code class="docutils literal notranslate"><span class="pre">gen_triangle.__init__()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#src.utils.rescale"><code class="docutils literal notranslate"><span class="pre">rescale()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.get_size"><code class="docutils literal notranslate"><span class="pre">get_size()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.get_lat_lon_segments"><code class="docutils literal notranslate"><span class="pre">get_lat_lon_segments()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.get_closest_idx"><code class="docutils literal notranslate"><span class="pre">get_closest_idx()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.latlon2m"><code class="docutils literal notranslate"><span class="pre">latlon2m()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.sliding_window_view"><code class="docutils literal notranslate"><span class="pre">sliding_window_view()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.taper"><code class="docutils literal notranslate"><span class="pre">taper</span></code></a><ul>
+<li><a class="reference internal" href="#src.utils.taper.__init__"><code class="docutils literal notranslate"><span class="pre">taper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#src.utils.taper.do_tapering"><code class="docutils literal notranslate"><span class="pre">taper.do_tapering()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=76f4ad40"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

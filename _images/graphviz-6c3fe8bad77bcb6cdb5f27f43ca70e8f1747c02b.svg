@@ -1,0 +1,256 @@
+<ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns1="http://www.w3.org/1999/xlink" width="694pt" height="560pt" viewBox="0.00 0.00 694.00 560.00">
+<ns0:g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 556)">
+<ns0:title>%3</ns0:title>
+<ns0:polygon fill="white" stroke="transparent" points="-4,4 -4,-556 690,-556 690,4 -4,4" />
+<ns0:g id="clust1" class="cluster">
+<ns0:title>cluster_topo</ns0:title>
+<ns0:polygon fill="none" stroke="black" points="8,-314 8,-544 124,-544 124,-314 8,-314" />
+<ns0:text text-anchor="start" x="38" y="-531.4" font-family="Verdana" font-weight="bold" font-size="12.00">load the</ns0:text>
+<ns0:text text-anchor="start" x="27" y="-519.4" font-family="Verdana" font-weight="bold" font-size="12.00">topography</ns0:text>
+</ns0:g>
+<ns0:g id="clust2" class="cluster">
+<ns0:title>cluster_grid</ns0:title>
+<ns0:polygon fill="none" stroke="black" points="132,-314 132,-533 562,-533 562,-314 132,-314" />
+<ns0:text text-anchor="start" x="297" y="-520.4" font-family="Verdana" font-weight="bold" font-size="12.00">define the grid</ns0:text>
+</ns0:g>
+<ns0:g id="clust3" class="cluster">
+<ns0:title>cluster_input</ns0:title>
+<ns0:polygon fill="none" stroke="black" points="572,-314 572,-467 678,-467 678,-314 572,-314" />
+<ns0:text text-anchor="start" x="590" y="-454.4" font-family="Verdana" font-weight="bold" font-size="12.00">define run</ns0:text>
+<ns0:text text-anchor="start" x="585" y="-442.4" font-family="Verdana" font-weight="bold" font-size="12.00">parameters</ns0:text>
+</ns0:g>
+
+<ns0:g id="node1" class="node">
+<ns0:title>topo</ns0:title>
+<ns0:polygon fill="none" stroke="transparent" points="8,-475.5 8,-511.5 124,-511.5 124,-475.5 8,-475.5" />
+<ns0:text text-anchor="middle" x="66" y="-496.9" font-family="Verdana" font-size="12.00">external</ns0:text>
+<ns0:text text-anchor="middle" x="66" y="-483.9" font-family="Verdana" font-size="12.00">topography data</ns0:text>
+</ns0:g>
+
+<ns0:g id="node2" class="node">
+<ns0:title>ncdata</ns0:title>
+<ns0:g id="a_node2"><ns0:a ns1:href="../modules/src.io.html#src.io.ncdata" ns1:title="src.io.ncdata" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="19.5,-393 19.5,-429 112.5,-429 112.5,-393 19.5,-393" />
+<ns0:text text-anchor="middle" x="66" y="-407.9" font-family="Verdana" font-size="12.00" fill="red">src.io.ncdata</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge1" class="edge">
+<ns0:title>topo-&gt;ncdata</ns0:title>
+<ns0:path fill="none" stroke="black" d="M66,-475.43C66,-464.97 66,-451.34 66,-439.4" />
+<ns0:polygon fill="black" stroke="black" points="69.5,-439.05 66,-429.05 62.5,-439.05 69.5,-439.05" />
+</ns0:g>
+
+<ns0:g id="node3" class="node">
+<ns0:title>vartopo</ns0:title>
+<ns0:g id="a_node3"><ns0:a ns1:href="../modules/src.var.html#src.var.topo" ns1:title="src.var.topo" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="23,-314.5 23,-350.5 109,-350.5 109,-314.5 23,-314.5" />
+<ns0:text text-anchor="middle" x="66" y="-329.4" font-family="Verdana" font-size="12.00" fill="red">src.var.topo</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge2" class="edge">
+<ns0:title>ncdata-&gt;vartopo</ns0:title>
+<ns0:path fill="none" stroke="black" d="M66,-392.64C66,-383.19 66,-371.27 66,-360.62" />
+<ns0:polygon fill="black" stroke="black" points="69.5,-360.53 66,-350.53 62.5,-360.53 69.5,-360.53" />
+</ns0:g>
+
+<ns0:g id="node11" class="node">
+<ns0:title>runs</ns0:title>
+<ns0:g id="a_node11"><ns0:a ns1:href="../modules/runs.html" ns1:title="assemble the components&lt;br/&gt;in a run script:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;runs&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="black" points="245.5,-230.5 245.5,-277.5 420.5,-277.5 420.5,-230.5 245.5,-230.5" />
+<ns0:text text-anchor="start" x="253.5" y="-263.9" font-family="Verdana" font-size="12.00">assemble the components</ns0:text>
+<ns0:text text-anchor="start" x="289.5" y="-250.9" font-family="Verdana" font-size="12.00">in a run script:</ns0:text>
+<ns0:text text-anchor="start" x="319.5" y="-237.9" font-family="Verdana" font-size="12.00" fill="red">runs</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge8" class="edge">
+<ns0:title>vartopo:s-&gt;runs:w</ns0:title>
+<ns0:path fill="none" stroke="black" d="M66,-314C66,-275.19 183.77,-256.68 233.87,-254.27" />
+<ns0:polygon fill="black" stroke="black" points="234.1,-257.77 244,-254 233.91,-250.77 234.1,-257.77" />
+</ns0:g>
+
+<ns0:g id="node4" class="node">
+<ns0:title>extgrid</ns0:title>
+<ns0:polygon fill="none" stroke="transparent" points="438,-475.5 438,-511.5 538,-511.5 538,-475.5 438,-475.5" />
+<ns0:text text-anchor="middle" x="488" y="-496.9" font-family="Verdana" font-size="12.00">external ICON</ns0:text>
+<ns0:text text-anchor="middle" x="488" y="-483.9" font-family="Verdana" font-size="12.00">grid</ns0:text>
+</ns0:g>
+
+<ns0:g id="node5" class="node">
+<ns0:title>readdat</ns0:title>
+<ns0:g id="a_node5"><ns0:a ns1:href="../modules/src.io.html#src.io.ncdata.read_dat" ns1:title="src.io.ncdata.read_dat" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="413.5,-393 413.5,-429 562.5,-429 562.5,-393 413.5,-393" />
+<ns0:text text-anchor="middle" x="488" y="-407.9" font-family="Verdana" font-size="12.00" fill="red">src.io.ncdata.read_dat</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge3" class="edge">
+<ns0:title>extgrid-&gt;readdat</ns0:title>
+<ns0:path fill="none" stroke="black" d="M488,-475.43C488,-464.97 488,-451.34 488,-439.4" />
+<ns0:polygon fill="black" stroke="black" points="491.5,-439.05 488,-429.05 484.5,-439.05 491.5,-439.05" />
+</ns0:g>
+
+<ns0:g id="node6" class="node">
+<ns0:title>vargrid</ns0:title>
+<ns0:g id="a_node6"><ns0:a ns1:href="../modules/src.var.html#src.var.grid" ns1:title="src.var.grid" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="291.5,-314.5 291.5,-350.5 374.5,-350.5 374.5,-314.5 291.5,-314.5" />
+<ns0:text text-anchor="middle" x="333" y="-329.4" font-family="Verdana" font-size="12.00" fill="red">src.var.grid</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge4" class="edge">
+<ns0:title>readdat-&gt;vargrid</ns0:title>
+<ns0:path fill="none" stroke="black" d="M453.21,-392.83C430.58,-381.66 400.87,-367 376.66,-355.05" />
+<ns0:polygon fill="black" stroke="black" points="378.19,-351.9 367.67,-350.61 375.09,-358.18 378.19,-351.9" />
+</ns0:g>
+
+<ns0:g id="edge10" class="edge">
+<ns0:title>vargrid:s-&gt;runs:n</ns0:title>
+<ns0:path fill="none" stroke="black" d="M333,-314C333,-302 333,-296.75 333,-288.12" />
+<ns0:polygon fill="black" stroke="black" points="336.5,-288 333,-278 329.5,-288 336.5,-288" />
+</ns0:g>
+
+<ns0:g id="node7" class="node">
+<ns0:title>delaunay</ns0:title>
+<ns0:g id="a_node7"><ns0:a ns1:href="../modules/src.delaunay.html#src.delaunay.get_decomposition" ns1:title="regional Delaunay&lt;br/&gt;triangulation:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;src.delaunay&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="270.5,-387.5 270.5,-434.5 395.5,-434.5 395.5,-387.5 270.5,-387.5" />
+<ns0:text text-anchor="start" x="278.5" y="-420.9" font-family="Verdana" font-size="12.00">regional Delaunay</ns0:text>
+<ns0:text text-anchor="start" x="293" y="-407.9" font-family="Verdana" font-size="12.00">triangulation:</ns0:text>
+<ns0:text text-anchor="start" x="295" y="-394.9" font-family="Verdana" font-size="12.00" fill="red">src.delaunay</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge5" class="edge">
+<ns0:title>delaunay-&gt;vargrid</ns0:title>
+<ns0:path fill="none" stroke="black" d="M333,-387.46C333,-379.06 333,-369.44 333,-360.67" />
+<ns0:polygon fill="black" stroke="black" points="336.5,-360.54 333,-350.54 329.5,-360.54 336.5,-360.54" />
+</ns0:g>
+
+<ns0:g id="node8" class="node">
+<ns0:title>isosceles</ns0:title>
+<ns0:g id="a_node8"><ns0:a ns1:href="../modules/src.utils.html#src.utils.isosceles" ns1:title="idealised:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;src.utils.isosceles&lt;br/&gt;src.utils.delaunay&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="132,-387.5 132,-434.5 252,-434.5 252,-387.5 132,-387.5" />
+<ns0:text text-anchor="start" x="163.5" y="-420.9" font-family="Verdana" font-size="12.00">idealised:</ns0:text>
+<ns0:text text-anchor="start" x="140.5" y="-407.9" font-family="Verdana" font-size="12.00" fill="red">src.utils.isosceles</ns0:text>
+<ns0:text text-anchor="start" x="140" y="-394.9" font-family="Verdana" font-size="12.00" fill="red">src.utils.delaunay</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge6" class="edge">
+<ns0:title>isosceles-&gt;vargrid</ns0:title>
+<ns0:path fill="none" stroke="black" d="M233.54,-387.46C252.25,-377.31 274.25,-365.37 292.8,-355.31" />
+<ns0:polygon fill="black" stroke="black" points="294.48,-358.38 301.6,-350.54 291.14,-352.23 294.48,-358.38" />
+</ns0:g>
+
+<ns0:g id="node9" class="node">
+<ns0:title>inputs</ns0:title>
+<ns0:g id="a_node9"><ns0:a ns1:href="../modules/inputs.html" ns1:title="user-defined&lt;br/&gt;inputs:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;inputs&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="581,-387.5 581,-434.5 673,-434.5 673,-387.5 581,-387.5" />
+<ns0:text text-anchor="start" x="589" y="-420.9" font-family="Verdana" font-size="12.00">user-defined</ns0:text>
+<ns0:text text-anchor="start" x="607" y="-407.9" font-family="Verdana" font-size="12.00">inputs:</ns0:text>
+<ns0:text text-anchor="start" x="608.5" y="-394.9" font-family="Verdana" font-size="12.00" fill="red">inputs</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="node10" class="node">
+<ns0:title>params</ns0:title>
+<ns0:g id="a_node10"><ns0:a ns1:href="../modules/src.var.html#src.var.params" ns1:title="&lt;font color=&quot;red&quot;&gt;src.var.params&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="transparent" points="572.5,-314.5 572.5,-350.5 677.5,-350.5 677.5,-314.5 572.5,-314.5" />
+<ns0:text text-anchor="start" x="580.5" y="-329.4" font-family="Verdana" font-size="12.00" fill="red">src.var.params</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge7" class="edge">
+<ns0:title>inputs-&gt;params</ns0:title>
+<ns0:path fill="none" stroke="black" d="M626.41,-387.46C626.19,-379.06 625.94,-369.44 625.71,-360.67" />
+<ns0:polygon fill="black" stroke="black" points="629.21,-360.44 625.45,-350.54 622.21,-360.63 629.21,-360.44" />
+</ns0:g>
+
+<ns0:g id="edge9" class="edge">
+<ns0:title>params:s-&gt;runs:e</ns0:title>
+<ns0:path fill="none" stroke="black" d="M625,-314C625,-269.9 487.93,-255.75 432.03,-254.16" />
+<ns0:polygon fill="black" stroke="black" points="432.05,-250.66 422,-254 431.94,-257.66 432.05,-250.66" />
+</ns0:g>
+
+<ns0:g id="node12" class="node">
+<ns0:title>nodepoint</ns0:title>
+<ns0:ellipse fill="black" stroke="black" cx="333" cy="-170" rx="0.72" ry="0.72" />
+</ns0:g>
+
+
+<ns0:g id="edge12" class="edge">
+<ns0:title>nodepoint:n-&gt;runs:s</ns0:title>
+<ns0:path fill="none" stroke="black" d="M333,-172C333,-193.95 333,-201.88 333,-219.67" />
+<ns0:polygon fill="black" stroke="black" points="329.5,-220 333,-230 336.5,-220 329.5,-220" />
+</ns0:g>
+
+<ns0:g id="node13" class="node">
+<ns0:title>wrappers</ns0:title>
+<ns0:g id="a_node13"><ns0:a ns1:href="../modules/wrappers.html" ns1:title="interface modules:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;wrappers&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="black" points="268.5,-73.5 268.5,-109.5 397.5,-109.5 397.5,-73.5 268.5,-73.5" />
+<ns0:text text-anchor="start" x="276.5" y="-94.9" font-family="Verdana" font-size="12.00">interface modules:</ns0:text>
+<ns0:text text-anchor="start" x="304.5" y="-81.9" font-family="Verdana" font-size="12.00" fill="red">wrappers</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+
+<ns0:g id="edge14" class="edge">
+<ns0:title>wrappers:n-&gt;nodepoint:s</ns0:title>
+<ns0:path fill="none" stroke="black" d="M333,-110C333,-135.78 333,-142.22 333,-168" />
+</ns0:g>
+
+
+
+<ns0:g id="node14" class="node">
+<ns0:title>exp</ns0:title>
+<ns0:polygon fill="none" stroke="transparent" points="352,-146.5 352,-193.5 562,-193.5 562,-146.5 352,-146.5" />
+<ns0:text text-anchor="middle" x="457" y="-179.9" font-family="Verdana" font-size="12.00">use the wrapper components as</ns0:text>
+<ns0:text text-anchor="middle" x="457" y="-166.9" font-family="Verdana" font-size="12.00">building blocks to interface</ns0:text>
+<ns0:text text-anchor="middle" x="457" y="-153.9" font-family="Verdana" font-size="12.00">with the core components</ns0:text>
+</ns0:g>
+
+<ns0:g id="node15" class="node">
+<ns0:title>src</ns0:title>
+<ns0:g id="a_node15"><ns0:a ns1:href="../modules/src.html" ns1:title="core modules:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;src&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="black" points="200.5,-0.5 200.5,-36.5 301.5,-36.5 301.5,-0.5 200.5,-0.5" />
+<ns0:text text-anchor="start" x="208.5" y="-21.9" font-family="Verdana" font-size="12.00">core modules:</ns0:text>
+<ns0:text text-anchor="start" x="242" y="-8.9" font-family="Verdana" font-size="12.00" fill="red">src</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge16" class="edge">
+<ns0:title>src:n-&gt;wrappers:w</ns0:title>
+<ns0:path fill="none" stroke="black" d="M251,-37C251,-58.1 244.54,-82.01 257.17,-89.28" />
+<ns0:polygon fill="black" stroke="black" points="256.48,-92.72 267,-91.5 258.01,-85.89 256.48,-92.72" />
+</ns0:g>
+
+<ns0:g id="node16" class="node">
+<ns0:title>vis</ns0:title>
+<ns0:g id="a_node16"><ns0:a ns1:href="../modules/vis.html" ns1:title="visualisation modules:&lt;br/&gt;&lt;font color=&quot;red&quot;&gt;vis&lt;/font&gt;" target="_top">
+<ns0:polygon fill="none" stroke="black" points="338,-0.5 338,-36.5 486,-36.5 486,-0.5 338,-0.5" />
+<ns0:text text-anchor="start" x="346" y="-21.9" font-family="Verdana" font-size="12.00">visualisation modules:</ns0:text>
+<ns0:text text-anchor="start" x="404" y="-8.9" font-family="Verdana" font-size="12.00" fill="red">vis</ns0:text>
+</ns0:a>
+</ns0:g>
+</ns0:g>
+
+<ns0:g id="edge17" class="edge">
+<ns0:title>vis:n-&gt;wrappers:e</ns0:title>
+<ns0:path fill="none" stroke="black" d="M412,-37C412,-57.62 420.16,-81.46 408.83,-89.05" />
+<ns0:polygon fill="black" stroke="black" points="407.86,-85.69 399,-91.5 409.55,-92.48 407.86,-85.69" />
+</ns0:g>
+</ns0:g>
+</ns0:svg>
