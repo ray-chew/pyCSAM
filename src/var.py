@@ -238,15 +238,20 @@ class analysis(object):
         self.kks = fobj.m_i / (fobj.Ni)
         self.lls = fobj.m_j / (fobj.Nj)
 
-        self.kks, self.lls = np.meshgrid(self.kks, self.lls)
+        self.dk = np.diff(self.kks).mean()
+        self.dl = np.diff(self.lls).mean()
 
-        # self.kks = self.kks / self.kks.size
-        # self.lls = self.lls / self.lls.size
+        wla = self.wlat
+        wlo = self.wlon
 
-    #         self.clat = ma.getdata(df.variables['clat'][:])
-    # clat_vertices = ma.getdata(df.variables['clat_vertices'][:])
-    # clon = ma.getdata(df.variables['clon'][:])
-    # clon_vertices = ma.getdata(df.variables['clon_vertices'][:])
+        kks = self.kks * 2.0 * np.pi
+        lls = self.lls * 2.0 * np.pi
+
+        kks = kks / wlo
+        lls = lls / wla
+
+        self.kks, self.lls = np.meshgrid(kks, lls)
+
 
     def grid_kk_ll(self, fobj, dat):
         """

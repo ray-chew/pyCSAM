@@ -45,11 +45,6 @@ class ideal_pmf(object):
         U = self.U
         V = self.V
 
-        wlat = analysis.wlat
-        wlon = analysis.wlon
-
-        kks = analysis.kks * 2.0 * np.pi
-        lls = analysis.lls * 2.0 * np.pi
 
         # if ((kks.ndim == 1) and (lls.ndim == 1)):
         #     print(True)
@@ -58,11 +53,8 @@ class ideal_pmf(object):
         #     ampls = analysis.ampls
         ampls = np.copy(analysis.ampls)
 
-        wla = wlat  # * self.AE
-        wlo = wlon  # * self.AE
-
-        kks = kks / wlo
-        lls = lls / wla
+        kks = analysis.kks
+        lls = analysis.lls
 
         om = -kks * U - lls * V
         omsq = om**2
