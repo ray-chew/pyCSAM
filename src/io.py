@@ -544,6 +544,77 @@ class writer(object):
         file.close()
 
 
+class nc_writer(object):
+
+    def __init__(self, params):
+
+        self.fn = params.output_fn
+
+        if self.fn[-3:] != ".nc":
+            self.fn += '.nc'
+
+        self.path = params.output_path
+        self.rect_set = params.rect_set
+        self.debug = params.debug_writer
+
+        rootgrp = nc.Dataset(self.path + self.fn, "w", format="NETCDF4")
+        
+        _ = rootgrp.createDimension("nspec", params.n_modes)
+
+        self.n_modes = params.n_modes
+        rootgrp.close()
+
+    def output(self, id, clat, clon, analysis):
+
+        rootgrp = nc.Dataset(self.path + self.fn, "a", format="NETCDF4")
+
+        grp = rootgrp.createGroup(str(id))
+
+        is_land_var = grp.createVariable("is_land","i4")
+        is_land_var[:] = 1
+
+        clat_var = grp.createVariable("clat","f8")
+        clat_var[:] = clat
+        clon_var = grp.createVariable("clon","f8")
+        clon_var[:] = clon
+
+        dk_var = grp.createVariable("dk","f8")
+        dk_var[:] = analysis.dk
+        dl_var = grp.createVariable("dl","f8")
+        dl_var[:] = analysis.dl
+
+        pick_idx = np.where(analysis.ampls > 0)
+
+        H_spec_var = grp.createVariable("H_spec","f8", ("nspec",))
+        H_spec_var[:] = self.pad_zeros(analysis.ampls[pick_idx], self.n_modes)
+
+        kks_var = grp.createVariable("kks","f8", ("nspec",))
+        kks_var[:] = self.pad_zeros(analysis.kks[pick_idx], self.n_modes)
+
+        lls_var = grp.createVariable("lls","f8", ("nspec",))
+        lls_var[:] = self.pad_zeros(analysis.lls[pick_idx], self.n_modes)
+
+        
+
+
+        rootgrp.close()
+
+
+    @staticmethod
+    def pad_zeros(lst, n_modes):
+
+        if lst.size < n_modes:
+            pad_len = n_modes - lst.size
+        else:
+            pad_len = 0
+
+        return np.concatenate((lst, np.zeros((pad_len))))
+
+
+
+
+
+
 class reader(object):
     """Simple reader class to read HDF5 output written by :class:`src.io.writer`"""
 

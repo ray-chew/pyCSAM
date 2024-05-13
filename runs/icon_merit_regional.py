@@ -43,9 +43,13 @@ topo = var.topo_cell()
 reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
 
 # writer object
-# writer = io.writer(params.output_fn, params.rect_set, debug=params.debug_writer)
+writer = io.nc_writer(params)
 
 reader.read_dat(params.fn_grid, grid)
+
+clat_rad = np.copy(grid.clat)
+clon_rad = np.copy(grid.clon)
+
 grid.apply_f(utils.rad2deg)
 
 # we only keep the topography that is inside this lat-lon extent.
@@ -99,7 +103,7 @@ cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat)
 
 
 # %%
-
+autoreload()
 idxs = []
 pmfs = []
 
@@ -170,6 +174,8 @@ for tri_idx in params.tri_set:
 
     cell.topo = topo_orig
 
+    writer.output(tri_idx, clat_rad[tri_idx], clon_rad[tri_idx], cell.analysis)
+    
     cell.uw = uw
 
     if params.plot:
@@ -216,8 +222,11 @@ for tri_idx in params.tri_set:
         plt.savefig("../output/T%i.pdf" % tri_idx)
         plt.show()
 
-        ideal = physics.ideal_pmf(U=params.U, V=params.V)
-        uw_comp = ideal.compute_uw_pmf(cell.analysis)
+    ideal = physics.ideal_pmf(U=params.U, V=params.V)
+    uw_comp = ideal.compute_uw_pmf(cell.analysis)
 
-        idxs.append(tri_idx)
-        pmfs.append(uw_comp)
+    idxs.append(tri_idx)
+    pmfs.append(uw_comp)
+
+
+# %%
