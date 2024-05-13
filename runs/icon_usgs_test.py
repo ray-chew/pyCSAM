@@ -16,8 +16,8 @@ from vis import plotter, cart_plot
 
 fn_grid = "../data/icon_compact.nc"
 fn_topo = "../data/topo_compact.nc"
-lat_extent = [52.0, 64.0, 64.0]
-lon_extent = [-141.0, -158.0, -127.0]
+lat_extent = [48.0, 64.0, 64.0]
+lon_extent = [-148.0, -148.0, -112.0]
 
 tri_set = [13, 104, 105, 106]
 
@@ -27,7 +27,7 @@ nhj = 48
 
 n_modes = 100
 
-U, V = 10.0, 0.1
+U, V = 10.0, 0.0
 
 rect = True
 
@@ -101,9 +101,8 @@ for tri_idx in tri_set:
     simplex_lon = triangles[tri_idx, :, 0]
     simplex_lat = triangles[tri_idx, :, 1]
 
-    triangle = utils.triangle(simplex_lon, simplex_lat)
     utils.get_lat_lon_segments(
-        simplex_lat, simplex_lon, cell, topo, triangle, rect=rect
+        simplex_lat, simplex_lon, cell, topo, rect=rect
     )
 
     topo_orig = np.copy(cell.topo)
@@ -143,7 +142,7 @@ for tri_idx in tri_set:
         fq_cpy[max_idx] = 0.0
 
     utils.get_lat_lon_segments(
-        simplex_lat, simplex_lon, cell, topo, triangle, rect=False
+        simplex_lat, simplex_lon, cell, topo, rect=False
     )
 
     k_idxs = [pair[1] for pair in indices]
