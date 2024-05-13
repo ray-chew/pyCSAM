@@ -7,6 +7,15 @@
 *.pdf
 *.png
 *.json
+*.bat
+*.log
+
 
 /docs/build/*
 .VSCodeCounter/*
+/notebooks/*
+/preprint/*
+/poster/*
+*submission/*
+manuscript/*
+outputs/*
