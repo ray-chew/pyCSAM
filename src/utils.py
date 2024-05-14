@@ -15,9 +15,23 @@ def pick_cell(
     grid,
     radius=1.0,
 ):
-    """
-    .. deprecated:: 0.90.0
+    """pick an ICON grid cell given (lon,lat) coorindates
 
+    Parameters
+    ----------
+    lat_ref : float
+        reference latitude coordinate in the cell to be picked
+    lon_ref : float
+        reference longitude coordinate in the cell to be picked
+    grid : class:`src.var.grid`
+        instance of an ICON grid
+    radius : float, optional
+        radius from `(lon_ref, lat_ref)` to search for `(clon,clat)`, by default 1.0
+
+    Returns
+    -------
+    _type_
+        _description_
     """
     clat, clon = grid.clat, grid.clon
     index = np.nonzero(
