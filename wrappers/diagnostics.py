@@ -168,9 +168,13 @@ class delaunay_metrics(object):
 
     def __gen_percentage_errs(self):
         """Computes the relative and maximum errors in percentage"""
-        max_idx = np.argmax(np.abs(self.pmf_refs))
+        if hasattr(self, "max_val"):
+            max_val = self.max_val
+        else:
+            max_idx = np.argmax(np.abs(self.pmf_refs))
+            max_val = self.pmf_refs[max_idx]
         self.max_errs = self.__get_max_diff(
-            self.pmf_sums, self.pmf_refs, np.array(self.pmf_refs[max_idx])
+            self.pmf_sums, self.pmf_refs, max_val
         )
         self.rel_errs = self.__get_rel_diff(self.pmf_sums, self.pmf_refs)
 

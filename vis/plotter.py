@@ -36,7 +36,7 @@ class fig_obj(object):
         self.set_label = set_label
 
     def phys_panel(
-        self, axs, data, title="", extent=None, xlabel="", ylabel="", v_extent=None
+        self, axs, data, title="", extent=None, xlabel="", ylabel="", v_extent=None,
     ):
         """
         Plots a physical depiction of the input data.
@@ -268,6 +268,7 @@ def error_bar_plot(
     fs=(10.0, 6.0),
     ylabel="",
     fontsize=8,
+    show_grid=True
 ):
     """
     Bar plot of errors.
@@ -298,6 +299,8 @@ def error_bar_plot(
         y-axis label, by default ""
     fontsize : int, optional
         by default 8
+    show_grid : bool, optional
+        toggles grid in output, by default True
     """
 
     data = pd.DataFrame(pmf_diff, index=idx_name, columns=["values"])
@@ -333,7 +336,8 @@ def error_bar_plot(
         fontsize=fontsize,
     )
 
-    plt.grid()
+    if show_grid:
+        plt.grid()
 
     plt.xlabel("first grid pair index", fontsize=fontsize + 3)
 
@@ -375,6 +379,7 @@ def error_bar_split_plot(
     bs,
     ts,
     ts_ticks,
+    color,
     fs=(3.5, 3.5),
     title="",
     output_fig=False,
@@ -396,10 +401,11 @@ def error_bar_split_plot(
     ax2.set_ylim(0, bs)
     ax1.set_ylim(ts[0], ts[1])
     ax1.set_yticks(ts_ticks)
+    ax1.ticklabel_format(style='plain')
 
-    bars1 = ax1.bar(XX.index, XX.values, color=("C0"))
-    bars2 = ax2.bar(XX.index, XX.values, color=("C0", "C1", "C2", "r"))
-    ax1.bar_label(bars1, padding=3)
+    bars1 = ax1.bar(XX.index, XX.values, color=color)
+    bars2 = ax2.bar(XX.index, XX.values, color=color)
+    ax1.bar_label(bars1, padding=3, fmt = '%d')
     ax2.bar_label(bars2, padding=3)
 
     for tick in ax2.get_xticklabels():
