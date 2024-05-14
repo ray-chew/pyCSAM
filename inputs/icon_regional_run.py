@@ -7,8 +7,18 @@ params.output_path = "/home/ray/git-projects/spec_appx/outputs/"
 params.output_fn = "icon_merit_reg"
 params.fn_grid = "../data/icon_compact.nc"
 params.fn_topo = "../data/topo_compact.nc"
+
+### alaska
 params.lat_extent = [48.0, 64.0, 64.0]
 params.lon_extent = [-148.0, -148.0, -112.0]
+
+### Tierra del Fuego
+params.lat_extent = [-38.0, -56.0, -56.0]
+params.lon_extent = [-76.0, -76.0, -53.0]
+
+### Tierra del Fuego
+params.lat_extent = [-75.0, -61.0, -61.0]
+params.lon_extent = [-77.0, -50.0, -50.0]
 
 params.tri_set = [13, 104, 105, 106]
 

@@ -166,11 +166,11 @@ class ncdata(object):
             lon_min_idx = self.__compute_idx(self.lon_verts.min(), "min", "lon")
             lon_max_idx = self.__compute_idx(self.lon_verts.max(), "max", "lon")
 
-            fns, lon_cnt, lat_cnt = self.__get_fns(
+            fns, dirs, lon_cnt, lat_cnt = self.__get_fns(
                 lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx
             )
 
-            self.get_topo(cell, fns, lon_cnt, lat_cnt)
+            self.get_topo(cell, fns, dirs, lon_cnt, lat_cnt)
 
         def __compute_idx(self, vert, typ, direction):
             """Given a point ``vert``, look up which MERIT NetCDF file contains this point."""
@@ -209,6 +209,7 @@ class ncdata(object):
         def __get_fns(self, lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx):
             """Construct the full filenames required for the loading of the topographic data from the indices identified in :func:`src.io.ncdata.read_merit_topo.__compute_idx`"""
             fns = []
+            dirs = []
 
             for lat_cnt, lat_idx in enumerate(range(lat_max_idx, lat_min_idx)):
                 l_lat_bound, r_lat_bound = (
@@ -219,6 +220,15 @@ class ncdata(object):
                     l_lat_bound, "lat"
                 ), self.__get_NSEW(r_lat_bound, "lat")
 
+                if ((l_lat_tag == "S" and r_lat_tag == "S") and (l_lat_bound == -60 and r_lat_bound == -90)):
+                    merit_or_rema = "REMA_BKG"
+                    self.rema = True
+                    self.dir = self.dir.replace("MERIT", "REMA")
+                else:
+                    merit_or_rema = "MERIT"
+                    self.rema = False
+                    self.dir = self.dir.replace("REMA", "MERIT")
+
                 for lon_cnt, lon_idx in enumerate(range(lon_min_idx, lon_max_idx)):
                     l_lon_bound, r_lon_bound = (
                         self.fn_lon[lon_idx],
@@ -228,7 +238,8 @@ class ncdata(object):
                         l_lon_bound, "lon"
                     ), self.__get_NSEW(r_lon_bound, "lon")
 
-                    name = "MERIT_%s%.2d-%s%.2d_%s%.3d-%s%.3d.nc4" % (
+                    name = "%s_%s%.2d-%s%.2d_%s%.3d-%s%.3d.nc4" % (
+                        merit_or_rema,
                         l_lat_tag,
                         np.abs(l_lat_bound),
                         r_lat_tag,
@@ -240,10 +251,11 @@ class ncdata(object):
                     )
 
                     fns.append(name)
+                    dirs.append(self.dir)
 
-            return fns, lon_cnt, lat_cnt
+            return fns, dirs, lon_cnt, lat_cnt
 
-        def get_topo(self, cell, fns, lon_cnt, lat_cnt, init=True, populate=True):
+        def get_topo(self, cell, fns, dirs, lon_cnt, lat_cnt, init=True, populate=True):
             """
             This method assembles a contiguous array in ``cell.topo`` containing the regional topography to be loaded.
 
@@ -254,7 +266,7 @@ class ncdata(object):
                 2. The second run populates the empty array with the information of the block arrays obtained in the first run.
             """
             if (cell.topo is None) and (init):
-                self.get_topo(cell, fns, lon_cnt, lat_cnt, init=False, populate=False)
+                self.get_topo(cell, fns, dirs, lon_cnt, lat_cnt, init=False, populate=False)
 
             if not populate:
                 nc_lon = 0
@@ -268,7 +280,7 @@ class ncdata(object):
                 cell.lon = []
 
             for cnt, fn in enumerate(fns):
-                test = nc.Dataset(self.dir + fn)
+                test = nc.Dataset(dirs[cnt] + fn)
 
                 lat = test["lat"]
                 lat_min_idx = np.argmin(np.abs(lat - self.lat_verts.min()))
@@ -287,8 +299,9 @@ class ncdata(object):
                 if not populate:
                     if cnt < (lon_cnt + 1):
                         nc_lon += lon_high - lon_low
-                    if (cnt % (lat_cnt + 1)) == 0:
+                    if cnt < (lat_cnt + 1):
                         nc_lat += lat_high - lat_low
+
                 else:
                     topo = test["Elevation"][lat_low:lat_high, lon_low:lon_high]
                     if n_col == 0:
@@ -318,8 +331,6 @@ class ncdata(object):
                 cell.topo = np.zeros((nc_lat, nc_lon))
             else:
                 iint = self.merit_cg
-                # cell.lat = np.sort(cell.lat)[::iint]
-                # cell.lon = np.sort(cell.lon)[::iint][:-1]
 
                 cell.lat = utils.sliding_window_view(
                     np.sort(cell.lat), (iint,), (iint,)
@@ -586,22 +597,20 @@ class nc_writer(object):
         pick_idx = np.where(analysis.ampls > 0)
 
         H_spec_var = grp.createVariable("H_spec","f8", ("nspec",))
-        H_spec_var[:] = self.pad_zeros(analysis.ampls[pick_idx], self.n_modes)
+        H_spec_var[:] = self.__pad_zeros(analysis.ampls[pick_idx], self.n_modes)
 
         kks_var = grp.createVariable("kks","f8", ("nspec",))
-        kks_var[:] = self.pad_zeros(analysis.kks[pick_idx], self.n_modes)
+        kks_var[:] = self.__pad_zeros(analysis.kks[pick_idx], self.n_modes)
 
         lls_var = grp.createVariable("lls","f8", ("nspec",))
-        lls_var[:] = self.pad_zeros(analysis.lls[pick_idx], self.n_modes)
-
-        
-
+        lls_var[:] = self.__pad_zeros(analysis.lls[pick_idx], self.n_modes)
 
         rootgrp.close()
 
 
+
     @staticmethod
-    def pad_zeros(lst, n_modes):
+    def __pad_zeros(lst, n_modes):
 
         if lst.size < n_modes:
             pad_len = n_modes - lst.size
@@ -609,9 +618,6 @@ class nc_writer(object):
             pad_len = 0
 
         return np.concatenate((lst, np.zeros((pad_len))))
-
-
-
 
 
 
