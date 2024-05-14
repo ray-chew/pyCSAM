@@ -133,7 +133,7 @@ class ncdata(object):
             verbose : bool, optional
                 prints loading progression, by default False
             """
-            self.dir = params.merit_path
+            self.dir = params.path_merit
             self.verbose = verbose
 
             self.fn_lon = np.array(
@@ -559,12 +559,12 @@ class nc_writer(object):
 
     def __init__(self, params):
 
-        self.fn = params.output_fn
+        self.fn = params.fn_output
 
         if self.fn[-3:] != ".nc":
             self.fn += '.nc'
 
-        self.path = params.output_path
+        self.path = params.path_output
         self.rect_set = params.rect_set
         self.debug = params.debug_writer
 

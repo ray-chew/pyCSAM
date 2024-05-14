@@ -808,3 +808,14 @@ class taper(object):
 
         stencil = (1.0 - gam) * stencil_iso + gam * stencil_aniso
         return stencil
+
+
+def transfer_attributes(params, cls, prefix=""):
+    for key, value in vars(cls).items():
+        if len(prefix) > 0:
+            key = prefix + '_' + key
+        
+        if not hasattr(params, key):
+            setattr(params, key, value)
+        elif getattr(params, key) == None:
+            setattr(params, key, value)

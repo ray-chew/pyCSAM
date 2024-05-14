@@ -23,13 +23,10 @@ def autoreload():
     if ipython is not None:
         ipython.run_line_magic("autoreload", "2")
 
-
-autoreload()
-
 # %%
 # from inputs.lam_run import params
 from inputs.selected_run import params
-
+autoreload()
 # from params.debug_run import params
 from copy import deepcopy
 
@@ -44,11 +41,11 @@ topo = var.topo_cell()
 
 # read grid
 reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
-reader.read_dat(params.fn_grid, grid)
+reader.read_dat(params.path_compact_grid, grid)
 grid.apply_f(utils.rad2deg)
 
 # writer object
-writer = io.writer(params.output_fn, params.rect_set, debug=params.debug_writer)
+writer = io.writer(params.fn_output, params.rect_set, debug=params.debug_writer)
 
 # we only keep the topography that is inside this lat-lon extent.
 lat_verts = np.array(params.lat_extent)
@@ -56,7 +53,7 @@ lon_verts = np.array(params.lon_extent)
 
 # read topography
 if not params.enable_merit:
-    reader.read_dat(params.fn_topo, topo)
+    reader.read_dat(params.path_compact_topo, topo)
     reader.read_topo(topo, topo, lon_verts, lat_verts)
 else:
     reader.read_merit_topo(topo, params)

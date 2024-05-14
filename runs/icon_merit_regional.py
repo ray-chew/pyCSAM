@@ -36,6 +36,8 @@ from inputs.icon_regional_run import params
 if params.self_test():
     params.print()
 
+print(params.path_compact_topo)
+
 grid = var.grid()
 topo = var.topo_cell()
 
@@ -45,7 +47,7 @@ reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
 # writer object
 writer = io.nc_writer(params)
 
-reader.read_dat(params.fn_grid, grid)
+reader.read_dat(params.path_compact_grid, grid)
 
 clat_rad = np.copy(grid.clat)
 clon_rad = np.copy(grid.clon)
@@ -219,7 +221,7 @@ for tri_idx in params.tri_set:
             axs[1, 1] = fig_obj.freq_panel(axs[1, 1], uw, title="PMF spectrum")
 
         plt.tight_layout()
-        plt.savefig("../output/T%i.pdf" % tri_idx)
+        plt.savefig("%sT%i.pdf" % (params.path_output, tri_idx))
         plt.show()
 
     ideal = physics.ideal_pmf(U=params.U, V=params.V)

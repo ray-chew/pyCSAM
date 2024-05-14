@@ -7,21 +7,24 @@ User input data for the run script :mod:`runs.delaunay_runs` for the studies:
 """
 
 import numpy as np
-from src import var
+from src import var, utils
+from inputs import local_paths
 
 params = var.params()
+utils.transfer_attributes(params, local_paths.paths, prefix="path")
+
 
 run_case = "R2B4"
 # run_case = "R2B5"
 # run_case = "R2B4_STRW"
 
-run_case = "R2B4_NN"
-run_case = "R2B4_NE"
-run_case = "R2B4_SE"
-run_case = "R2B4_SS"
-run_case = "R2B4_SW"
-run_case = "R2B4_WW"
-run_case = "R2B4_NW"
+# run_case = "R2B4_NN"
+# run_case = "R2B4_NE"
+# run_case = "R2B4_SE"
+# run_case = "R2B4_SS"
+# run_case = "R2B4_SW"
+# run_case = "R2B4_WW"
+# run_case = "R2B4_NW"
 
 if run_case == "R2B4":
     coarse = True

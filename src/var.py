@@ -299,15 +299,15 @@ class params(obj):
         """
         # Define filenames
         self.run_case = ""
-        self.path = "../data/"
-        self.fn_grid = self.path + "icon_compact.nc"
-        self.fn_topo = self.path + "topo_compact.nc"
+        self.path_compact_grid = None
+        self.path_compact_topo = None
 
-        self.output_fn = None
+        self.path_output = None
+        self.fn_output = None
 
         self.enable_merit = True
         self.merit_cg = 10
-        self.merit_path = "/home/ray/Documents/orog_data/MERIT/"
+        self.path_merit = None
 
         # Domain size
         self.lat_extent = None
@@ -368,8 +368,8 @@ class params(obj):
         bool
             True if test passed, False otherwise
         """
-        if self.output_fn is None:
-            self.output_fn = io.fn_gen(self)
+        if self.fn_output is None:
+            self.fn_output = io.fn_gen(self)
 
         self.check_init()
 
