@@ -1,6 +1,6 @@
 import numpy as np
-from src import var, utils
-from inputs import local_paths
+from ..src import var, utils
+from ..inputs import local_paths
 
 params = var.params()
 
@@ -23,6 +23,8 @@ params.lon_extent = [-77.0, -50.0, -50.0]
 
 params.tri_set = [13, 104, 105, 106]
 
+params.merit_cg = 20
+
 # Setup the Fourier parameters and object.
 params.nhi = 24
 params.nhj = 48
@@ -34,7 +36,7 @@ params.U, params.V = 10.0, 0.0
 params.rect = True
 
 params.debug = False
-params.dfft_first_guess = True
+params.dfft_first_guess = False
 params.refine = False
 params.verbose = False
 

@@ -819,3 +819,15 @@ def transfer_attributes(params, cls, prefix=""):
             setattr(params, key, value)
         elif getattr(params, key) == None:
             setattr(params, key, value)
+
+
+def is_land(cell, simplex_lat, simplex_lon, topo, height_tol=0.5, percent_tol=0.95):
+
+    get_lat_lon_segments(
+    simplex_lat, simplex_lon, cell, topo, load_topo=True, filtered=False
+    ) 
+
+    if not (((cell.topo <= height_tol).sum() / cell.topo.size) > percent_tol):
+        return False
+    else:
+        return True

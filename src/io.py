@@ -8,7 +8,7 @@ import h5py
 import os
 from datetime import datetime
 
-from src import utils
+from ..src import utils
 
 
 class ncdata(object):
@@ -570,40 +570,52 @@ class nc_writer(object):
 
         rootgrp = nc.Dataset(self.path + self.fn, "w", format="NETCDF4")
         
+        for key, value in vars(params).items():
+
+            # if params attribute is None but check passed, then the attribute is not necessary for the run; skip it
+            if value is None:
+                continue
+            # NetCDF does not accept Boolean types; convert to int
+            if type(value) is bool:
+                value = int(value)
+            # Else, write attribute
+            setattr(rootgrp, key, value)
+
         _ = rootgrp.createDimension("nspec", params.n_modes)
 
         self.n_modes = params.n_modes
         rootgrp.close()
 
-    def output(self, id, clat, clon, analysis):
+    def output(self, id, clat, clon, is_land, analysis=None):
 
         rootgrp = nc.Dataset(self.path + self.fn, "a", format="NETCDF4")
 
         grp = rootgrp.createGroup(str(id))
 
         is_land_var = grp.createVariable("is_land","i4")
-        is_land_var[:] = 1
+        is_land_var[:] = is_land
 
         clat_var = grp.createVariable("clat","f8")
         clat_var[:] = clat
         clon_var = grp.createVariable("clon","f8")
         clon_var[:] = clon
 
-        dk_var = grp.createVariable("dk","f8")
-        dk_var[:] = analysis.dk
-        dl_var = grp.createVariable("dl","f8")
-        dl_var[:] = analysis.dl
+        if analysis is not None:
+            dk_var = grp.createVariable("dk","f8")
+            dk_var[:] = analysis.dk
+            dl_var = grp.createVariable("dl","f8")
+            dl_var[:] = analysis.dl
 
-        pick_idx = np.where(analysis.ampls > 0)
+            pick_idx = np.where(analysis.ampls > 0)
 
-        H_spec_var = grp.createVariable("H_spec","f8", ("nspec",))
-        H_spec_var[:] = self.__pad_zeros(analysis.ampls[pick_idx], self.n_modes)
+            H_spec_var = grp.createVariable("H_spec","f8", ("nspec",))
+            H_spec_var[:] = self.__pad_zeros(analysis.ampls[pick_idx], self.n_modes)
 
-        kks_var = grp.createVariable("kks","f8", ("nspec",))
-        kks_var[:] = self.__pad_zeros(analysis.kks[pick_idx], self.n_modes)
+            kks_var = grp.createVariable("kks","f8", ("nspec",))
+            kks_var[:] = self.__pad_zeros(analysis.kks[pick_idx], self.n_modes)
 
-        lls_var = grp.createVariable("lls","f8", ("nspec",))
-        lls_var[:] = self.__pad_zeros(analysis.lls[pick_idx], self.n_modes)
+            lls_var = grp.createVariable("lls","f8", ("nspec",))
+            lls_var[:] = self.__pad_zeros(analysis.lls[pick_idx], self.n_modes)
 
         rootgrp.close()
 

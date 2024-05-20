@@ -3,8 +3,8 @@ Interface wrapper module to ease setting up the CSAM building blocks
 """
 
 
-from src import fourier, lin_reg, physics, reconstruction
-from src import utils, var
+from ..src import fourier, lin_reg, physics, reconstruction
+from ..src import utils, var
 from copy import deepcopy
 import numpy as np
 

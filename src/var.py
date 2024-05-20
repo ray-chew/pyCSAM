@@ -3,7 +3,7 @@ This module defines the data objects used in the program.
 """
 
 import numpy as np
-from src import utils, io
+from ..src import utils, io
 
 
 class grid(object):

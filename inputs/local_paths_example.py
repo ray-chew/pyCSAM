@@ -1,4 +1,4 @@
-from src import var
+from ..src import var
 
 paths = var.obj()
 
