@@ -1,16 +1,11 @@
 # %%
-import sys
-
-# set system path to find local modules
-sys.path.append("..")
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src import io, var, utils, fourier, physics
-from wrappers import interface
-from vis import plotter, cart_plot
+from pycsam.src import io, var, utils, fourier
+from pycsam.wrappers import interface
+from pycsam.vis import plotter, cart_plot
 
 from IPython import get_ipython
 
@@ -29,9 +24,12 @@ from sys import exit
 
 if __name__ != "__main__":
     exit(0)
+
+
 # %%
+
 autoreload()
-from inputs.icon_regional_run import params
+from pycsam.inputs.icon_regional_run import params
 
 if params.self_test():
     params.print()
@@ -55,8 +53,8 @@ grid.apply_f(utils.rad2deg)
 
 n_cells = grid.clat.size
 
-for c_idx in range(n_cells)[:1]:
-    c_idx = 90
+for c_idx in range(n_cells)[3:6]:
+    # c_idx = 1
     print(c_idx)
 
     topo = var.topo_cell()
@@ -81,7 +79,10 @@ for c_idx in range(n_cells)[:1]:
         topo.topo[np.where(topo.topo < -500.0)] = -500.0
 
     topo.gen_mgrids()
+
+
 # %%
+
     clon = np.array([grid.clon[c_idx]])
     clat = np.array([grid.clat[c_idx]])
     clon_vertices = np.array([grid.clon_vertices[c_idx]])
@@ -93,7 +94,7 @@ for c_idx in range(n_cells)[:1]:
     clon_vertices = np.where(clon_vertices < -180.0, clon_vertices + 360.0, clon_vertices)
     clon_vertices = np.where(clon_vertices > 180.0, clon_vertices - 360.0, clon_vertices)
 
-    triangles = np.zeros((ncells, nv, 2), np.float32)
+    triangles = np.zeros((ncells, nv, 2))
 
     for i in range(0, ncells, 1):
         triangles[i, :, 0] = np.array(clon_vertices[i, :])
@@ -101,8 +102,12 @@ for c_idx in range(n_cells)[:1]:
 
     print("--> triangles done")
 
-    cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat)
+    if params.plot:
+        cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat)
 
+# %%
+
+    print(topo.topo.shape)
 
 # %%
     tri_idx = 0
@@ -116,11 +121,20 @@ for c_idx in range(n_cells)[:1]:
         simplex_lat, simplex_lon, cell, topo, rect=params.rect
     )
 
+    if utils.is_land(cell, simplex_lat, simplex_lon, topo):
+        writer.output(c_idx, clat_rad[tri_idx], clon_rad[tri_idx], 0)
+        continue
+    else:
+        is_land = 1
+
     topo_orig = np.copy(cell.topo)
 
     if params.dfft_first_guess:
         nhi = len(cell.lon)
         nhj = len(cell.lat)
+    else:
+        nhi = params.nhi
+        nhj = params.nhj
 
     first_guess = interface.get_pmf(nhi, nhj, params.U, params.V)
     fobj_tri = fourier.f_trans(nhi, nhj)
@@ -129,7 +143,7 @@ for c_idx in range(n_cells)[:1]:
     # do fourier...
 
     if not params.dfft_first_guess:
-        freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, lmbda=0.0)
+        freqs, uw_pmf_freqs, dat_2D_fg0 = first_guess.sappx(cell, params.lmbda_fa)
 
     #######################################################
     # do fourier using DFFT
@@ -141,6 +155,9 @@ for c_idx in range(n_cells)[:1]:
     print("uw_pmf_freqs_sum:", uw_pmf_freqs.sum())
 
     fq_cpy = np.copy(freqs)
+    fq_cpy[
+        np.isnan(fq_cpy)
+    ] = 0.0  # necessary. Otherwise, popping with fq_cpy.max() gives the np.nan entries first.
 
     indices = []
     max_ampls = []
@@ -168,11 +185,11 @@ for c_idx in range(n_cells)[:1]:
     else:
         second_guess.fobj.set_kls(k_idxs, l_idxs, recompute_nhij=False)
 
-    freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=1e-1, updt_analysis=True)
+    freqs, uw, dat_2D_sg0 = second_guess.sappx(cell, lmbda=params.lmbda_sa, updt_analysis=True)
 
     cell.topo = topo_orig
 
-    writer.output(tri_idx, clat_rad[tri_idx], clon_rad[tri_idx], cell.analysis)
+    writer.output(c_idx, clat_rad[tri_idx], clon_rad[tri_idx], is_land, cell.analysis)
     
     cell.uw = uw
 
@@ -219,4 +236,6 @@ for c_idx in range(n_cells)[:1]:
         plt.tight_layout()
         plt.savefig("%sT%i.pdf" % (params.path_output, tri_idx))
         plt.show()
+
+
 # %%
