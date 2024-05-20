@@ -3,8 +3,8 @@ Diagnostic wrapper module to ease setting up the CSAM building blocks
 """
 
 import numpy as np
-from src import physics
-from vis import plotter
+from ..src import physics
+from ..vis import plotter
 from copy import deepcopy
 
 import matplotlib.pyplot as plt
@@ -357,3 +357,4 @@ class diag_plotter(object):
                 plt.savefig(self.output_dir + fn + ".pdf", dpi=200, bbox_inches="tight")
 
             plt.show()
+
