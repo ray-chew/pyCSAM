@@ -4,9 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-from pycsam.src import io, var, utils, fourier
+from pycsam.src import io, var, utils
 from pycsam.wrappers import interface, diagnostics
-from pycsam.vis import plotter, cart_plot
+from pycsam.vis import cart_plot
 
 from IPython import get_ipython
 
@@ -123,13 +123,13 @@ for c_idx in range(n_cells)[3:6]:
 
     tri.tri_lon_verts = triangles[:, :, 0]
     tri.tri_lat_verts = triangles[:, :, 1]
-
+    
 
     simplex_lat = tri.tri_lat_verts[tri_idx]
     simplex_lon = tri.tri_lon_verts[tri_idx]
 
     if utils.is_land(cell, simplex_lat, simplex_lon, topo):
-        writer.output(c_idx, clat_rad[tri_idx], clon_rad[tri_idx], 0)
+        writer.output(c_idx, clat_rad[c_idx], clon_rad[c_idx], 0)
         continue
     else:
         is_land = 1
