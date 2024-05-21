@@ -28,6 +28,7 @@ class ncdata(object):
         """
         self.read_merit = read_merit
         self.padding = padding_tol + padding
+        self.is_open = False
 
     def read_dat(self, fn, obj):
         """Reads data by attributes defined in the ``obj`` class.
@@ -39,13 +40,21 @@ class ncdata(object):
         obj : :class:`src.var.grid` or :class:`src.var.topo` or :class:`src.var.topo_cell`
             any data object in :mod:`src.var` accepting topography attributes
         """
-        df = nc.Dataset(fn)
+        df = nc.Dataset(fn, "r")
 
         for key, _ in vars(obj).items():
             if key in df.variables:
                 setattr(obj, key, df.variables[key][:])
 
         df.close()
+
+    def open(self, fn):
+        self.df = nc.Dataset(fn, "r")
+        self.is_open = True
+
+    def close(self):
+        if self.is_open and hasattr(self, "df"):
+            self.df.close()
 
     def __get_truths(self, arr, vert_pts, d_pts):
         """Assembles Boolean array selecting for data points within a given lat-lon range, including padded boundary."""
@@ -121,7 +130,7 @@ class ncdata(object):
     class read_merit_topo(object):
         """Subclass to read MERIT topographic data"""
 
-        def __init__(self, cell, params, verbose=False):
+        def __init__(self, cell, params, verbose=False, is_parallel=False):
             """Populates ``cell`` object instance with arguments from ``params``
 
             Parameters
@@ -135,6 +144,7 @@ class ncdata(object):
             """
             self.dir = params.path_merit
             self.verbose = verbose
+            self.opened_dfs = []
 
             self.fn_lon = np.array(
                 [
@@ -160,6 +170,12 @@ class ncdata(object):
 
             self.merit_cg = params.merit_cg
 
+            if not is_parallel:
+                self.get_topo(cell)
+            
+            self.is_parallel = is_parallel
+
+        def get_topo(self, cell):
             lat_min_idx = self.__compute_idx(self.lat_verts.min(), "min", "lat")
             lat_max_idx = self.__compute_idx(self.lat_verts.max(), "max", "lat")
 
@@ -170,7 +186,7 @@ class ncdata(object):
                 lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx
             )
 
-            self.get_topo(cell, fns, dirs, lon_cnt, lat_cnt)
+            self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt)
 
         def __compute_idx(self, vert, typ, direction):
             """Given a point ``vert``, look up which MERIT NetCDF file contains this point."""
@@ -255,7 +271,7 @@ class ncdata(object):
 
             return fns, dirs, lon_cnt, lat_cnt
 
-        def get_topo(self, cell, fns, dirs, lon_cnt, lat_cnt, init=True, populate=True):
+        def __load_topo(self, cell, fns, dirs, lon_cnt, lat_cnt, init=True, populate=True):
             """
             This method assembles a contiguous array in ``cell.topo`` containing the regional topography to be loaded.
 
@@ -266,7 +282,7 @@ class ncdata(object):
                 2. The second run populates the empty array with the information of the block arrays obtained in the first run.
             """
             if (cell.topo is None) and (init):
-                self.get_topo(cell, fns, dirs, lon_cnt, lat_cnt, init=False, populate=False)
+                self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt, init=False, populate=False)
 
             if not populate:
                 nc_lon = 0
@@ -280,7 +296,11 @@ class ncdata(object):
                 cell.lon = []
 
             for cnt, fn in enumerate(fns):
-                test = nc.Dataset(dirs[cnt] + fn)
+                try:
+                    test.isopen()
+                except:
+                    test = nc.Dataset(dirs[cnt] + fn, "r")
+                    self.opened_dfs.append(test)
 
                 lat = test["lat"]
                 lat_min_idx = np.argmin(np.abs(lat - self.lat_verts.min()))
@@ -325,7 +345,7 @@ class ncdata(object):
 
                     lon_sz_old = np.copy(lon_sz)
 
-                test.close()
+                # test.close()
 
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
@@ -342,6 +362,12 @@ class ncdata(object):
                 cell.topo = utils.sliding_window_view(
                     cell.topo, (iint, iint), (iint, iint)
                 ).mean(axis=(-1, -2))[::-1, :]
+
+
+        def close_all(self):
+            for df in self.opened_dfs:
+                df.close()
+
 
         @staticmethod
         def __get_NSEW(vert, typ):

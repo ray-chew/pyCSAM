@@ -1,63 +1,36 @@
 # %%
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
 
 from pycsam.src import io, var, utils
 from pycsam.wrappers import interface, diagnostics
 from pycsam.vis import cart_plot
 
-from IPython import get_ipython
+# from IPython import get_ipython
 
-ipython = get_ipython()
+# ipython = get_ipython()
 
-if ipython is not None:
-    ipython.run_line_magic("load_ext", "autoreload")
-else:
-    print(ipython)
+# if ipython is not None:
+#     ipython.run_line_magic("load_ext", "autoreload")
+# else:
+#     print(ipython)
 
-def autoreload():
-    if ipython is not None:
-        ipython.run_line_magic("autoreload", "2")
+# def autoreload():
+#     if ipython is not None:
+#         ipython.run_line_magic("autoreload", "2")
 
-from sys import exit
+# from sys import exit
 
-if __name__ != "__main__":
-    exit(0)
+# if __name__ != "__main__":
+#     exit(0)
 
 
 # %%
-
-autoreload()
-from pycsam.inputs.icon_regional_run import params
-
-if params.self_test():
-    params.print()
-
-print(params.path_compact_topo)
-
-grid = var.grid()
-
-# read grid
-reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
-
-# writer object
-writer = io.nc_writer(params)
-
-reader.read_dat(params.path_compact_grid, grid)
-
-clat_rad = np.copy(grid.clat)
-clon_rad = np.copy(grid.clon)
-
-grid.apply_f(utils.rad2deg)
-
-n_cells = grid.clat.size
-
-for c_idx in range(n_cells)[3:6]:
-    # c_idx = 1
-    print(c_idx)
-
+def do_cell(c_idx,
+            grid,
+            params,
+            reader,
+            writer,
+            ):
     topo = var.topo_cell()
     lat_verts = grid.clat_vertices[c_idx]
     lon_verts = grid.clon_vertices[c_idx]
@@ -71,13 +44,11 @@ for c_idx in range(n_cells)[3:6]:
     params.lat_extent = lat_extent
     params.lon_extent = lon_extent
 
-    # read topography
-    if not params.enable_merit:
-        reader.read_dat(params.fn_topo, topo)
-        reader.read_topo(topo, topo, lon_verts, lat_verts)
-    else:
-        reader.read_merit_topo(topo, params)
-        topo.topo[np.where(topo.topo < -500.0)] = -500.0
+
+    reader = reader.read_merit_topo(None, params, is_parallel=True)
+    reader.get_topo(topo)
+    # reader.close_all()
+    topo.topo[np.where(topo.topo < -500.0)] = -500.0
 
     topo.gen_mgrids()
 
@@ -123,14 +94,14 @@ for c_idx in range(n_cells)[3:6]:
 
     tri.tri_lon_verts = triangles[:, :, 0]
     tri.tri_lat_verts = triangles[:, :, 1]
-    
+
 
     simplex_lat = tri.tri_lat_verts[tri_idx]
     simplex_lon = tri.tri_lon_verts[tri_idx]
 
     if utils.is_land(cell, simplex_lat, simplex_lon, topo):
         writer.output(c_idx, clat_rad[c_idx], clon_rad[c_idx], 0)
-        continue
+        return
     else:
         is_land = 1
 
@@ -161,28 +132,88 @@ for c_idx in range(n_cells)[3:6]:
 
     v_extent = [dat_2D_fa.min(), dat_2D_fa.max()]
 
-    if params.dfft_first_guess:
-        dplot.show(
-        tri_idx, sols, kls=kls_fa, v_extent=v_extent, dfft_plot=True,
-        output_fig=False
-    )
-    else:
-        dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
+    if params.plot:
+        if params.dfft_first_guess:
+            dplot.show(
+            tri_idx, sols, kls=kls_fa, v_extent=v_extent, dfft_plot=True,
+            output_fig=False
+        )
+        else:
+            dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
 
     if params.recompute_rhs:
-        sols, sols_rc = sa.do(tri_idx, ampls_fa)
+        sols, _ = sa.do(tri_idx, ampls_fa)
     else:
         sols = sa.do(tri_idx, ampls_fa)
 
     cell, ampls_sa, uw_sa, dat_2D_sa = sols
     v_extent = [dat_2D_sa.min(), dat_2D_sa.max()]
 
-    if params.dfft_first_guess:
-        dplot.show(
-        tri_idx, sols, kls=kls_fa, v_extent=v_extent, dfft_plot=True,
-        output_fig=False
-    )
-    else:
-        dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
+    writer.output(c_idx, clat_rad[c_idx], clon_rad[c_idx], is_land, cell.analysis)
 
+    if params.plot:
+        if params.dfft_first_guess:
+            dplot.show(
+            tri_idx, sols, kls=kls_fa, v_extent=v_extent, dfft_plot=True,
+            output_fig=False
+        )
+        else:
+            dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
+
+    return 1
+
+
+def parallel_wrapper(grid, params, reader, writer):
+    return lambda ii : do_cell(ii, grid, params, reader, writer)
+
+
+
+# %%
+
+# autoreload()
+from pycsam.inputs.icon_regional_run import params
+
+# %%
+from dask.distributed import Client, progress
+import dask
+
+if __name__ == '__main__':
+    if params.self_test():
+        params.print()
+
+    print(params.path_compact_topo)
+
+    grid = var.grid()
+
+    # read grid
+    reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
+
+    # writer object
+    writer = io.nc_writer(params)
+
+    reader.read_dat(params.path_compact_grid, grid)
+
+    clat_rad = np.copy(grid.clat)
+    clon_rad = np.copy(grid.clon)
+
+    grid.apply_f(utils.rad2deg)
+
+    n_cells = grid.clat.size
+
+    print(n_cells)
+
+    pw_run = parallel_wrapper(grid, params, reader, writer)
+
+    client = Client(threads_per_worker=2, n_workers=4)
+
+    lazy_results = []
+
+    for c_idx in range(n_cells)[:12]:
+        # pw_run(c_idx)
+        lazy_result = dask.delayed(pw_run)(c_idx)
+        lazy_results.append(lazy_result)
+
+    results = dask.compute(*lazy_results)
+
+    # merit_reader.close_all()
 
