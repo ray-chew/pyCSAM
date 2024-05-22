@@ -1,16 +1,16 @@
 # %%
-import sys
+# import sys
 
 # set system path to find local modules
-sys.path.append("..")
+# sys.path.append("..")
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from src import io, var, utils, fourier, physics
-from wrappers import interface
-from vis import plotter, cart_plot
+from pycsam.src import io, var, utils, fourier, physics
+from pycsam.wrappers import interface
+from pycsam.vis import plotter, cart_plot
 
 from IPython import get_ipython
 
@@ -31,7 +31,7 @@ if __name__ != "__main__":
     exit(0)
 # %%
 autoreload()
-from inputs.icon_regional_run import params
+from pycsam.inputs.icon_regional_run import params
 
 if params.self_test():
     params.print()
