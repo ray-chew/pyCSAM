@@ -646,6 +646,57 @@ class nc_writer(object):
         rootgrp.close()
 
 
+    def duplicate(self, id, struct):
+
+        rootgrp = nc.Dataset(self.path + self.fn, "a", format="NETCDF4")
+
+        grp = rootgrp.createGroup(str(id))
+
+        is_land_var = grp.createVariable("is_land","i4")
+        is_land_var[:] = struct.is_land
+
+        clat_var = grp.createVariable("clat","f8")
+        clat_var[:] = struct.clat
+        clon_var = grp.createVariable("clon","f8")
+        clon_var[:] = struct.clon
+
+        if struct.is_land:
+            dk_var = grp.createVariable("dk","f8")
+            dk_var[:] = struct.dk
+            dl_var = grp.createVariable("dl","f8")
+            dl_var[:] = struct.dl
+
+            pick_idx = np.where(struct.ampls > 0)
+
+            H_spec_var = grp.createVariable("H_spec","f8", ("nspec",))
+            H_spec_var[:] = self.__pad_zeros(struct.ampls[pick_idx], self.n_modes)
+
+            kks_var = grp.createVariable("kks","f8", ("nspec",))
+            kks_var[:] = self.__pad_zeros(struct.kks[pick_idx], self.n_modes)
+
+            lls_var = grp.createVariable("lls","f8", ("nspec",))
+            lls_var[:] = self.__pad_zeros(struct.lls[pick_idx], self.n_modes)
+
+        rootgrp.close()
+
+    class grp_struct(object):
+        def __init__(self, c_idx, clat, clon, is_land, analysis = None):
+            self.c_idx = c_idx
+            self.clat = clat
+            self.clon = clon
+            self.is_land = is_land
+
+            self.dk = None
+            self.dl = None
+
+            self.ampls = None
+            self.kks = None
+            self.lls = None
+
+            if analysis is not None:
+                for key, value in vars(analysis).items():
+                    setattr(self, key, value)
+
 
     @staticmethod
     def __pad_zeros(lst, n_modes):
