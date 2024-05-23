@@ -285,6 +285,8 @@ class ncdata(object):
                 self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt, init=False, populate=False)
 
             if not populate:
+                n_col = 0
+                n_row = 0
                 nc_lon = 0
                 nc_lat = 0
             else:
@@ -295,32 +297,64 @@ class ncdata(object):
                 cell.lat = []
                 cell.lon = []
 
+            ### Handles the case where a cell spans four topographic datasets
+            cnt_lat = 0
+            cnt_lon = 0
+            lat_low_old = np.ones((len(fns))) * np.inf
+            lat_high_old = np.ones((len(fns))) * np.inf
+            lon_low_old = np.ones((len(fns))) * np.inf
+            lon_high_old = np.ones((len(fns))) * np.inf
+            lat_nc_change, lon_nc_change = False, False
+
             for cnt, fn in enumerate(fns):
-                try:
-                    test.isopen()
-                except:
-                    test = nc.Dataset(dirs[cnt] + fn, "r")
-                    self.opened_dfs.append(test)
+                # try:
+                #     test.isopen()
+                # except:
+                test = nc.Dataset(dirs[cnt] + fn, "r")
+                self.opened_dfs.append(test)
 
                 lat = test["lat"]
-                lat_min_idx = np.argmin(np.abs(lat - self.lat_verts.min()))
-                lat_max_idx = np.argmin(np.abs(lat - self.lat_verts.max()))
+                lat_min_idx = np.argmin(np.abs((lat - np.sign(lat) * 1e-4) - self.lat_verts.min()))
+                lat_max_idx = np.argmin(np.abs((lat + np.sign(lat) * 1e-4) - self.lat_verts.max()))
 
                 lat_high = np.max((lat_min_idx, lat_max_idx))
                 lat_low = np.min((lat_min_idx, lat_max_idx))
 
                 lon = test["lon"]
-                lon_min_idx = np.argmin(np.abs(lon - (self.lon_verts.min())))
-                lon_max_idx = np.argmin(np.abs(lon - (self.lon_verts.max())))
+                lon_min_idx = np.argmin(np.abs((lon - np.sign(lon) * 1e-4) - (self.lon_verts.min())))
+                lon_max_idx = np.argmin(np.abs((lon + np.sign(lon) * 1e-4) - (self.lon_verts.max())))
 
                 lon_high = np.max((lon_min_idx, lon_max_idx))
                 lon_low = np.min((lon_min_idx, lon_max_idx))
 
+                ### Only add lat and lon elements if there are changes to the low and high indices identified:
+                if (lon_low not in lon_low_old) and (lon_high not in lon_high_old):
+                    lon_nc_change = True
+
+                if (lat_low not in lat_low_old) and (lat_high not in lat_high_old):
+                    lat_nc_change = True
+
+                lon_low_old[cnt] = lon_low
+                lon_high_old[cnt] = lon_high
+                lat_low_old[cnt] = lat_low
+                lat_high_old[cnt] = lat_high
+
                 if not populate:
-                    if cnt < (lon_cnt + 1):
+                    if n_row == 0:
+
+                    # if (cnt_lon < (lon_cnt + 1)) and lon_nc_change:
                         nc_lon += lon_high - lon_low
-                    if cnt < (lat_cnt + 1):
+                        cnt_lon += 1
+
+                    if n_col == 0:
+                    # if (cnt_lat < (lat_cnt + 1)) and lat_nc_change:
                         nc_lat += lat_high - lat_low
+                        cnt_lat += 1
+
+                    n_col += 1
+                    if n_col == (lon_cnt+1):
+                        n_col = 0
+                        n_row += 1
 
                 else:
                     topo = test["Elevation"][lat_low:lat_high, lon_low:lon_high]
@@ -332,20 +366,35 @@ class ncdata(object):
                     lon_sz = lon_high - lon_low
                     lat_sz = lat_high - lat_low
 
+
+                    # if lon_nc_change and cnt > 0:
+                    #     n_col += 1
+
+                    # # if n_col == (lon_cnt + 1):
+                    # #     n_col = 0
+                    # if lat_nc_change and cnt > 0:
+                    #     n_row += 1
+                    #     lat_sz_old = np.copy(lat_sz)
+
                     cell.topo[
-                        n_row * lat_sz_old : n_row * lat_sz_old + lat_sz,
-                        n_col * lon_sz_old : n_col * lon_sz_old + lon_sz,
+                        lat_sz_old : lat_sz_old + lat_sz,
+                        lon_sz_old : lon_sz_old + lon_sz,
                     ] = topo
 
                     n_col += 1
-                    if n_col == (lon_cnt + 1):
-                        n_col = 0
-                        n_row += 1
-                        lat_sz_old = np.copy(lat_sz)
-
                     lon_sz_old = np.copy(lon_sz)
 
-                # test.close()
+                    if n_col == (lon_cnt+1):
+                        n_col = 0
+                        lon_sz_old = 0
+
+                        n_row += 1
+                        lat_sz_old = np.copy(lat_sz)         
+
+                lon_nc_change = False
+                lat_nc_change = False
+
+                test.close()
 
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))

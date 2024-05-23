@@ -23,7 +23,7 @@ params.lon_extent = [-77.0, -50.0, -50.0]
 
 params.tri_set = [13, 104, 105, 106]
 
-params.merit_cg = 20
+params.merit_cg = 50
 
 # Setup the Fourier parameters and object.
 params.nhi = 24

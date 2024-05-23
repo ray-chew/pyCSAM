@@ -828,6 +828,6 @@ def is_land(cell, simplex_lat, simplex_lon, topo, height_tol=0.5, percent_tol=0.
     ) 
 
     if not (((cell.topo <= height_tol).sum() / cell.topo.size) > percent_tol):
-        return False
-    else:
         return True
+    else:
+        return False

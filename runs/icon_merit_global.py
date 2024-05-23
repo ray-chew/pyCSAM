@@ -38,8 +38,8 @@ def do_cell(c_idx,
     lat_verts = grid.clat_vertices[c_idx]
     lon_verts = grid.clon_vertices[c_idx]
 
-    lat_extent = [lat_verts.min() - 1.0,lat_verts.min() - 1.0,lat_verts.max() + 1.0]
-    lon_extent = [lon_verts.min() - 1.0,lon_verts.min() - 1.0,lon_verts.max() + 1.0]
+    lat_extent = [lat_verts.min() - 0.0,lat_verts.min() - 0.0,lat_verts.max() + 0.0]
+    lon_extent = [lon_verts.min() - 0.0,lon_verts.min() - 0.0,lon_verts.max() + 0.0]
     # we only keep the topography that is inside this lat-lon extent.
     lat_verts = np.array(lat_extent)
     lon_verts = np.array(lon_extent)
@@ -99,9 +99,9 @@ def do_cell(c_idx,
     simplex_lat = tri.tri_lat_verts[tri_idx]
     simplex_lon = tri.tri_lon_verts[tri_idx]
 
-    if utils.is_land(cell, simplex_lat, simplex_lon, topo):
+    if not utils.is_land(cell, simplex_lat, simplex_lon, topo):
         # writer.output(c_idx, clat_rad[c_idx], clon_rad[c_idx], 0)
-        print("--> skipping land cell")
+        print("--> skipping ocean cell")
         return writer.grp_struct(c_idx, clat_rad[c_idx], clon_rad[c_idx], 0)
     else:
         is_land = 1
@@ -177,7 +177,7 @@ def parallel_wrapper(grid, params, reader, writer):
 # autoreload()
 from pycsam.inputs.icon_regional_run import params
 
-# from dask.distributed import Client, progress
+# from dask.distributed import Client
 # import dask
 
 # dask.config.set(scheduler='synchronous') 
@@ -186,17 +186,15 @@ if __name__ == '__main__':
     if params.self_test():
         params.print()
 
-    print(params.path_compact_topo)
-
     grid = var.grid()
 
     # read grid
     reader = io.ncdata(padding=params.padding, padding_tol=(60 - params.padding))
+    # reader.read_dat(params.path_compact_grid, grid)
+    reader.read_dat(params.path_icon_grid, grid)
 
     # writer object
     writer = io.nc_writer(params)
-
-    reader.read_dat(params.path_compact_grid, grid)
 
     clat_rad = np.copy(grid.clat)
     clon_rad = np.copy(grid.clon)
@@ -209,18 +207,18 @@ if __name__ == '__main__':
 
     pw_run = parallel_wrapper(grid, params, reader, writer)
 
-    # client = Client(threads_per_worker=1, n_workers=1)
+    # NetCDF-4 reader does not work well with multithreading
+    # Use only 1 thread per worker! (At least on my laptop)
+    # client = Client(threads_per_worker=1, n_workers=8)
 
-    lazy_results = []
+    # lazy_results = []
 
-    for c_idx in range(n_cells)[47:48]:
+    for c_idx in range(n_cells):
         pw_run(c_idx)
     #     lazy_result = dask.delayed(pw_run)(c_idx)
     #     lazy_results.append(lazy_result)
 
     # results = dask.compute(*lazy_results)
-
-    # merit_reader.close_all()
 
     # for item in results:
     #     writer.duplicate(item.c_idx, item)
