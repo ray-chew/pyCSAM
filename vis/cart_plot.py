@@ -398,7 +398,7 @@ def lat_lon_icon(
         fc="r",
         alpha=0.2,
         linewidth=1,
-        transform=ccrs.Geodetic(),
+        transform=ccrs.PlateCarree(),
         zorder=3,
     )
     ax.add_collection(coll)

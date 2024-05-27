@@ -180,17 +180,23 @@ class ncdata(object):
 
             # if lat_verts 
 
+            if ( (self.lon_verts.max() - self.lon_verts.min()) > 180.0 ):
+                self.split_EW = True
+
+            if self.split_EW:
+                min_lon = max(np.where(self.lon_verts < 0.0, self.lon_verts + 360.0, self.lon_verts)) - 360.0
+                max_lon = min(np.where(self.lon_verts < 0.0, self.lon_verts + 360.0, self.lon_verts))
+            else:
+                min_lon = self.lon_verts.min()
+                max_lon = self.lon_verts.max()
 
             lat_min_idx = self.__compute_idx(self.lat_verts.min(), "min", "lat")
             lat_max_idx = self.__compute_idx(self.lat_verts.max(), "max", "lat")
 
-            lon_min_idx = self.__compute_idx(self.lon_verts.min(), "min", "lon")
-            lon_max_idx = self.__compute_idx(self.lon_verts.max(), "max", "lon")
+            lon_min_idx = self.__compute_idx(min_lon, "min", "lon")
+            lon_max_idx = self.__compute_idx(max_lon, "max", "lon")
 
             if ( (self.lon_verts.max() - self.lon_verts.min()) > 180.0 ):
-                # lon_max_idx, lon_min_idx = lon_min_idx, lon_max_idx
-                self.split_EW = True
-
                 lon_idx_rng = list(range(lon_max_idx, len(self.fn_lon) - 1 )) + list(range(0,lon_min_idx + 1))
 
             else:
@@ -219,15 +225,17 @@ class ncdata(object):
                 print(fn_int, where_idx)
 
             if typ == "min":
-                if (vert - fn_int[where_idx]) < 0.0:
+                if ((vert - fn_int[where_idx]) < 0.0):
                     if direction == "lon":
-                        where_idx -= 1
+                        if not self.split_EW:
+                            where_idx -= 1
                     else:
                         where_idx += 1
             elif typ == "max":
-                if (vert - fn_int[where_idx]) > 0.0:
+                if ((vert - fn_int[where_idx]) > 0.0):
                     if direction == "lon":
-                        where_idx += 1
+                        if not self.split_EW:
+                            where_idx += 1
                     else:
                         where_idx -= 1
 
@@ -390,12 +398,16 @@ class ncdata(object):
                             lon_low = np.argmin(np.abs(lon - l_lon_bound))
 
                     else:
-                        if lon_in_file.max() == self.lon_verts.max():
+                        if lon_in_file.max() == min(np.where(self.lon_verts < 0.0, self.lon_verts + 360.0, self.lon_verts)):
                             lon_high = np.argmin(np.abs(lon - r_lon_bound))
                             lon_low = np.argmin(np.abs(lon - lon_in_file.min()))
+                        else:
+                            lon_high = np.argmin(np.abs(lon - r_lon_bound))
                         
-                        if lon_in_file.min() == self.lon_verts.min():
+                        if lon_in_file.min() == (max(self.lon_verts[self.lon_verts < 0.0] + 360.0) - 360.0):
                             lon_high = np.argmin(np.abs(lon - lon_in_file.max()))
+                            lon_low = np.argmin(np.abs(lon - l_lon_bound))
+                        else:
                             lon_low = np.argmin(np.abs(lon - l_lon_bound))
                     # if r_lon_bound > lon_in_file.max():
                     #     lon_high = np.argmin(np.abs(lon - lon_in_file.max()))
@@ -452,7 +464,7 @@ class ncdata(object):
                     ] = topo
 
                     n_col += 1
-                    lon_sz_old = np.copy(lon_sz)
+                    lon_sz_old += np.copy(lon_sz)
 
                     if n_col == (lon_cnt+1):
                         n_col = 0

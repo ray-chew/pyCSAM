@@ -55,14 +55,15 @@ def do_cell(c_idx,
     # lon_expand = 0.0
     # lon_extent = [lon_verts.min() - lon_expand,lon_verts.min() - lon_expand,lon_verts.max() + lon_expand]
 
-    lat_extent = lat_verts
-    lon_extent = lon_verts
+    # lat_extent = lat_verts
+    # lon_extent = lon_verts
     # we only keep the topography that is inside this lat-lon extent.
 
-    lat_extent, lon_extent = utils.handle_latlon_expansion(lat_extent, lon_extent)
+    lat_extent, lon_extent = utils.handle_latlon_expansion(lat_verts, lon_verts)
 
-    lat_verts = np.array(lat_extent)
-    lon_verts = np.array(lon_extent)
+    # lat_verts = np.array(lat_verts)
+    # lon_verts = np.array(lon_verts)
+    lat_verts, lon_verts = utils.handle_latlon_expansion(lat_verts, lon_verts, lat_expand = 0.0, lon_expand = 0.0)
 
     params.lat_extent = lat_extent
     params.lon_extent = lon_extent
@@ -106,7 +107,7 @@ def do_cell(c_idx,
         triangles[i, :, 1] = np.array(clat_vertices[i, :])
 
     if params.plot:
-        cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat)
+        cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat, title=c_idx)
 
 # %%
     tri_idx = 0
@@ -170,7 +171,7 @@ def do_cell(c_idx,
             output_fig=False
         )
         else:
-            dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
+            dplot.show(c_idx, sols, v_extent=v_extent, output_fig=False)
 
     if params.recompute_rhs:
         sols, _ = sa.do(tri_idx, ampls_fa)
@@ -190,7 +191,7 @@ def do_cell(c_idx,
             output_fig=False
         )
         else:
-            dplot.show(tri_idx, sols, v_extent=v_extent, output_fig=False)
+            dplot.show(c_idx, sols, v_extent=v_extent, output_fig=False)
 
     print("--> analysis done")
 
@@ -242,8 +243,10 @@ if __name__ == '__main__':
     # client = Client(threads_per_worker=1, n_workers=8)
 
     # lazy_results = []
+
+    # for c_idx in range(n_cells)[:20]:
     # for c_idx in range(n_cells)[180:190]:
-    for c_idx in range(n_cells)[2048:2050]:
+    for c_idx in range(n_cells)[2046:2060]:
         pw_run(c_idx)
     #     lazy_result = dask.delayed(pw_run)(c_idx)
     #     lazy_results.append(lazy_result)
