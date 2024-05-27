@@ -160,7 +160,7 @@ class ncdata(object):
                     90.0,
                     120.0,
                     150.0,
-                    180.0,
+                    180.0
                 ]
             )
             self.fn_lat = np.array([90.0, 60.0, 30.0, 0.0, -30.0, -60.0, -90.0])
@@ -169,6 +169,7 @@ class ncdata(object):
             self.lon_verts = np.array(params.lon_extent)
 
             self.merit_cg = params.merit_cg
+            self.split_EW = False
 
             if not is_parallel:
                 self.get_topo(cell)
@@ -176,17 +177,34 @@ class ncdata(object):
             self.is_parallel = is_parallel
 
         def get_topo(self, cell):
+
+            # if lat_verts 
+
+
             lat_min_idx = self.__compute_idx(self.lat_verts.min(), "min", "lat")
             lat_max_idx = self.__compute_idx(self.lat_verts.max(), "max", "lat")
 
             lon_min_idx = self.__compute_idx(self.lon_verts.min(), "min", "lon")
             lon_max_idx = self.__compute_idx(self.lon_verts.max(), "max", "lon")
 
+            if ( (self.lon_verts.max() - self.lon_verts.min()) > 180.0 ):
+                # lon_max_idx, lon_min_idx = lon_min_idx, lon_max_idx
+                self.split_EW = True
+
+                lon_idx_rng = list(range(lon_max_idx, len(self.fn_lon) - 1 )) + list(range(0,lon_min_idx + 1))
+
+            else:
+                if lon_min_idx == lon_max_idx:
+                    lon_max_idx += 1
+                lon_idx_rng = list(range(lon_min_idx, lon_max_idx))
+
+            lat_idx_rng = list(range(lat_max_idx, lat_min_idx))
+
             fns, dirs, lon_cnt, lat_cnt = self.__get_fns(
-                lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx
+                lat_idx_rng, lon_idx_rng
             )
 
-            self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt)
+            self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt, lat_idx_rng, lon_idx_rng)
 
         def __compute_idx(self, vert, typ, direction):
             """Given a point ``vert``, look up which MERIT NetCDF file contains this point."""
@@ -213,6 +231,9 @@ class ncdata(object):
                     else:
                         where_idx -= 1
 
+                if where_idx == (len(fn_int) - 1):
+                    where_idx -= 1
+
             where_idx = int(where_idx)
 
             if self.verbose:
@@ -222,12 +243,12 @@ class ncdata(object):
 
             return where_idx
 
-        def __get_fns(self, lat_min_idx, lat_max_idx, lon_min_idx, lon_max_idx):
+        def __get_fns(self, lat_idx_rng, lon_idx_rng):
             """Construct the full filenames required for the loading of the topographic data from the indices identified in :func:`src.io.ncdata.read_merit_topo.__compute_idx`"""
             fns = []
             dirs = []
 
-            for lat_cnt, lat_idx in enumerate(range(lat_max_idx, lat_min_idx)):
+            for lat_cnt, lat_idx in enumerate(lat_idx_rng):
                 l_lat_bound, r_lat_bound = (
                     self.fn_lat[lat_idx],
                     self.fn_lat[lat_idx + 1],
@@ -245,7 +266,7 @@ class ncdata(object):
                     self.rema = False
                     self.dir = self.dir.replace("REMA", "MERIT")
 
-                for lon_cnt, lon_idx in enumerate(range(lon_min_idx, lon_max_idx)):
+                for lon_cnt, lon_idx in enumerate(lon_idx_rng):
                     l_lon_bound, r_lon_bound = (
                         self.fn_lon[lon_idx],
                         self.fn_lon[lon_idx + 1],
@@ -271,7 +292,7 @@ class ncdata(object):
 
             return fns, dirs, lon_cnt, lat_cnt
 
-        def __load_topo(self, cell, fns, dirs, lon_cnt, lat_cnt, init=True, populate=True):
+        def __load_topo(self, cell, fns, dirs, lon_cnt, lat_cnt,  lat_idx_rng, lon_idx_rng, init=True, populate=True):
             """
             This method assembles a contiguous array in ``cell.topo`` containing the regional topography to be loaded.
 
@@ -282,7 +303,7 @@ class ncdata(object):
                 2. The second run populates the empty array with the information of the block arrays obtained in the first run.
             """
             if (cell.topo is None) and (init):
-                self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt, init=False, populate=False)
+                self.__load_topo(cell, fns, dirs, lon_cnt, lat_cnt, lat_idx_rng, lon_idx_rng, init=False, populate=False)
 
             if not populate:
                 n_col = 0
@@ -320,19 +341,68 @@ class ncdata(object):
                 lat_high = np.max((lat_min_idx, lat_max_idx))
                 lat_low = np.min((lat_min_idx, lat_max_idx))
 
-                lon = test["lon"]
-                lon_min_idx = np.argmin(np.abs((lon - np.sign(lon) * 1e-4) - (self.lon_verts.min())))
-                lon_max_idx = np.argmin(np.abs((lon + np.sign(lon) * 1e-4) - (self.lon_verts.max())))
+                # lon = test["lon"]
+                # lon_min_idx = np.argmin(np.abs((lon - np.sign(lon) * 1e-4) - (self.lon_verts.min())))
+                # lon_max_idx = np.argmin(np.abs((lon + np.sign(lon) * 1e-4) - (self.lon_verts.max())))
 
-                lon_high = np.max((lon_min_idx, lon_max_idx))
-                lon_low = np.min((lon_min_idx, lon_max_idx))
+                # lon_high = np.max((lon_min_idx, lon_max_idx))
+                # lon_low = np.min((lon_min_idx, lon_max_idx))
 
                 ### Only add lat and lon elements if there are changes to the low and high indices identified:
-                if (lon_low not in lon_low_old) and (lon_high not in lon_high_old):
-                    lon_nc_change = True
+                # if (lon_low not in lon_low_old) and (lon_high not in lon_high_old):
+                #     lon_nc_change = True
 
-                if (lat_low not in lat_low_old) and (lat_high not in lat_high_old):
-                    lat_nc_change = True
+                # if (lat_low not in lat_low_old) and (lat_high not in lat_high_old):
+                #     lat_nc_change = True
+
+                ############################################
+                lat = test["lat"]
+                lon = test["lon"]
+
+                l_lat_bound, r_lat_bound = (
+                    self.fn_lat[lat_idx_rng[n_row]],
+                    self.fn_lat[lat_idx_rng[n_row] + 1],
+                )
+
+                l_lon_bound, r_lon_bound = (
+                    self.fn_lon[lon_idx_rng[n_col]],
+                    self.fn_lon[lon_idx_rng[n_col] + 1],
+                )
+
+                lon_rng = r_lon_bound - l_lon_bound
+
+                lon_in_file = self.lon_verts[( (self.lon_verts - l_lon_bound) > 0 ) & ( (self.lon_verts - l_lon_bound) <= lon_rng )]
+
+                if len(lon_in_file) == 0:
+                    lon_high = np.argmin(np.abs(lon - r_lon_bound))
+                    lon_low = np.argmin(np.abs(lon - l_lon_bound))
+
+                else:
+                    if not self.split_EW:
+                        if lon_in_file.max() == self.lon_verts.max():
+                            lon_high = np.argmin(np.abs(lon - lon_in_file.max()))
+                        else: 
+                            lon_high = np.argmin(np.abs(lon - r_lon_bound))
+
+                        if lon_in_file.min() == self.lon_verts.min():
+                            lon_low = np.argmin(np.abs(lon - lon_in_file.min()))
+                        else:
+                            lon_low = np.argmin(np.abs(lon - l_lon_bound))
+
+                    else:
+                        if lon_in_file.max() == self.lon_verts.max():
+                            lon_high = np.argmin(np.abs(lon - r_lon_bound))
+                            lon_low = np.argmin(np.abs(lon - lon_in_file.min()))
+                        
+                        if lon_in_file.min() == self.lon_verts.min():
+                            lon_high = np.argmin(np.abs(lon - lon_in_file.max()))
+                            lon_low = np.argmin(np.abs(lon - l_lon_bound))
+                    # if r_lon_bound > lon_in_file.max():
+                    #     lon_high = np.argmin(np.abs(lon - lon_in_file.max()))
+
+                    # if lon_in_file.min() > l_lon_bound:
+                    #     lon_low = np.argmin(np.abs(lon - lon_in_file.min()))
+
 
                 lon_low_old[cnt] = lon_low
                 lon_high_old[cnt] = lon_high
@@ -399,6 +469,11 @@ class ncdata(object):
             if not populate:
                 cell.topo = np.zeros((nc_lat, nc_lon))
             else:
+
+                if self.split_EW:
+                    cell.lon = np.array(cell.lon)
+                    cell.lon[cell.lon < 0.0] += 360.0
+
                 iint = self.merit_cg
 
                 cell.lat = utils.sliding_window_view(

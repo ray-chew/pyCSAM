@@ -35,12 +35,32 @@ def do_cell(c_idx,
     print(c_idx)
 
     topo = var.topo_cell()
+
     lat_verts = grid.clat_vertices[c_idx]
     lon_verts = grid.clon_vertices[c_idx]
 
-    lat_extent = [lat_verts.min() - 0.0,lat_verts.min() - 0.0,lat_verts.max() + 0.0]
-    lon_extent = [lon_verts.min() - 0.0,lon_verts.min() - 0.0,lon_verts.max() + 0.0]
+    # if ( (lon_verts.max() - lon_verts.min()) > 180.0 ):
+    #     lon_verts[np.argmin(lon_verts)] += 360.0
+
+    # clon = utils.rescale(grid.clon[c_idx], rng=[lon_verts.min(),lon_verts.max()])
+    # clat = utils.rescale(grid.clat[c_idx], rng=[lat_verts.min(),lat_verts.max()])
+
+    # check = utils.gen_triangle(lon_verts, lat_verts)
+
+    # print("is center in triangle:", check.vec_get_mask((clon, clat)))
+
+    # lat_expand = 0.0
+    # lat_extent = [lat_verts.min() - lat_expand,lat_verts.min() - lat_expand,lat_verts.max() + lat_expand]
+
+    # lon_expand = 0.0
+    # lon_extent = [lon_verts.min() - lon_expand,lon_verts.min() - lon_expand,lon_verts.max() + lon_expand]
+
+    lat_extent = lat_verts
+    lon_extent = lon_verts
     # we only keep the topography that is inside this lat-lon extent.
+
+    lat_extent, lon_extent = utils.handle_latlon_expansion(lat_extent, lon_extent)
+
     lat_verts = np.array(lat_extent)
     lon_verts = np.array(lon_extent)
 
@@ -60,14 +80,24 @@ def do_cell(c_idx,
 
     clon = np.array([grid.clon[c_idx]])
     clat = np.array([grid.clat[c_idx]])
-    clon_vertices = np.array([grid.clon_vertices[c_idx]])
-    clat_vertices = np.array([grid.clat_vertices[c_idx]])
+    # clon = np.array([clon])
+    # clat = np.array([clat])
+    # clon_vertices = np.array([grid.clon_vertices[c_idx]])
+    # clat_vertices = np.array([grid.clat_vertices[c_idx]])
+    clon_vertices = np.array([lon_verts])
+    clat_vertices = np.array([lat_verts])
+
 
     ncells = 1
     nv = clon_vertices[0].size
     # -- create the triangles
-    clon_vertices = np.where(clon_vertices < -180.0, clon_vertices + 360.0, clon_vertices)
-    clon_vertices = np.where(clon_vertices > 180.0, clon_vertices - 360.0, clon_vertices)
+    # clon_vertices = np.where(clon_vertices < -180.0, clon_vertices + 360.0, clon_vertices)
+    # clon_vertices = np.where(clon_vertices > 180.0, clon_vertices - 360.0, clon_vertices)
+
+    # if ( (clon_vertices.max() - clon_vertices.min()) > 180.0 ):
+    if reader.split_EW:
+        clon_vertices[clon_vertices < 0.0] += 360.0
+
 
     triangles = np.zeros((ncells, nv, 2))
 
@@ -212,8 +242,8 @@ if __name__ == '__main__':
     # client = Client(threads_per_worker=1, n_workers=8)
 
     # lazy_results = []
-
-    for c_idx in range(n_cells):
+    # for c_idx in range(n_cells)[180:190]:
+    for c_idx in range(n_cells)[2048:2050]:
         pw_run(c_idx)
     #     lazy_result = dask.delayed(pw_run)(c_idx)
     #     lazy_results.append(lazy_result)

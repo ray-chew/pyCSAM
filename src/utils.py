@@ -831,3 +831,24 @@ def is_land(cell, simplex_lat, simplex_lon, topo, height_tol=0.5, percent_tol=0.
         return True
     else:
         return False
+    
+
+def handle_latlon_expansion(clat_vertices, clon_vertices, lat_expand = 1.0, lon_expand = 1.0):
+    clon_vertices = np.array(clon_vertices)
+    clat_vertices = np.array(clat_vertices)
+    
+    clon_vertices[np.where(np.abs(np.abs(clon_vertices) - 180.0) < 1e-5)] = 180.0
+
+    clat_vertices[np.argmax(clat_vertices)] += lat_expand
+    clon_vertices[np.argmax(clon_vertices)] += lon_expand
+    
+    clat_vertices[np.argmin(clat_vertices)] -= lat_expand
+    clon_vertices[np.argmin(clon_vertices)] -= lon_expand
+
+    clon_vertices[np.where(clon_vertices < -180.0)] += 360.0
+    clon_vertices[np.where(clon_vertices > 180.0)]  -= 360.0
+
+    clat_vertices = np.where(clat_vertices < -90.0, clat_vertices + 1.0, clat_vertices)
+    clat_vertices = np.where(clat_vertices > 90.0, clat_vertices - 1.0, clat_vertices)
+
+    return clat_vertices, clon_vertices
