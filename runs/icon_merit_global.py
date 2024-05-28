@@ -106,8 +106,10 @@ def do_cell(c_idx,
         triangles[i, :, 0] = np.array(clon_vertices[i, :])
         triangles[i, :, 1] = np.array(clat_vertices[i, :])
 
-    if params.plot:
-        cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat, title=c_idx)
+    if params.plot or params.plot_output:
+
+        output_fn = params.path_output + str(c_idx) + ".png"
+        cart_plot.lat_lon_icon(topo, triangles, ncells=ncells, clon=clon, clat=clat, title=c_idx, fn = output_fn, output_fig = True)
 
 # %%
     tri_idx = 0
@@ -122,6 +124,7 @@ def do_cell(c_idx,
     sa = interface.second_appx(nhi, nhj, params, topo, tri)
 
     dplot = diagnostics.diag_plotter(params, nhi, nhj)
+    dplot.output_dir = params.path_output
 
 
     tri.tri_lon_verts = triangles[:, :, 0]
@@ -244,9 +247,9 @@ if __name__ == '__main__':
 
     # lazy_results = []
 
-    # for c_idx in range(n_cells)[:20]:
-    # for c_idx in range(n_cells)[180:190]:
-    for c_idx in range(n_cells)[2046:2060]:
+    for c_idx in range(n_cells)[15455:]:
+    # # for c_idx in range(n_cells)[180:190]:
+    # for c_idx in range(n_cells)[2046:2060]:
         pw_run(c_idx)
     #     lazy_result = dask.delayed(pw_run)(c_idx)
     #     lazy_results.append(lazy_result)

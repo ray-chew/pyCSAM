@@ -427,3 +427,4 @@ def lat_lon_icon(
     # -- maximize and save the PNG file
     if output_fig:
         plt.savefig(fn, bbox_inches="tight", dpi=200)
+        plt.close()

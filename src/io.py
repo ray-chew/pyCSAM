@@ -170,6 +170,7 @@ class ncdata(object):
 
             self.merit_cg = params.merit_cg
             self.split_EW = False
+            self.prev_MERIT = False
 
             if not is_parallel:
                 self.get_topo(cell)
@@ -193,8 +194,12 @@ class ncdata(object):
             lat_min_idx = self.__compute_idx(self.lat_verts.min(), "min", "lat")
             lat_max_idx = self.__compute_idx(self.lat_verts.max(), "max", "lat")
 
-            lon_min_idx = self.__compute_idx(min_lon, "min", "lon")
-            lon_max_idx = self.__compute_idx(max_lon, "max", "lon")
+            if not self.split_EW:
+                lon_min_idx = self.__compute_idx(min_lon, "min", "lon")
+                lon_max_idx = self.__compute_idx(max_lon, "max", "lon")
+            else:
+                lon_min_idx = self.__compute_idx(min_lon, "max", "lon")
+                lon_max_idx = self.__compute_idx(max_lon, "min", "lon")
 
             if ( (self.lon_verts.max() - self.lon_verts.min()) > 180.0 ):
                 lon_idx_rng = list(range(lon_max_idx, len(self.fn_lon) - 1 )) + list(range(0,lon_min_idx + 1))
@@ -227,8 +232,8 @@ class ncdata(object):
             if typ == "min":
                 if ((vert - fn_int[where_idx]) < 0.0):
                     if direction == "lon":
-                        if not self.split_EW:
-                            where_idx -= 1
+                        # if not self.split_EW:
+                        where_idx -= 1
                     else:
                         where_idx += 1
             elif typ == "max":
@@ -239,7 +244,7 @@ class ncdata(object):
                     else:
                         where_idx -= 1
 
-                if where_idx == (len(fn_int) - 1):
+                if (where_idx == (len(fn_int) - 1)) and self.split_EW:
                     where_idx -= 1
 
             where_idx = int(where_idx)
@@ -444,6 +449,18 @@ class ncdata(object):
                         cell.lat += lat[lat_low:lat_high].tolist()
                     if n_row == 0:
                         cell.lon += lon[lon_low:lon_high].tolist()
+
+                        # current dataset at n_row = 0 is a MERIT dataset
+                        if "MERIT" in fn:
+                            self.prev_merit = True
+
+                    # topographic data is read over MERIT and REMA interface:
+                    if n_row > 0:
+                        if ("REMA" in fn) and (self.prev_merit):
+                            pass
+
+
+
 
                     lon_sz = lon_high - lon_low
                     lat_sz = lat_high - lat_low

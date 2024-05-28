@@ -7,8 +7,6 @@ params = var.params()
 params.fn_output = "icon_merit_reg"
 utils.transfer_attributes(params, local_paths.paths, prefix="path")
 
-print(True)
-
 ### alaska
 params.lat_extent = [48.0, 64.0, 64.0]
 params.lon_extent = [-148.0, -148.0, -112.0]
@@ -40,4 +38,5 @@ params.dfft_first_guess = False
 params.refine = False
 params.verbose = False
 
-params.plot = True
+params.plot = False
+params.plot_output = True
