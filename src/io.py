@@ -170,7 +170,7 @@ class ncdata(object):
 
             self.merit_cg = params.merit_cg
             self.split_EW = False
-            self.prev_MERIT = False
+            self.span = False
 
             if not is_parallel:
                 self.get_topo(cell)
@@ -448,19 +448,22 @@ class ncdata(object):
                     if n_col == 0:
                         cell.lat += lat[lat_low:lat_high].tolist()
                     if n_row == 0:
-                        cell.lon += lon[lon_low:lon_high].tolist()
 
-                        # current dataset at n_row = 0 is a MERIT dataset
-                        if "MERIT" in fn:
-                            self.prev_merit = True
+                        if "MERIT" in fns and "REMA" in fns:
+                            self.span = True
+                            # new_lon = 
 
-                    # topographic data is read over MERIT and REMA interface:
-                    if n_row > 0:
-                        if ("REMA" in fn) and (self.prev_merit):
-                            pass
+                        else:
+                            cell.lon += lon[lon_low:lon_high].tolist()
 
+                    #     # current dataset at n_row = 0 is a MERIT dataset
+                    #     if "MERIT" in fn:
+                    #         self.merit = True
 
-
+                    # # topographic data is read over MERIT and REMA interface:
+                    # if n_row > 0:
+                    #     if ("REMA" in fn) and (self.prev_merit):
+                        
 
                     lon_sz = lon_high - lon_low
                     lat_sz = lat_high - lat_low
