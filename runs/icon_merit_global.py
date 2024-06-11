@@ -212,7 +212,8 @@ def parallel_wrapper(grid, params, reader, writer):
 from pycsam.inputs.icon_regional_run import params
 
 from dask.distributed import Client
-import dask
+import dask.bag as db
+# import dask
 
 # dask.config.set(scheduler='synchronous') 
 
@@ -247,12 +248,16 @@ if __name__ == '__main__':
 
     lazy_results = []
 
-    for c_idx in range(n_cells):
-        # pw_run(c_idx)
-        lazy_result = dask.delayed(pw_run)(c_idx)
-        lazy_results.append(lazy_result)
+    b = db.from_sequence(range(n_cells), npartitions=10)
+    results = b.map(pw_run)
+    results = results.compute()
 
-    results = dask.compute(*lazy_results)
+    # for c_idx in range(n_cells):
+    #     # pw_run(c_idx)
+    #     lazy_result = dask.delayed(pw_run)(c_idx)
+    #     lazy_results.append(lazy_result)
+
+    # results = dask.compute(*lazy_results)
 
     for item in results:
         writer.duplicate(item.c_idx, item)

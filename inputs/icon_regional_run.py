@@ -27,7 +27,8 @@ params.merit_cg = 50
 params.nhi = 24
 params.nhj = 48
 
-params.n_modes = 50
+params.n_modes = 10
+params.padding = 10
 
 params.U, params.V = 10.0, 0.0
 
