@@ -498,6 +498,9 @@ class ncdata(object):
 
                 new_lon = np.linspace(new_min, new_max, new_sz)
 
+                merit_dat.close()
+                rema_dat.close()
+
                 return new_lon
 
 
