@@ -211,8 +211,8 @@ def parallel_wrapper(grid, params, reader, writer):
 # autoreload()
 from pycsam.inputs.icon_regional_run import params
 
-# from dask.distributed import Client
-# import dask
+from dask.distributed import Client
+import dask
 
 # dask.config.set(scheduler='synchronous') 
 
@@ -243,18 +243,16 @@ if __name__ == '__main__':
 
     # NetCDF-4 reader does not work well with multithreading
     # Use only 1 thread per worker! (At least on my laptop)
-    # client = Client(threads_per_worker=1, n_workers=8)
+    client = Client(threads_per_worker=1, n_workers=2)
 
-    # lazy_results = []
+    lazy_results = []
 
-    for c_idx in range(n_cells)[15455:]:
-    # # for c_idx in range(n_cells)[180:190]:
-    # for c_idx in range(n_cells)[2046:2060]:
-        pw_run(c_idx)
-    #     lazy_result = dask.delayed(pw_run)(c_idx)
-    #     lazy_results.append(lazy_result)
+    for c_idx in range(n_cells):
+        # pw_run(c_idx)
+        lazy_result = dask.delayed(pw_run)(c_idx)
+        lazy_results.append(lazy_result)
 
-    # results = dask.compute(*lazy_results)
+    results = dask.compute(*lazy_results)
 
-    # for item in results:
-    #     writer.duplicate(item.c_idx, item)
+    for item in results:
+        writer.duplicate(item.c_idx, item)
