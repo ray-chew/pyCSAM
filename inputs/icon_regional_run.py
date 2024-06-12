@@ -21,13 +21,13 @@ params.lon_extent = [-77.0, -50.0, -50.0]
 
 params.tri_set = [13, 104, 105, 106]
 
-params.merit_cg = 50
+params.merit_cg = 100
 
 # Setup the Fourier parameters and object.
 params.nhi = 24
 params.nhj = 48
 
-params.n_modes = 10
+params.n_modes = 50
 params.padding = 10
 
 params.U, params.V = 10.0, 0.0

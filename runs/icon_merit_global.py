@@ -209,11 +209,12 @@ def parallel_wrapper(grid, params, reader, writer):
 # %%
 
 # autoreload()
-from pycsam.inputs.icon_regional_run import params
+from pycsam.inputs.icon_global_run import params
 
 from dask.distributed import Client
-import dask.bag as db
-# import dask
+# from dask.diagnostics import ProgressBar
+# import dask.bag as db
+import dask
 
 # dask.config.set(scheduler='synchronous') 
 
@@ -228,9 +229,6 @@ if __name__ == '__main__':
     # reader.read_dat(params.path_compact_grid, grid)
     reader.read_dat(params.path_icon_grid, grid)
 
-    # writer object
-    writer = io.nc_writer(params)
-
     clat_rad = np.copy(grid.clat)
     clon_rad = np.copy(grid.clon)
 
@@ -238,26 +236,33 @@ if __name__ == '__main__':
 
     n_cells = grid.clat.size
 
-    print(n_cells)
-
-    pw_run = parallel_wrapper(grid, params, reader, writer)
-
     # NetCDF-4 reader does not work well with multithreading
     # Use only 1 thread per worker! (At least on my laptop)
     client = Client(threads_per_worker=1, n_workers=2)
 
-    lazy_results = []
+    print(n_cells)
 
-    b = db.from_sequence(range(n_cells), npartitions=10)
-    results = b.map(pw_run)
-    results = results.compute()
+    chunk_sz = 50
+    for chunk in range(0, n_cells, chunk_sz):
+    # writer object
+        sfx = "_" + str(chunk+chunk_sz)
+        writer = io.nc_writer(params, sfx)
 
-    # for c_idx in range(n_cells):
-    #     # pw_run(c_idx)
-    #     lazy_result = dask.delayed(pw_run)(c_idx)
-    #     lazy_results.append(lazy_result)
+        pw_run = parallel_wrapper(grid, params, reader, writer)
 
-    # results = dask.compute(*lazy_results)
+        lazy_results = []
 
-    for item in results:
-        writer.duplicate(item.c_idx, item)
+        # with ProgressBar():
+        #     b = db.from_sequence(range(chunk), npartitions=100)
+        #     results = b.map(pw_run)
+        #     results = results.compute()
+
+        for c_idx in range(chunk, chunk+chunk_sz):
+            # pw_run(c_idx)
+            lazy_result = dask.delayed(pw_run)(c_idx)
+            lazy_results.append(lazy_result)
+
+        results = dask.compute(*lazy_results)
+
+        for item in results:
+            writer.duplicate(item.c_idx, item)

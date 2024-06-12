@@ -1,32 +1,43 @@
 import numpy as np
-from src import var
+from ..src import var, utils
+from ..inputs import local_paths
 
 params = var.params()
 
-params.output_path = "/home/ray/git-projects/spec_appx/outputs/"
-params.output_fn = "icon_merit_reg"
-params.fn_grid = "../data/icon_compact.nc"
-params.fn_topo = "../data/topo_compact.nc"
+params.fn_output = "icon_merit_global"
+utils.transfer_attributes(params, local_paths.paths, prefix="path")
+
+### alaska
+params.lat_extent = [48.0, 64.0, 64.0]
+params.lon_extent = [-148.0, -148.0, -112.0]
+
+### Tierra del Fuego
+params.lat_extent = [-38.0, -56.0, -56.0]
+params.lon_extent = [-76.0, -76.0, -53.0]
 
 ### South Pole
-params.lat_extent = None
-params.lon_extent = None
+params.lat_extent = [-75.0, -61.0, -61.0]
+params.lon_extent = [-77.0, -50.0, -50.0]
 
 params.tri_set = [13, 104, 105, 106]
+
+params.merit_cg = 100
 
 # Setup the Fourier parameters and object.
 params.nhi = 24
 params.nhj = 48
 
 params.n_modes = 50
+params.padding = 10
 
 params.U, params.V = 10.0, 0.0
 
 params.rect = True
 
 params.debug = False
-params.dfft_first_guess = True
+params.dfft_first_guess = False
 params.refine = False
 params.verbose = False
 
-params.plot = True
+params.plot = False
+params.plot_output = False

@@ -403,7 +403,7 @@ def lat_lon_icon(
     )
     ax.add_collection(coll)
 
-    print("--> polygon collection done")
+    # print("--> polygon collection done")
 
     if annotate_idxs:
         ncells = kwargs["ncells"]

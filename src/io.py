@@ -50,13 +50,13 @@ class ncdata(object):
 
         df.close()
 
-    def open(self, fn):
-        self.df = nc.Dataset(fn, "r")
-        self.is_open = True
+    # def open(self, fn):
+    #     self.df = nc.Dataset(fn, "r")
+    #     self.is_open = True
 
-    def close(self):
-        if self.is_open and hasattr(self, "df"):
-            self.df.close()
+    # def close(self):
+    #     if self.is_open and hasattr(self, "df"):
+    #         self.df.close()
 
     def __get_truths(self, arr, vert_pts, d_pts):
         """Assembles Boolean array selecting for data points within a given lat-lon range, including padded boundary."""
@@ -770,9 +770,9 @@ class writer(object):
 
 class nc_writer(object):
 
-    def __init__(self, params):
+    def __init__(self, params, sfx=""):
 
-        self.fn = params.fn_output
+        self.fn = params.fn_output + str(sfx)
 
         if self.fn[-3:] != ".nc":
             self.fn += '.nc'
