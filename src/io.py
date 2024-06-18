@@ -463,6 +463,9 @@ class ncdata(object):
 
                 iint = self.merit_cg
 
+                if max(cell.lat) < -85.0:
+                    iint *= 5
+
                 cell.lat = utils.sliding_window_view(
                     np.sort(cell.lat), (iint,), (iint,)
                 ).mean(axis=-1)
@@ -777,6 +780,7 @@ class nc_writer(object):
         if self.fn[-3:] != ".nc":
             self.fn += '.nc'
 
+        self.fn = 'datasets/' + self.fn
         self.path = params.path_output
         self.rect_set = params.rect_set
         self.debug = params.debug_writer

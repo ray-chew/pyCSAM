@@ -212,7 +212,6 @@ def parallel_wrapper(grid, params, reader, writer):
 from pycsam.inputs.icon_global_run import params
 
 from dask.distributed import Client
-# from dask.diagnostics import ProgressBar
 # import dask.bag as db
 import dask
 
@@ -242,8 +241,9 @@ if __name__ == '__main__':
 
     print(n_cells)
 
-    chunk_sz = 50
-    for chunk in range(0, n_cells, chunk_sz):
+    chunk_sz = 100
+    chunk_start = 0
+    for chunk in range(chunk_start, n_cells, chunk_sz):
     # writer object
         sfx = "_" + str(chunk+chunk_sz)
         writer = io.nc_writer(params, sfx)
