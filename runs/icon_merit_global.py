@@ -241,8 +241,8 @@ if __name__ == '__main__':
 
     print(n_cells)
 
-    chunk_sz = 100
-    chunk_start = 0
+    chunk_sz = 10
+    chunk_start = 20400
     for chunk in range(chunk_start, n_cells, chunk_sz):
     # writer object
         sfx = "_" + str(chunk+chunk_sz)
@@ -256,8 +256,12 @@ if __name__ == '__main__':
         #     b = db.from_sequence(range(chunk), npartitions=100)
         #     results = b.map(pw_run)
         #     results = results.compute()
+        if chunk+chunk_sz > n_cells:
+            chunk_end = n_cells
+        else:
+            chunk_end = chunk+chunk_sz
 
-        for c_idx in range(chunk, chunk+chunk_sz):
+        for c_idx in range(chunk, chunk_end):
             # pw_run(c_idx)
             lazy_result = dask.delayed(pw_run)(c_idx)
             lazy_results.append(lazy_result)
