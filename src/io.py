@@ -870,6 +870,32 @@ class nc_writer(object):
 
         rootgrp.close()
 
+
+    @staticmethod
+    def read_dat(path, fn, id, struct):
+        try:
+            rootgrp = nc.Dataset(path + fn, "a", format="NETCDF4")
+        except:
+            return False
+        
+        grp = rootgrp[str(id)]
+
+        struct.is_land = grp["is_land"][:]
+        struct.clat    = grp["clat"][:]
+        struct.clon    = grp["clon"][:]
+
+        if struct.is_land:
+            struct.dk = grp["dk"][:]
+            struct.dl = grp["dl"][:]
+
+            struct.ampls = grp["H_spec"][:]
+            struct.kks = grp["kks"][:]
+            struct.lls = grp["lls"][:]
+
+        rootgrp.close()
+
+        return True
+
     class grp_struct(object):
         def __init__(self, c_idx, clat, clon, is_land, analysis = None):
             self.c_idx = c_idx
